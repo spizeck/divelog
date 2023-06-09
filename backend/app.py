@@ -1,29 +1,19 @@
-import re
-from datetime import datetime
-
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+import os
+from sqlalchemy import text
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-
-@app.route("/")
-def home():
-    return "Hello, Flask!"
-
-
-@app.route("/hello/<name>")
-def hello_there(name):
-    now = datetime.now()
-    formatted_now = now.strftime("%A, %d %B, %Y at %X")
-
-    # Filter the name argument to letters only using regular expressions. URL arguments
-    # can contain arbitrary text, so we restrict to safe characters only.
-    match_object = re.match("[a-zA-Z]+", name)
-
-    if match_object:
-        clean_name = match_object.group(0)
-    else:
-        clean_name = "Friend"
-
-    content = "Hello there, " + clean_name + "! It's " + formatted_now
-    return content
+@app.route('/')
+def test_connection():
+    try:
+        # Perform a simple query to test the database connection
+        stmt = text('SELECT 1')
+        db.session.execute(stmt)
+        return 'Database connection successful'
+    except Exception as e:
+        return f'Error connecting to database: {str(e)}'
