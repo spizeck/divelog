@@ -1,6 +1,7 @@
 from flask import Flask
 from models.database import init_db
 from models.dives import Dive
+import models.tester
 import os
 from dotenv import load_dotenv
 # from models.sightings import Sighting
@@ -30,3 +31,9 @@ def test_connection():
         return 'Database connection successful'
     except Exception as e:
         return f'Error connecting to database: {str(e)}'
+    
+@app.route('/table_tester')
+def check_tables(): 
+    models.tester.create_table_if_not_exists()
+    models.tester.read_entries()
+    return 'actions completed'
