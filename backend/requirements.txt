@@ -1,0 +1,4 @@
+dotenv
+flask-cors
+flask
+sqlalchemy

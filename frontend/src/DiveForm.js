@@ -19,65 +19,79 @@ const DiveForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Perform form submission logic here, e.g., send data to backend API
+    
+    // Send an HTTP POST request to the Flask API endpoint
 
-    // Reset form data
-    setFormData({
-      date: '',
-      diveNumber: '',
-      boat: '',
-      diveGuide: '',
-      diveSite: '',
+    fetch('http://localhost:5000/dives', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log('Dive logged successfully');
+
+      // Reset form data or show a success message
+      } else {
+       console.error('Failed to create dive');
+      // Handle the error or show an error message
+      }
+    })
+    .catch((error) => {
+      console.error('An error occurred:', error);
+      // Handle the error or show an error message
     });
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Date:
+    <form onSubmit={handleSubmit} className="form-container">
+      <div className="form-group">
+        <label>Date:</label>
         <input
-          type="text"
+          type="date"
           name="date"
           value={formData.date}
           onChange={handleChange}
         />
-      </label>
-      <label>
-        Dive Number:
+      </div>
+      <div className="form-group">
+        <label>Dive Number:</label>
         <input
           type="text"
           name="diveNumber"
           value={formData.diveNumber}
           onChange={handleChange}
         />
-      </label>
-      <label>
-        Boat:
+      </div>
+      <div className="form-group">
+        <label>Boat:</label>
         <input
           type="text"
           name="boat"
           value={formData.boat}
           onChange={handleChange}
         />
-      </label>
-      <label>
-        Dive Guide:
+      </div>
+      <div className="form-group">
+        <label>Dive Guide:</label>
         <input
           type="text"
           name="diveGuide"
           value={formData.diveGuide}
           onChange={handleChange}
         />
-      </label>
-      <label>
-        Dive Site:
+      </div>
+      <div className="form-group">
+        <label>Dive Site:</label>
         <input
           type="text"
           name="diveSite"
           value={formData.diveSite}
           onChange={handleChange}
         />
-      </label>
+      </div>
       <button type="submit">Submit</button>
     </form>
   );

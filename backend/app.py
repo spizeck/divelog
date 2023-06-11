@@ -1,4 +1,5 @@
-from flask import Flask
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from models.database import init_db
 from models.dives import Dive
 import models.tester
@@ -9,6 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -37,3 +39,22 @@ def check_tables():
     models.tester.create_table_if_not_exists()
     models.tester.read_entries()
     return 'actions completed'
+
+@app.route('/dives', methods=['POST'])
+def create_dive():
+    # Extract form data from the request
+    data = request.json
+
+    # Create a new Dive instance and populate it with form data
+    dive = Dive(
+        date=data['date'],
+        dive_number=data['diveNumber'],
+        boat=data['boat'],
+        dive_guide=data['diveGuide'],
+        dive_site=data['diveSite']
+    )
+
+    # Save the dive to the database
+    dive.save()
+
+    return jsonify({'message': 'Dive created successfully'}), 201
