@@ -11,13 +11,7 @@ class Dive(Base):
     dive_guide = Column(String)
     dive_site = Column(String)
 
-    def __init__(self, date, dive_number, boat, dive_guide, dive_site):
-        self.date = date
-        self.dive_number = dive_number
-        self.boat = boat
-        self.dive_guide = dive_guide
-        self.dive_site = dive_site
-
+    @staticmethod
     def save(self):
         db_session.add(self)
         db_session.commit()

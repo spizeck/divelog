@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from .database import db_session, Base
 
@@ -10,13 +10,9 @@ class Sightings(Base):
     count = Column(Integer, nullable=False)
     dive_id = Column(Integer, ForeignKey('dives.id'), nullable=False)
     
-    dive = relationship('Dive', backref='sightings')
+    dive = relationship('Dive', back_populates='sightings')
 
-    def __init__(self, species, count, dive):
-        self.species = species
-        self.count = count
-        self.dive = dive
-
+    @staticmethod
     def save(self):
         db_session.add(self)
         db_session.commit()
