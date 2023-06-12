@@ -1,0 +1,18 @@
+.form-container {
+    display: flex;
+    padding: 20pt;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  label {
+    display: block;
+    font-weight: bold;
+  }
+  
+  input[type='date'],
+  input[type='text'] {
+    width: 100%;
+    padding: 0.5rem;
+  }
+  

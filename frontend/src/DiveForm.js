@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { Form, Input, Button } from 'semantic-ui-react';
+import 'semantic-ui-css/semantic.min.css';
+import './Form.css';
 
 const DiveForm = () => {
   const [formData, setFormData] = useState({
@@ -46,54 +49,54 @@ const DiveForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form-container">
-      <div className="form-group">
+    <Form onSubmit={handleSubmit} className="form-container">
+      <Form.Field>
         <label>Date:</label>
-        <input
+        <Input
           type="date"
           name="date"
           value={formData.date}
           onChange={handleChange}
         />
-      </div>
-      <div className="form-group">
+      </Form.Field>
+      <Form.Field>
         <label>Dive Number:</label>
-        <input
+        <Input
           type="text"
           name="diveNumber"
           value={formData.diveNumber}
           onChange={handleChange}
         />
-      </div>
-      <div className="form-group">
+      </Form.Field>
+      <Form.Field>
         <label>Boat:</label>
-        <input
+        <Input
           type="text"
           name="boat"
           value={formData.boat}
           onChange={handleChange}
         />
-      </div>
-      <div className="form-group">
+      </Form.Field>
+      <Form.Field>
         <label>Dive Guide:</label>
-        <input
+        <Input
           type="text"
           name="diveGuide"
           value={formData.diveGuide}
           onChange={handleChange}
         />
-      </div>
-      <div className="form-group">
+      </Form.Field>
+      <Form.Field>
         <label>Dive Site:</label>
-        <input
+        <Input
           type="text"
           name="diveSite"
           value={formData.diveSite}
           onChange={handleChange}
         />
-      </div>
-      <button type="submit">Submit</button>
-    </form>
+      </Form.Field>
+      <Button type="submit">Submit</Button>
+    </Form>
   );
 };
 

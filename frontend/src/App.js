@@ -1,19 +1,16 @@
 import React from 'react';
-import './app.css';
-import Header from './components/Header';
-import Navigation from './components/Navigation';
-import DiveForm from './components/DiveForm';
+// import Header from './Header';
+// import Navigation from './Navigation';
+import DiveForm from './DiveForm';
 import {ReactComponent as Logo} from "./logo.svg"
 
 const App = () => {
   return (
     <div>
-      <Header />
-        <Logo />
-      <Navigation />
-      <main>
-        <DiveForm />
-      </main>
+      {/* <Header /> */}
+      <h1> <Logo /></h1>
+      {/* <Navigation /> */}
+      <DiveForm />
     </div>
   );
 };
