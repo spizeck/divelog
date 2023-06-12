@@ -40,65 +40,60 @@ const DiveForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+  
+    if (step === totalSteps) {
+       
+      // Submit dive data to the /dives endpoint
+  fetch("http://localhost:5000/dives", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(diveFormData),
+  })
+    .then((response) => {
+      if (response.ok) {
+        console.log("Dive logged successfully");
 
-    // Send data to the appropriate endpoints based on the step
+        // Submit sightings data to the /sightings endpoint
+        return fetch("http://localhost:5000/sightings", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(sightingsData),
+        });
+      } else {
+        throw new Error("Failed to create dive");
+      }
+    })
+    .then((response) => {
+      if (response.ok) {
+        console.log("Sightings logged successfully");
 
-    if (step === 1) {
-      // Submit diveFormData to the dives endpoint
-      // Example:
-      // fetch('http://localhost:5000/dives', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(diveFormData),
-      // })
-      //   .then((response) => {
-      //     if (response.ok) {
-      //       console.log('Dive logged successfully');
-      //     } else {
-      //       console.error('Failed to create dive');
-      //     }
-      //   })
-      //   .catch((error) => {
-      //     console.error('An error occurred:', error);
-      //   });
-    } else if (step >= 2 && step <= 4) {
-      // Submit sightingsData to the sightings endpoint
-      // Example:
-      // fetch('http://localhost:5000/sightings', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(sightingsData),
-      // })
-      //   .then((response) => {
-      //     if (response.ok) {
-      //       console.log('Sightings recorded successfully');
-      //     } else {
-      //       console.error('Failed to record sightings');
-      //     }
-      //   })
-      //   .catch((error) => {
-      //     console.error('An error occurred:', error);
-      //   });
+        // Reset form data or show a success message
+      } else {
+        throw new Error("Failed to create sightings");
+      }
+    })
+    .catch((error) => {
+      console.error("An error occurred:", error);
+      // Handle the error or show an error message
+    });
+  
+      return;
     }
-
-    if (step < 4) {
-      setStep(step + 1);
-    } else {
-      console.log('Form submission completed');
-      // Show a success message or navigate to another page
-    }
+  
+    setStep((prevStep) => prevStep + 1);
   };
+  
 
   const handlePrevious = () => {
     if (step > 1) {
       setStep((prevStep) => prevStep - 1);
     }
   };
-  
+
 
   const renderStep = () => {
     switch (step) {

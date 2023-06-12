@@ -20,5 +20,7 @@ def teardown_request(exception=None):
     db_session.remove()
 
 def create_all():
+    from .sightings import Sightings
     with current_app.app_context():
         Base.metadata.create_all(bind=db.engine)
+        Sightings.__table__.create(bind=db.engine)
