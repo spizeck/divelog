@@ -16,10 +16,8 @@ const DiveForm = () => {
   });
 
   const [sightingsData, setSightingsData] = useState({
-    turtles: 0,
-    sharks: 0,
-    groupers: 0,
-    invertebrates: 0,
+    species: '',
+    count: 0,
   });
 
   const handleChange = (e) => {
@@ -40,6 +38,13 @@ const DiveForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Create a new sighting instance using the form data
+    const sighting = {
+      species: sightingsData.species,
+      count: sightingsData.count,
+      dive_id: diveId // replace with variable in a minute
+    }
   
     if (step === totalSteps) {
        
@@ -61,7 +66,7 @@ const DiveForm = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(sightingsData),
+          body: JSON.stringify(sighting),
         });
       } else {
         throw new Error("Failed to create dive");
