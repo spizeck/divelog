@@ -13,6 +13,7 @@ app = Flask(__name__)
 CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Check if the database URL is set
 if not app.config['SQLALCHEMY_DATABASE_URI']:
@@ -26,7 +27,7 @@ create_all(app)
 
 @app.route('/')
 def index():
-    return ('At least that worked...')
+    return 'At least that worked...'
 
 
 @app.route('/test')
@@ -63,27 +64,30 @@ def create_dive():
     return jsonify({'message': 'Dive created successfully', 'diveId': dive_id}), 201
 
 
+import traceback
+
 @app.route("/sightings", methods=["POST"])
 def create_sighting():
     # Extract form data from the request
-    data = request.get_json()
+    data = request.json.get('sightings', [])
     print("Received data:", data)  # Add this line to print the received data
 
-    dive_id = data.get('dive_id')
-    sightings = data.get('sightings')
+    try:
+        for sighting_data in data:
+            # Extract the necessary fields from each sighting data
+            species = sighting_data.get('species')
+            count = sighting_data.get('count')
+            dive_id = sighting_data.get('dive_id')
 
-    if dive_id is None or not isinstance(sightings, list):
-        return jsonify({"error": "Invalid request data"}), 400
-
-    # Create new Sighting instances and populate them with form data
-    for sighting in sightings:
-        species = sighting.get("species")
-        count = sighting.get("count")
-
-        if species is not None and count is not None:
-            sighting_instance = Sightings(
-                species=species, count=count, dive_id=dive_id)
-            sighting_instance.save()  # Use the instance method to save
-
-    return jsonify({"message": "Sightings created successfully"}), 201
-
+            if species is not None and count is not None:
+                sighting_instance = Sightings(
+                    species=species, count=count, dive_id=dive_id)
+                db.session.add(sighting_instance)  # Add the instance to the session
+            else:
+                raise ValueError("Missing required fields in sighting data")
+        
+        db.session.commit()  # Commit the session to save the sightings
+        return {'message': 'Sightings created successfully'}, 201
+    except Exception as e:
+        traceback.print_exc()  # Print the error traceback
+        return {'message': 'Failed to create sightings', 'error': str(e)}, 400

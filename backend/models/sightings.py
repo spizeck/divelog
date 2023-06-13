@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship, Session
+from sqlalchemy.orm import relationship
 from .database import Base, db_session
 
 
@@ -13,6 +13,6 @@ class Sightings(Base):
 
     dive = relationship('Dive', back_populates='sightings')
 
-    def save(self, session: Session = db_session):
+    def save(self, session=db_session):
         session.add(self)
         session.commit()
