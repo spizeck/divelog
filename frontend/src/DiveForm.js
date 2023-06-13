@@ -16,8 +16,10 @@ const DiveForm = () => {
   });
 
   const [sightingsData, setSightingsData] = useState({
-    species: '',
-    count: 0,
+    turtles: 0,
+    sharks: 0,
+    groupers: 0,
+    invertebrates: 0,
   });
 
   const handleChange = (e) => {
@@ -31,14 +33,14 @@ const DiveForm = () => {
     } else if (step >= 2 && step <= totalSteps) {
       setSightingsData((prevData) => ({
         ...prevData,
-        [name]: value,
+        [name]: parseInt(value, 10),
       }));
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+
     if (step === totalSteps) {
       // Submit dive data to the /dives endpoint
       fetch("http://localhost:5000/dives", {
@@ -51,60 +53,61 @@ const DiveForm = () => {
         .then((response) => {
           if (response.ok) {
             console.log("Dive logged successfully");
-  
-            // Get the dive ID from the response
             return response.json();
           } else {
             throw new Error("Failed to create dive");
           }
         })
         .then((data) => {
-          const diveId = data.diveId; // Replace with the actual key name for the dive ID in the response
+          const diveId = data.diveId;
           console.log("Dive ID:", diveId);
-  
+
           // Create a new sighting instance using the form data and the dive ID
-          const sighting = {
-            species: sightingsData.species,
-            count: sightingsData.count,
-            dive_id: diveId,
-          };
-  
+          const sightings = Object.keys(sightingsData).map((species) => {
+            return {
+              species,
+              count: sightingsData[species],
+              dive_id: diveId,
+            };
+          });
+          console.log("Sightings:", sightings);
           // Submit sightings data to the /sightings endpoint
           return fetch("http://localhost:5000/sightings", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(sighting),
+            body: JSON.stringify({ sightings }),
+            
           });
         })
+        
         .then((response) => {
           if (response.ok) {
             console.log("Sightings logged successfully");
-  
-            // Reset form data or show a success message
           } else {
             throw new Error("Failed to create sightings");
           }
         })
         .catch((error) => {
           console.error("An error occurred:", error);
-          // Handle the error or show an error message
+          if (error.response) {
+            console.log("Response data:", error.response.data);
+            console.log("Response status:", error.response.status);
+            console.log("Response headers:", error.response.headers);
+          }
         });
+        
     }
-  
+
     setStep((prevStep) => prevStep + 1);
   };
-  
-
-
 
   const handlePrevious = () => {
     if (step > 1) {
       setStep((prevStep) => prevStep - 1);
     }
   };
-
 
   const renderStep = () => {
     switch (step) {

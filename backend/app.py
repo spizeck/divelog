@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
-# Import create_all function
 from models.database import db, init_db, create_all
 from models.dives import Dive
 from models.sightings import Sightings
@@ -58,13 +57,18 @@ def create_dive():
     db.session.add(dive)
     db.session.commit()
 
-    return jsonify({'message': 'Dive created successfully'}), 201
+    # Fetch the generated dive ID
+    dive_id = dive.id
+
+    return jsonify({'message': 'Dive created successfully', 'diveId': dive_id}), 201
 
 
 @app.route("/sightings", methods=["POST"])
 def create_sighting():
     # Extract form data from the request
     data = request.get_json()
+    print("Received data:", data)  # Add this line to print the received data
+
     dive_id = data.get('dive_id')
     sightings = data.get('sightings')
 
@@ -79,6 +83,7 @@ def create_sighting():
         if species is not None and count is not None:
             sighting_instance = Sightings(
                 species=species, count=count, dive_id=dive_id)
-            sighting_instance.save()  # Save each sighting instance to the database
+            sighting_instance.save()  # Use the instance method to save
 
     return jsonify({"message": "Sightings created successfully"}), 201
+
