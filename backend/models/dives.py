@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date
-from sqlalchemy.orm import relationship
-from .database import db_session, Base
+from sqlalchemy.orm import relationship, Session
+from .database import Base, db_session
 
 class Dive(Base):
     __tablename__ = "dives"
@@ -14,7 +14,6 @@ class Dive(Base):
     
     sightings = relationship('Sightings', back_populates='dive')
 
-    # @staticmethod
-    def save(self):
-        db_session.add(self)
-        db_session.commit()
+    def save(self, session: Session = db_session):
+        session.add(self)
+        session.commit()

@@ -38,60 +38,66 @@ const DiveForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Create a new sighting instance using the form data
-    const sighting = {
-      species: sightingsData.species,
-      count: sightingsData.count,
-      dive_id: diveId // replace with variable in a minute
-    }
   
     if (step === totalSteps) {
-       
       // Submit dive data to the /dives endpoint
-  fetch("http://localhost:5000/dives", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(diveFormData),
-  })
-    .then((response) => {
-      if (response.ok) {
-        console.log("Dive logged successfully");
-
-        // Submit sightings data to the /sightings endpoint
-        return fetch("http://localhost:5000/sightings", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(sighting),
-        });
-      } else {
-        throw new Error("Failed to create dive");
-      }
-    })
-    .then((response) => {
-      if (response.ok) {
-        console.log("Sightings logged successfully");
-
-        // Reset form data or show a success message
-      } else {
-        throw new Error("Failed to create sightings");
-      }
-    })
-    .catch((error) => {
-      console.error("An error occurred:", error);
-      // Handle the error or show an error message
-    });
+      fetch("http://localhost:5000/dives", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(diveFormData),
+      })
+        .then((response) => {
+          if (response.ok) {
+            console.log("Dive logged successfully");
   
-      return;
+            // Get the dive ID from the response
+            return response.json();
+          } else {
+            throw new Error("Failed to create dive");
+          }
+        })
+        .then((data) => {
+          const diveId = data.diveId; // Replace with the actual key name for the dive ID in the response
+          console.log("Dive ID:", diveId);
+  
+          // Create a new sighting instance using the form data and the dive ID
+          const sighting = {
+            species: sightingsData.species,
+            count: sightingsData.count,
+            dive_id: diveId,
+          };
+  
+          // Submit sightings data to the /sightings endpoint
+          return fetch("http://localhost:5000/sightings", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(sighting),
+          });
+        })
+        .then((response) => {
+          if (response.ok) {
+            console.log("Sightings logged successfully");
+  
+            // Reset form data or show a success message
+          } else {
+            throw new Error("Failed to create sightings");
+          }
+        })
+        .catch((error) => {
+          console.error("An error occurred:", error);
+          // Handle the error or show an error message
+        });
     }
   
     setStep((prevStep) => prevStep + 1);
   };
   
+
+
 
   const handlePrevious = () => {
     if (step > 1) {
