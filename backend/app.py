@@ -31,13 +31,17 @@ def index():
 
 
 @app.route('/test')
-def test_connection():
+def test_database_connection():
     try:
         # Perform a simple query to test the database connection
-        dives = Dive.query.all()
-        return 'Database connection successful'
+        dives = db.session.query(Dive).all()
+        sightings = db.session.query(Sightings).all()
+
+        # If the queries executed successfully, the database connection is working
+        return jsonify({'message': 'Database connection successful'}), 200
     except Exception as e:
-        return f'Error connecting to database: {str(e)}'
+        # If there's an exception, there is an issue with the database connection
+        return jsonify({'message': f'Error connecting to database: {str(e)}'}), 500
 
 
 @app.route('/dives', methods=['POST'])
