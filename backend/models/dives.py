@@ -1,4 +1,5 @@
 from extensions import db
+from sqlalchemy.exc import IntegrityError
 
 
 class Dive(db.Model):
@@ -18,12 +19,10 @@ class Dive(db.Model):
         db.session.commit()
         
     def validate_unique(self):
-        if duplicate_dive := Dive.query.filter(
-            Dive.date == self.date,
-            Dive.dive_number == self.dive_number,
-            Dive.boat == self.boat,
-            Dive.dive_guide == self.dive_guide,
-        ).first():
+        if Dive.query.filter_by(
+            date=self.date, 
+            dive_number=self.dive_number,
+            boat=self.boat,
+            dive_guide=self.dive_guide,
+            ).first():
             raise IntegrityError("Dive already exists")
-
-
