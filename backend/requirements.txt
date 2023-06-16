@@ -1,4 +1,6 @@
-dotenv
 flask-cors
 flask
+flask-testing
 sqlalchemy
+pytest
+```
