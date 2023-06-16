@@ -15,8 +15,3 @@ def before_request():
 
 def teardown_request(exception=None):
     db.session.remove()
-
-
-def create_all(app):
-    with app.app_context():
-        app.metadata.create_all(bind=db.engine)

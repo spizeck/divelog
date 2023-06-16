@@ -1,9 +1,9 @@
+from config import app_config
+from extensions import create_all, init_db
 from flask import Flask
 from flask_cors import CORS
-from extensions import init_db, create_all
-from routes.db_routes import register_routes as register_db_routes
 from routes.auth import register_routes as register_auth_routes
-from config import app_config
+from routes.db_routes import register_routes as register_db_routes
 
 
 def create_app():
