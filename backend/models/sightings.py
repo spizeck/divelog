@@ -1,18 +1,15 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
-from extensions import Base, db_session
+from extensions import db
 
-
-class Sightings(Base):
+class Sightings(db.Model):
     __tablename__ = "sightings"
 
-    id = Column(Integer, primary_key=True)
-    species = Column(String, nullable=False)
-    count = Column(Integer, nullable=False)
-    dive_id = Column(Integer, ForeignKey('dives.id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    species = db.Column(db.String, nullable=False)
+    count = db.Column(db.Integer, nullable=False)
+    dive_id = db.Column(db.Integer, db.ForeignKey('dives.id'), nullable=False)
 
-    dive = relationship('Dive', back_populates='sightings')
+    dive = db.relationship('Dive', back_populates='sightings')
 
-    def save(self, session=db_session):
-        session.add(self)
-        session.commit()
+    def save(self):
+        db.session.add(self)
+        db.session.commit()

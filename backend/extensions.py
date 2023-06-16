@@ -1,10 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
 
 db = SQLAlchemy()
-Base = declarative_base()
-db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False))
 
 
 def init_db(app):
@@ -23,4 +19,4 @@ def teardown_request(exception=None):
 
 def create_all(app):
     with app.app_context():
-        Base.metadata.create_all(bind=db.engine)
+        app.metadata.create_all(bind=db.engine)
