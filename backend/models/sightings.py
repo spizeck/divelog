@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from .database import Base, db_session
+from extensions import Base, db_session
 
 
 class Sightings(Base):

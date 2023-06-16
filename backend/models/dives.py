@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import relationship, Session
-from .database import Base, db_session
+from extensions import Base, db_session
 
 class Dive(Base):
     __tablename__ = "dives"
