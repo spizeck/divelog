@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_cors import CORS
 from extensions import db, init_db, create_all
-from routes.db_routes import register_routes
+from routes.db_routes import register_routes as register_db_routes
+from routes.auth import register_routes as register_auth_routes
 from config import app_config
 
 app = Flask(__name__)
@@ -17,7 +18,8 @@ init_db(app)
 create_all(app)
 
 # Register the blueprints
-register_routes(app)
+register_auth_routes(app)
+register_db_routes(app)
 
 if __name__ == '__main__':
     app.run()
