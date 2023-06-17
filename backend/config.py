@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -6,14 +7,13 @@ load_dotenv()
 
 
 class Config:
-    DEBUG = False
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
 
 
 class ProductionConfig(Config):
@@ -21,13 +21,16 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('PRODUCTION_DATABASE_URL')
 
 
-class TestConfig(Config):
+class TestingConfig(Config):
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL')
 
 
 # Create an instance of the appropriate configuration class based on the environment
-app_env = os.environ.get('APP_ENV', 'development')
+app_env = os.environ.get('FLASK_ENV')
 if app_env == 'production':
     app_config = ProductionConfig()
+elif app_env == 'testing':
+    app_config = TestingConfig()
 else:
     app_config = DevelopmentConfig()

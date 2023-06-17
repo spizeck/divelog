@@ -1,12 +1,14 @@
 from flask import Flask
-from config import Config
+from config import app_config
 from errors import register_error_handlers
 from extensions import db
 
-def create_app(config_class=Config):
+def create_app(config_class=app_config):
     app = Flask(__name__)
-    app.config.from_object(config_class)
 
+    # Configure Flask app
+    app.config.from_object(config_class)
+    
     # Initialize Flask extensions
     db.init_app(app)
 

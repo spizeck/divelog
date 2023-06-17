@@ -2,7 +2,7 @@ import unittest
 from datetime import date
 
 from app import create_app, db
-from config import app_config
+from config import TestingConfig
 from models.dives import Dive
 from sqlalchemy.exc import IntegrityError
 
@@ -10,18 +10,20 @@ from sqlalchemy.exc import IntegrityError
 class DivesModelTestCase(unittest.TestCase):
     def setUp(self):
         # Set up any test-specific data or configurations
-        self.app = create_app()
-        self.app.config.from_object(app_config)
+        self.app = create_app(config_class=TestingConfig)
         self.app_context = self.app.app_context()
         self.app_context.push()
-        db.init_app(self.app)
-        db.create_all()
+        self.client = self.app.test_client()
+
+        # Create all database tables if they do not already exist
+        with self.app.app_context():
+            db.create_all()
 
     def tearDown(self):
         # Clean up after each test
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        with self.app.app_context():
+            db.session.remove()
+            db.drop_all()
 
     def test_save_dive(self):
         # Create a new Dive instance
