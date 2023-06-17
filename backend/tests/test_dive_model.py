@@ -3,8 +3,7 @@ from datetime import date
 
 from app import create_app, db
 from config import TestingConfig
-from models.dives import Dive
-from sqlalchemy.exc import IntegrityError
+from models.dives import Dive, DiveIntegrityError
 
 
 class DivesModelTestCase(unittest.TestCase):
@@ -20,10 +19,13 @@ class DivesModelTestCase(unittest.TestCase):
             db.create_all()
 
     def tearDown(self):
-        # Clean up after each test
+         # Clean up after each test
         with self.app.app_context():
-            db.session.remove()
-            db.drop_all()
+            db.session.query(Dive).delete()
+            db.session.commit()
+            
+        # Remove the session
+        db.session.remove()
 
     def test_save_dive(self):
         # Create a new Dive instance
@@ -39,7 +41,7 @@ class DivesModelTestCase(unittest.TestCase):
         dive.save()
 
         # Query the dive from the database
-        saved_dive = Dive.query.get(dive.id)
+        saved_dive = Dive.query.filter_by(dive_number='123').first()
 
         # Assert that the saved dive is not None
         self.assertIsNotNone(saved_dive)
@@ -72,7 +74,7 @@ class DivesModelTestCase(unittest.TestCase):
         )
 
         # Assert that saving the duplicate dive raises an IntegrityError
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises(DiveIntegrityError):
             dive2.save()
 
     # Add more test cases as needed
