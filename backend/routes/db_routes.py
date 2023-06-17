@@ -1,17 +1,16 @@
+from app import db
 from flask import Blueprint, jsonify, request
 from models.dives import Dive
 from models.sightings import Sightings
-from extensions import db
 
-db_routes = Blueprint('db_routes', __name__)
+db_bp = Blueprint('db_bp', __name__, url_prefix='/db')
 
-
-@db_routes.route('/')
+@db_bp.route('/')
 def index():
     return jsonify(message='Welcome to the API')
 
 
-@db_routes.route('/test')
+@db_bp.route('/test')
 def test_database_connection():
     try:
         # Perform a simple query to test the database connection
@@ -25,7 +24,7 @@ def test_database_connection():
         return jsonify(message=f'Error connecting to database: {str(e)}'), 500
 
 
-@db_routes.route('/dives', methods=['POST'])
+@db_bp.route('/dives', methods=['POST'])
 def create_dive():
     # Extract form data from the request
     data = request.json
@@ -49,7 +48,7 @@ def create_dive():
     return jsonify({'message': 'Dive created successfully', 'diveId': dive_id}), 201
 
 
-@db_routes.route("/sightings", methods=["POST"])
+@db_bp.route("/sightings", methods=["POST"])
 def create_sighting():
     # Extract form data from the request
     data = request.json.get('sightings', [])
@@ -73,7 +72,6 @@ def create_sighting():
         return {'message': 'Sightings created successfully'}, 201
     except Exception as e:
         return {'message': 'Failed to create sightings', 'error': str(e)}, 400
-
-
+    
 def register_routes(app):
-    app.register_blueprint(db_routes)
+    app.register_blueprint(db_bp)

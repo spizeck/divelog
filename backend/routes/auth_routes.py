@@ -1,10 +1,10 @@
 from flask import Blueprint, jsonify, request, session
-from extensions import db
 from models.users import User
+from extensions import db
 
-auth_routes = Blueprint('auth_routes', __name__)
+auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 
-@auth_routes.route('/login', methods=['POST'])
+@auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.json
     username = data['username']
@@ -20,7 +20,7 @@ def login():
     token = user.generate_access_token()
     return jsonify(message='Login successful', token=token), 200
 
-@auth_routes.route('/register', methods=['POST'])
+@auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.json
     username = data['username']
@@ -42,14 +42,14 @@ def register():
     
     return jsonify(message='User created successfully'), 201
 
-@auth_routes.route('/logout', methods=['POST'])
+@auth_bp.route('/logout', methods=['POST'])
 def logout():
     # Clear the session
     session.clear()
     
     return jsonify(message='Logout successful'), 200
 
-@auth_routes.route('/forgot_password', methods=['POST'])
+@auth_bp.route('/forgot_password', methods=['POST'])
 def forgot_password():
     data = request.json
     email = data['email']
@@ -70,4 +70,4 @@ def forgot_password():
     return jsonify(message='New password sent to email'), 200
 
 def register_routes(app):
-    app.register_blueprint(auth_routes)
+    app.register_blueprint(auth_bp)

@@ -1,9 +1,8 @@
 import unittest
 from datetime import date
 
-from app import create_app
+from app import create_app, db
 from config import app_config
-from extensions import db
 from models.dives import Dive
 from sqlalchemy.exc import IntegrityError
 
