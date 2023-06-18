@@ -4,6 +4,7 @@ from datetime import datetime
 from app import create_app, db
 from models.users import User
 
+
 class UserModelTestCase(unittest.TestCase):
     def setUp(self):
         # Set up any test-specific data or configurations
@@ -44,7 +45,27 @@ class UserModelTestCase(unittest.TestCase):
         self.assertTrue(saved_user.is_approved)
         self.assertFalse(saved_user.admin)
 
-    # Add more test cases as needed
+    def test_validate_email_format(self):
+        # Test valid and invalid email formats
+        email = 'test@example.com'
+        self.assertTrue(User.validate_email_format(email))
+        email = 'testexample.com'
+        self.assertFalse(User.validate_email_format(email))
 
+    def test_validate_password_strength(self):
+        # Test valid and invalid password strengths
+        password = 'Password1'
+        self.assertTrue(User.validate_password_strength(password))
+        password = 'password'
+        self.assertFalse(User.validate_password_strength(password))
+
+    def test_validate_username(self):
+        # Test valid and invalid usernames
+        username = 'testuser'
+        self.assertTrue(User.validate_username(username))
+        username = 'testuser!'
+        self.assertFalse(User.validate_username(username))
+
+    
 if __name__ == '__main__':
     unittest.main()

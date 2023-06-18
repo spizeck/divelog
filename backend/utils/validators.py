@@ -6,7 +6,7 @@ def validate_email_format(email):
     if re.match(regex, email):
         return True
 
-# Validate password strength
+# Validate password strength (at least 8 characters, 1 uppercase, 1 lowercase, 1 number)
 def validate_password_strength(password):
     regex = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$"
     if re.match(regex, password):

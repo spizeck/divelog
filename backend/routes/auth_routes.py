@@ -26,6 +26,18 @@ def register():
     username = data['username']
     password = data['password']
     
+    # Validate email format
+    if not User.validate_email_format(username):
+        return jsonify(message='Invalid email format'), 400
+    
+    # Validate username
+    if not User.validate_username(username):
+        return jsonify(message='Invalid username'), 400
+    
+    # Validate password strength
+    if not User.validate_password_strength(password):  
+        return jsonify(message='Invalid password'), 400
+    
     # Check if the user exists
     user = User.query.filter_by(username=username).first()
     
