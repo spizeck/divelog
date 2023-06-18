@@ -1,6 +1,6 @@
 from app import db
 from datetime import datetime
-from utils.validators import validate_email_format, validate_password_strength
+from utils.validators import validate_email_format, validate_password_strength, validate_username
 
 class User(db.Model):
     __tablename__ = "users"
@@ -31,3 +31,7 @@ class User(db.Model):
     @staticmethod
     def validate_password_strength(password):
         return validate_password_strength(password)
+    
+    @staticmethod
+    def validate_username(username):
+        return validate_username(username)
