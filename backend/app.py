@@ -18,8 +18,10 @@ def create_app(config_class=app_config):
     # Register blueprints
     from routes.auth_routes import auth_bp
     from routes.db_routes import db_bp
+    from routes.admin_routes import admin_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(db_bp)
+    app.register_blueprint(admin_bp)
 
     return app
 
