@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+from utils.validators import validate_email_format, validate_password_strength
 
 class User(db.Model):
     __tablename__ = "users"
@@ -22,3 +23,11 @@ class User(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+
+    @staticmethod
+    def validate_email_format(email):
+        return validate_email_format(email)
+    
+    @staticmethod
+    def validate_password_strength(password):
+        return validate_password_strength(password)
