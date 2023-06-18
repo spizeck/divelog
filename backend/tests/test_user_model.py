@@ -1,6 +1,5 @@
 import unittest
-from datetime import datetime
-
+from config import TestingConfig
 from app import create_app, db
 from models.users import User
 
@@ -8,7 +7,7 @@ from models.users import User
 class UserModelTestCase(unittest.TestCase):
     def setUp(self):
         # Set up any test-specific data or configurations
-        self.app = create_app()
+        self.app = create_app(config_class=TestingConfig)
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
