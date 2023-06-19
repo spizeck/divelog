@@ -10,16 +10,20 @@ const DiveForm = () => {
   const [step, setStep] = useState(1);
   const totalSteps = 4;
 
+  const [formData, setFormData] = useState(diveFormData);
+  const [sightingData, setSightingData] = useState(sightingsData);
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     if (step === 1) {
-      diveFormData((prevData) => ({
+      setFormData((prevData) => ({
         ...prevData,
         [name]: value,
       }));
     } else if (step >= 2 && step <= totalSteps) {
-      sightingsData((prevData) => ({
+      setSightingData((prevData) => ({
         ...prevData,
         [name]: value,
       }));
@@ -31,16 +35,16 @@ const DiveForm = () => {
 
     if (step === totalSteps) {
       // Submit dive data to the /dives endpoint
-      createDive(diveFormData)
+      createDive(formData)
         .then((response) => {
           const diveId = response.data.id;
           console.log("Dive ID:", diveId);
 
           // Create a new sighting instance using the form data and the dive ID
-          const sightings = Object.entries(sightingsData).map((species) => {
+          const sightings = Object.entries(sightingData).map((species) => {
             return {
               species,
-              count: sightingsData[species],
+              count: sightingData[species],
               dive_id: diveId,
             };
           });
@@ -106,77 +110,56 @@ const DiveForm = () => {
       case 2:
         return (
           <>
-            {Object.entries(sightingsData).map(([key, value]) => (
-              <Form.Field key={key}>
-                <label>{value.label}</label>
-                {value.type === 'select' ? (
-                  <Form.Select
-                    name={key}
-                    options={value.options}
-                    value={sightingsData[key]}
+            {sightingsData
+              .filter((sighting) => sighting.step === step)
+              .map((sighting) => (
+                <Form.Field key={sighting.name}>
+                  <label>{sighting.name}</label>
+                  <input
+                    type="number"
+                    name={sighting.name}
+                    value={sighting.defaultValue}
                     onChange={handleChange}
                   />
-                ) : (
-                  <Input
-                    type={value.type}
-                    name={key}
-                    value={sightingsData[key]}
-                    onChange={handleChange}
-                  />
-                )}
-              </Form.Field>
-            ))}
+                </Form.Field>
+              ))}
           </>
         );
 
       case 3:
         return (
           <>
-            {Object.entries(sightingsData).map(([key, value]) => (
-              <Form.Field key={key}>
-                <label>{value.label}</label>
-                {value.type === 'select' ? (
-                  <Form.Select
-                    name={key}
-                    options={value.options}
-                    value={sightingsData[key]}
+            {sightingsData
+              .filter((sighting) => sighting.step === step)
+              .map((sighting) => (
+                <Form.Field key={sighting.name}>
+                  <label>{sighting.name}</label>
+                  <input
+                    type="number"
+                    name={sighting.name}
+                    value={sighting.defaultValue}
                     onChange={handleChange}
                   />
-                ) : (
-                  <Input
-                    type={value.type}
-                    name={key}
-                    value={sightingsData[key]}
-                    onChange={handleChange}
-                  />
-                )}
-              </Form.Field>
-            ))}
+                </Form.Field>
+              ))}
           </>
         );
       case 4:
         return (
           <>
-            {Object.entries(sightingsData).map(([key, value]) => (
-              <Form.Field key={key}>
-                <label>{value.label}</label>
-                {value.type === 'select' ? (
-                  <Form.Select
-                    name={key}
-                    options={value.options}
-                    value={sightingsData[key]}
+            {sightingsData
+              .filter((sighting) => sighting.step === step)
+              .map((sighting) => (
+                <Form.Field key={sighting.name}>
+                  <label>{sighting.name}</label>
+                  <input
+                    type="number"
+                    name={sighting.name}
+                    value={sighting.defaultValue}
                     onChange={handleChange}
                   />
-                ) : (
-                  <Input
-                    type={value.type}
-                    name={key}
-                    value={sightingsData[key]}
-                    onChange={handleChange}
-                  />
-                )}
-              </Form.Field>
-            ))}
+                </Form.Field>
+              ))}
           </>
         );
       default:
