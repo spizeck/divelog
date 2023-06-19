@@ -25,7 +25,7 @@ const DiveForm = () => {
   });
 
   const [sightingData, setSightingData] = useState(sightingsData);
-
+  const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -69,6 +69,7 @@ const DiveForm = () => {
         .then((response) => {
           if (response.ok) {
             console.log("Sightings logged successfully");
+            setSubmitted(true);
           } else {
             throw new Error("Failed to create sightings");
           }
@@ -80,11 +81,15 @@ const DiveForm = () => {
             console.log("Response status:", error.response.status);
             console.log("Response headers:", error.response.headers);
           }
+
         });
 
     }
 
+    // Set submitted to true to render the confirmation screen
+    
     setStep((prevStep) => prevStep + 1);
+    
   };
 
   const handlePrevious = () => {
@@ -93,7 +98,34 @@ const DiveForm = () => {
     }
   };
 
+  const handleReset = () => {
+    setFormData(diveFormData);
+    setSightingData(sightingsData);
+    setSubmitted(false);
+    setStep(1);
+  };
+
+  const renderConfirmationScreen = () => {
+    return (
+      <div>
+        <h2>Form Submission Successful!</h2>
+        <p>Summary of submitted data:</p>
+        {/* Render a summary of the submitted data */}
+        {Object.entries(formData).map(([key, value]) => (
+          <p key={key}>{value.label}:
+            {value.type === 'select' ? value.options.find(option =>
+              option.value === value.value)?.text : value.value}</p>
+        ))}
+        <Button onClick={handleReset}>Reset Form</Button>
+      </div>
+    );
+  };
+
   const renderStep = () => {
+    if (submitted) {
+      return renderConfirmationScreen();
+    }
+
     switch (step) {
       case 1:
         return (
@@ -178,6 +210,8 @@ const DiveForm = () => {
       default:
         return null;
     }
+
+
   };
 
   return (
