@@ -99,7 +99,6 @@ const DiveForm = () => {
                   <Input
                     type={value.type}
                     name={key}
-                    value={diveFormData[key]}
                     onChange={handleChange}
                   />
                 )}
@@ -118,7 +117,7 @@ const DiveForm = () => {
                   <input
                     type="number"
                     name={sighting.name}
-                    value={sighting.defaultValue}
+                    defaultValue={sighting.defaultValue}
                     onChange={handleChange}
                   />
                 </Form.Field>
@@ -137,7 +136,7 @@ const DiveForm = () => {
                   <input
                     type="number"
                     name={sighting.name}
-                    value={sighting.defaultValue}
+                    defaultValue={sighting.defaultValue}
                     onChange={handleChange}
                   />
                 </Form.Field>
@@ -155,7 +154,7 @@ const DiveForm = () => {
                   <input
                     type="number"
                     name={sighting.name}
-                    value={sighting.defaultValue}
+                    defaultValue={sighting.defaultValue}
                     onChange={handleChange}
                   />
                 </Form.Field>
