@@ -10,7 +10,20 @@ const DiveForm = () => {
   const [step, setStep] = useState(1);
   const totalSteps = 4;
 
-  const [formData, setFormData] = useState(diveFormData);
+  const [formData, setFormData] = useState(() => {
+    const defaultData = {};
+
+    Object.entries(diveFormData).forEach(([key, value]) => {
+      if (value.defaultValue) {
+        defaultData[key] = value.defaultValue;
+      } else {
+        defaultData[key] = "";
+      }
+    });
+
+    return defaultData;
+  });
+
   const [sightingData, setSightingData] = useState(sightingsData);
 
 
@@ -90,15 +103,16 @@ const DiveForm = () => {
                 <label>{value.label} </label>
                 {value.type === 'select' ? (
                   <Form.Select
-                    name={key}
+                    name={value.name}
                     options={value.options}
-                    value={diveFormData[key]}
+                    value={formData[value.name]}
                     onChange={handleChange}
                   />
                 ) : (
                   <Input
                     type={value.type}
-                    name={key}
+                    name={value.name}
+                    value={formData[value.name]}
                     onChange={handleChange}
                   />
                 )}
