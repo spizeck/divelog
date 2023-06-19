@@ -40,4 +40,5 @@ backend/.pytest_cache/
 backend/tests/.pytest_cache/
 
 .pytest_cache/
+backend/tests/__pycache__/
 ```
