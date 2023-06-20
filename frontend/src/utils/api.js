@@ -22,78 +22,87 @@ const API_ENDPOINTS = {
     demoteUser: `admin/users/${userId}/demote`,
     deleteUser: `admin/users/${userId}/delete`,
     // db endpoints
-    createDive: '/dives/entries',
-    createSighting: '/sightings/entries',
+    createDive: '/db/dives/entries',
+    createSighting: '/db/sightings/entries',
 };
 
-// Login endpoint
-export const login = async (username, password) => {
-    try {
-        const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.login}`, {
-            username,
-            password,
-        });
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
+// Set the userId dynamically before each request
+const setUserId = (id) => {
+    userId = id;
 };
 
-// Register endpoint
-export const register = async (username, email, password) => {
-    try {
-        const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.register}`, {
-            username,
-            email,
-            password,
-        });
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
+const api = {
+    // Login endpoint
+    login: async (username, password) => {
+        try {
+            const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.login}`, {
+                username,
+                password,
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response.data;
+        }
+    },
+
+    // Register endpoint
+    register: async (username, email, password) => {
+        try {
+            const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.register}`, {
+                username,
+                email,
+                password,
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response.data;
+        }
+    },
+
+    // Logout endpoint
+    logout: async () => {
+        try {
+            const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.logout}`);
+            return response.data;
+        } catch (error) {
+            throw error.response.data;
+        }
+    },
+
+    // Forgot password endpoint
+    forgotPassword: async (email) => {
+        try {
+            const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.forgotPassword}`, {
+                email,
+            });
+            return response.data;
+        } catch (error) {
+            throw error.response.data;
+        }
+    },
+
+    // Create dive endpoint
+    createDive: async (diveData) => {
+        try {
+            const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.createDive}`, diveData);
+            return response.data;
+        } catch (error) {
+            throw error.response.data;
+        }
+    },
+
+    // Create sighting endpoint
+    createSighting: async (sightingData) => {
+        try {
+            const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.createSighting}`, sightingData);
+            return response.data;
+        } catch (error) {
+            throw error.response.data;
+        }
+    },
+    setUserId,
 };
 
-// Logout endpoint
-export const logout = async () => {
-    try {
-        const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.logout}`);
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
-};
+export default api;
 
-// Forgot password endpoint
-export const forgotPassword = async (email) => {
-    try {
-        const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.forgotPassword}`, {
-            email,
-        });
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
-};
-
-// Create dive endpoint
-export const createDive = async (diveData) => {
-    try {
-        const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.createDive}`, diveData);
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
-};
-
-// Create sighting endpoint
-export const createSighting = async (sightingData) => {
-    try {
-        const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.createSighting}`, sightingData);
-        return response.data;
-    } catch (error) {
-        throw error.response.data;
-    }
-};
-
-// Add more endpoint functions here
-
+// Path: frontend\src\utils\auth.js

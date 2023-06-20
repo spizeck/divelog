@@ -2,16 +2,16 @@ from app import db
 from flask import Blueprint, jsonify, request
 from models.dives import Dive
 from models.sightings import Sightings
+from sqlalchemy import text
 
 db_bp = Blueprint('db_bp', __name__, url_prefix='/db')
 
 
-@db_bp.route('/test')
+@db_bp.route('/test', methods=['GET'])
 def test_database_connection():
     try:
         # Perform a simple query to test the database connection
-        db.session.query(Dive).first()
-        db.session.query(Sightings).first()
+        db.session.execute(text('SELECT 1'))
 
         # If the queries executed successfully, the database connection is working
         return jsonify(message='Database connection successful'), 200

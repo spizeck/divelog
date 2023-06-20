@@ -1,10 +1,12 @@
 const diveFormData = {
     date: {
+        name: "date",
         label: "Date",
         type: "date",
         defaultValue: new Date().toISOString().slice(0, 10),
     },
     diveNumberOptions: {
+        name: "diveNumber",
         label: "Dive Number",
         type: "select",
         options: [
@@ -16,6 +18,7 @@ const diveFormData = {
         ]
     },
     boatOptions: {
+        name: "boatName",
         label: "Boat Name",
         type: "select",
         options: [
@@ -26,11 +29,13 @@ const diveFormData = {
         ]
     },
     diveGuide: {
+        name: "diveGuide",
         label: "Dive Guide",
         type: "text",
         defaultValue: "Jimbob", //user.username,
     },
     diveSiteOptions: {
+        name: "diveSite",
         label: "Dive Site",
         type: "select",
         options: [

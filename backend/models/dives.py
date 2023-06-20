@@ -8,7 +8,7 @@ class DiveIntegrityError(Exception):
 class Dive(db.Model):
     __tablename__ = "dives"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     date = db.Column(db.Date, nullable=False)
     dive_number = db.Column(db.String, nullable=False)
     boat = db.Column(db.String, nullable=False)
