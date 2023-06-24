@@ -56,10 +56,10 @@ const DiveForm = () => {
         console.log("Dive ID:", diveId);
 
           // Create a new sighting instance using the form data and the dive ID
-          const sightings = Object.entries(sightingData).map((species) => {
+          const sightings = Object.entries(sightingData).map(([key, value]) => {
             return {
-              species,
-              count: sightingData[species],
+              species: key,
+              count: value,
               dive_id: diveId,
             };
           });
@@ -69,7 +69,7 @@ const DiveForm = () => {
           return createSighting(sightings);
         })
         .then((response) => {
-          if (response.ok) {
+          if (response.status === 200) {
             console.log("Sightings logged successfully");
             setSubmitted(true);
           } else {
