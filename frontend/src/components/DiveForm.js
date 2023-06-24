@@ -37,10 +37,11 @@ const DiveForm = () => {
         [name]: value,
       }));
     } else if (step >= 2 && step <= totalSteps) {
-      setSightingData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
+      setSightingData((prevData) => 
+        prevData.map(item =>
+          item.name === name ? { ...item, defaultValue: value } : item
+          )
+      );          
     }
   };
 
@@ -54,27 +55,38 @@ const DiveForm = () => {
         const diveId = diveResponse.id;
         console.log("Dive ID:", diveId);
 
+          // Create a new sighting instance using the form data and the dive ID
+          const sightings = Object.entries(sightingData).map((species) => {
+            return {
+              species,
+              count: sightingData[species],
+              dive_id: diveId,
+            };
+          });
+          console.log("Sightings:", sightings);
 
-        // Create a new sighting instance using the form data and the dive ID
-        const sightings = Object.entries(sightingData).map(([species, count]) => ({
-          species,
-          count,
-          dive_id: diveId,
-        }));
-        console.log("Sightings:", sightings);
+          // Submit sightings data to the /sightings endpoint
+          return createSighting(sightings);
+        })
+        .then((response) => {
+          if (response.ok) {
+            console.log("Sightings logged successfully");
+            setSubmitted(true);
+          } else {
+            throw new Error("Failed to create sightings");
+          }
+        })
+        .catch((error) => {
+          console.error("An error occurred:", error);
+          if (error.response) {
+            console.log("Response data:", error.response.data);
+            console.log("Response status:", error.response.status);
+            console.log("Response headers:", error.response.headers);
+          }
 
-        // Submit sightings data to the /sightings endpoint
-        await api.createSighting(sightings);
-        console.log("Sightings response:");
-        setSubmitted(true);
-      } catch (error) {
-        console.error("An error occurred:", error);
-        if (error.response) {
-          console.log("Response data:", error.response.data);
-          console.log("Response status:", error.response.status);
-          console.log("Response headers:", error.response.headers);
-        }
-      }}
+        });
+
+    }
 
         // Set submitted to true to render the confirmation screen
 
