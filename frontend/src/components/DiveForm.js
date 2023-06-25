@@ -28,6 +28,7 @@ const DiveForm = () => {
   const [submitted, setSubmitted] = useState(false);
 
   const handleFormSubmit = (e) => {
+    e.preventDefault();
     handleSubmit(e, formData, sightingData, step, totalSteps, setSubmitted);
   };
 
@@ -39,9 +40,10 @@ const DiveForm = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = (e) => {
+    e.preventDefault();
     if (step < totalSteps) {
-      setStep((prevStep) => prevStep + 1);
+      setStep(step + 1);
     }
   };
 
@@ -81,7 +83,7 @@ const DiveForm = () => {
     switch (step) {
       case 1:
         return (
-          <div className="step">
+          <div>
             <h2>Dive Information</h2>
             {Object.entries(diveFormData).map(([key, value]) => (
               <Form.Field key={key}>
@@ -90,14 +92,14 @@ const DiveForm = () => {
                   <Form.Select
                     name={value.name}
                     options={value.options}
-                    value={formData[value.name]}
+                    value={formData[value.name] || ""}
                     onChange={handleChangeFn}
                   />
                 ) : (
                   <Input
                     type={value.type}
                     name={value.name}
-                    value={formData[value.name]}
+                    value={formData[value.name] || ""}
                     onChange={handleChangeFn}
                   />
                 )}
@@ -107,65 +109,71 @@ const DiveForm = () => {
         );
       case 2:
         return (
-          <div className="step">
+          <div>
             <h2>Sightings</h2>
-            <Form>
               {sightingData
                 .filter((item) => item.step === step)
-                .map((item) => (
-                  <Form.Field key={item.name}>
-                    <label>{item.name}</label>
-                    <Input
-                      type="number"
-                      name={item.name}
-                      value={formData[item.name]}
-                      onChange={handleChangeFn}
-                    />
-                  </Form.Field>
-                ))}
-            </Form>
+                .map((item) => {
+                  const fieldValue = sightingData.find(
+                    (data) => data.name === item.name)?.defaultValue || "";
+                  return (
+                    <Form.Field key={item.name}>
+                      <label>{item.name}</label>
+                      <Input
+                        type="number"
+                        name={item.name}
+                        value={fieldValue}
+                        onChange={handleChangeFn}
+                      />
+                    </Form.Field>
+                  )
+                })}
           </div>
         );
       case 3:
         return (
-          <div className="step">
-            <h2>Sightings</h2>
-            <Form>
+          <div>
+            <h2>Sightings cont.</h2>
               {sightingData
                 .filter((item) => item.step === step)
-                .map((item) => (
-                  <Form.Field key={item.name}>
-                    <label>{item.name}</label>
-                    <Input
-                      type="number"
-                      name={item.name}
-                      value={formData[item.name]}
-                      onChange={handleChangeFn}
-                    />
-                  </Form.Field>
-                ))}
-            </Form>
+                .map((item) => {
+                  const fieldValue = sightingData.find(
+                    (data) => data.name === item.name)?.defaultValue || "";
+                  return (
+                    <Form.Field key={item.name}>
+                      <label>{item.name}</label>
+                      <Input
+                        type="number"
+                        name={item.name}
+                        value={fieldValue}
+                        onChange={handleChangeFn}
+                      />
+                    </Form.Field>
+                  )
+                })}
           </div>
         );
       case 4:
         return (
-          <div className="step">
-            <h2>Sightings</h2>
-            <Form>
+          <div>
+            <h2>Sightings cont.</h2>
               {sightingData
                 .filter((item) => item.step === step)
-                .map((item) => (
-                  <Form.Field key={item.name}>
-                    <label>{item.name}</label>
-                    <Input
-                      type="number"
-                      name={item.name}
-                      value={formData[item.name]}
-                      onChange={handleChangeFn}
-                    />
-                  </Form.Field>
-                ))}
-            </Form>
+                .map((item) => {
+                  const fieldValue = sightingData.find(
+                    (data) => data.name === item.name)?.defaultValue || "";
+                  return (
+                    <Form.Field key={item.name}>
+                      <label>{item.name}</label>
+                      <Input
+                        type="number"
+                        name={item.name}
+                        value={fieldValue}
+                        onChange={handleChangeFn}
+                      />
+                    </Form.Field>
+                  )
+                })}
           </div>
         );
 
@@ -175,13 +183,13 @@ const DiveForm = () => {
   };
 
   return (
-    <div className="form-container">
+    <div>
       <Form onSubmit={handleFormSubmit}>
         {renderStep()}
         <div className="buttons">
-          <Button onClick={handlePrevious}>Previous</Button>
+          <Button type="button" onClick={handlePrevious}>Previous</Button>
           {step < totalSteps ? (
-            <Button onClick={handleNext}>Next</Button>
+            <Button type="button" onClick={handleNext}>Next</Button>
           ) : (
             <Button type="submit">Submit</Button>
           )}

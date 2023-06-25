@@ -40,6 +40,8 @@
     ]
   },
   "devDependencies": {
-    "jest": "^27.5.1"
+    "jest": "^27.5.1",
+    "@babel/plugin-proposal-private-property-in-object": "^7.16.7"
+    
   }
 }
