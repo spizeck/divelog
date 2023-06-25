@@ -50,22 +50,23 @@ def create_sighting():
     data = request.json.get('sightings', [])
 
     try:
+        sightings_to_save = []
         for sighting_data in data:
             # Extract the necessary fields from each sighting data
             species = sighting_data.get('species')
             count = sighting_data.get('count')
             dive_id = sighting_data.get('dive_id')
 
-            if species is not None and count is not None:
+            if species is not None and count is not None and count != 0:
                 sighting_instance = Sightings(
                     species=species, count=count, dive_id=dive_id)
-                # Add the instance to the session
-                db.session.add(sighting_instance)
-            else:
-                raise ValueError("Missing required fields in sighting data")
+                sightings_to_save.append(sighting_instance)
 
-        db.session.commit()  # Commit the session to save the sightings
-        return {'message': 'Sightings created successfully'}, 201
+        if sightings_to_save:
+            db.session.add_all(sightings_to_save)
+            db.session.commit()  # Commit the session to save the sightings
+
+        return {'message': 'Sightings created successfully', 'status': 201}, 201
     except Exception as e:
         return {'message': 'Failed to create sightings', 'error': str(e)}, 400
 

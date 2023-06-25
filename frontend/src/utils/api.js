@@ -100,6 +100,8 @@ const api = {
             throw error.response.data;
         }
     },
+
+    // Set userId endpoint
     setUserId,
 };
 

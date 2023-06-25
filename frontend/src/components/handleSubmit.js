@@ -1,44 +1,46 @@
 import api from "../utils/api";
 
 const handleSubmit = async (e, formData, sightingData, step, totalSteps, setSubmitted) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (step === totalSteps) {
-      // Submit dive data to the /dives endpoint
-      try {
-        const diveResponse = await api.createDive(formData);
-        const diveId = diveResponse.id;
-        console.log("Dive ID:", diveId);
+  if (step === totalSteps) {
+    // Submit dive data to the /dives endpoint
+    try {
+      const diveResponse = await api.createDive(formData);
+      const { diveId } = diveResponse;
+      console.log("Dive ID:", diveId);
 
-          // Create a new sighting instance using the form data and the dive ID
-          const sightings = Object.entries(sightingData).map(([key, value]) => {
-            return {
-              species: key,
-              count: value,
-              dive_id: diveId,
-            };
-          });
-          console.log("Sightings:", sightings);
+      // Create a new sighting instance using the form data and the dive ID
+      const sightings = sightingData.map((item) => {
+        const count = item.count || item.defaultValue;
+        return {
+          species: item.name,
+          count: parseInt(count, 10),
+          dive_id: diveId,
+        };
+      });
 
-          // Submit sightings data to the /sightings endpoint
-            const sightingsResponse = await api.createSightings(sightings);
-            console.log("Sightings response:", sightingsResponse);
+      console.log("Sightings:", sightings);
 
-            if (sightingsResponse.status === 200) {
-                console.log("Sightings logged successfully");
-                setSubmitted(true);
-            } else {
-                throw new Error("Failed to create sightings");
-            }
-        } catch (error) {
-            console.error("An error occurred:", error);
-            if (error.response) {
-                console.log("Response data:", error.response.data);
-                console.log("Response status:", error.response.status);
-                console.log("Response headers:", error.response.headers);
-            }
-        }
+      // Submit sightings data to the /sightings endpoint
+      const sightingsResponse = await api.createSighting({sightings});
+      console.log("Sightings response:", sightingsResponse, sightingsResponse.status);
+
+      if (sightingsResponse.status === 201) {
+        console.log("Sightings logged successfully");
+        setSubmitted(true);
+      } else {
+        throw new Error("Failed to create sightings");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      if (error.response) {
+        console.log("Response data:", error.response.data);
+        console.log("Response status:", error.response.status);
+        console.log("Response headers:", error.response.headers);
+      }
     }
+  }
 };
 
 export default handleSubmit;

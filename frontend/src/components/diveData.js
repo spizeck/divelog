@@ -18,7 +18,7 @@ const diveFormData = {
         ]
     },
     boatOptions: {
-        name: "boatName",
+        name: "boat",
         label: "Boat Name",
         type: "select",
         options: [
