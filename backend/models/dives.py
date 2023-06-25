@@ -1,8 +1,5 @@
 from extensions import db
-
-
-class DiveIntegrityError(Exception):
-    pass
+from errors import DiveIntegrityError
 
 
 class Dive(db.Model):
@@ -31,4 +28,4 @@ class Dive(db.Model):
         ).first():
             # Rollback the session to prevent the duplicate dive from being saved
             db.session.rollback()
-            raise DiveIntegrityError("Dive already exists")
+            raise DiveIntegrityError()

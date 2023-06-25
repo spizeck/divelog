@@ -13,3 +13,7 @@ def register_error_handlers(app):
     # def handle_custom_exception(e):
     #     return "Custom Exception Occurred", 500
 
+class DiveIntegrityError(Exception):
+    def __init__(self, message="Dive already exists"):
+        self.message = message
+        super().__init__(self.message)

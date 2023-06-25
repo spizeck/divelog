@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 from models.dives import Dive
 from models.sightings import Sightings
 from sqlalchemy import text
+from errors import DiveIntegrityError
 
 db_bp = Blueprint('db_bp', __name__, url_prefix='/db')
 
@@ -25,24 +26,35 @@ def create_dive():
     # Extract form data from the request
     data = request.json
 
-    # Create a new Dive instance and populate it with form data
-    dive = Dive(
-        date=data['date'],
-        dive_number=data['diveNumber'],
-        boat=data['boat'],
-        dive_guide=data['diveGuide'],
-        dive_site=data['diveSite']
-    )
+    try:
 
-    # Save the dive to the dive table in the database
-    db.session.add(dive)
-    db.session.commit()
+        # Create a new Dive instance and populate it with form data
+        dive = Dive(
+            date=data['date'],
+            dive_number=data['diveNumber'],
+            boat=data['boat'],
+            dive_guide=data['diveGuide'],
+            dive_site=data['diveSite']
+        )
+        
+        # Validate that the dive is unique
+        dive.validate_unique()
 
-    # Fetch the generated dive ID
-    dive_id = dive.id
+        # Save the dive to the dive table in the database
+        db.session.add(dive)
+        db.session.commit()
 
-    return jsonify({'message': 'Dive created successfully', 'diveId': dive_id}), 201
+        # Fetch the generated dive ID
+        dive_id = dive.id
 
+        return jsonify({'message': 'Dive created successfully', 'diveId': dive_id}), 201
+
+    except DiveIntegrityError as e:
+        return jsonify({'message': str(e)}), 400
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Failed to create dive: {str(e)}'}), 400
 
 @db_bp.route("/sightings/entries", methods=["POST"])
 def create_sighting():
