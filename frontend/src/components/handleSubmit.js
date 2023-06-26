@@ -1,6 +1,15 @@
 import api from "../utils/api";
 
-const handleSubmit = async (e, formData, sightingData, step, totalSteps, setSubmitted) => {
+const handleSubmit = async (
+  e, 
+  formData, 
+  sightingData, 
+  step, 
+  totalSteps, 
+  setSubmitted, 
+  setConfirmationMessage, 
+  setErrorMessage
+  ) => {
   e.preventDefault();
 
   if (step === totalSteps) {
@@ -23,21 +32,25 @@ const handleSubmit = async (e, formData, sightingData, step, totalSteps, setSubm
       console.log("Sightings:", sightings);
 
       // Submit sightings data to the /sightings endpoint
-      const sightingsResponse = await api.createSighting({sightings});
+      const sightingsResponse = await api.createSighting({ sightings });
       console.log("Sightings response:", sightingsResponse, sightingsResponse.status);
 
       if (sightingsResponse.status === 201) {
         console.log("Sightings logged successfully");
+        setConfirmationMessage("Dive logged successfully");
+        setErrorMessage("");
         setSubmitted(true);
       } else {
         throw new Error("Failed to create sightings");
       }
     } catch (error) {
       console.error("An error occurred:", error);
+      setErrorMessage("An error occurred: " + error.message);
       if (error.response) {
         console.log("Response data:", error.response.data);
         console.log("Response status:", error.response.status);
         console.log("Response headers:", error.response.headers);
+        setErrorMessage("An error occurred: " + error.response.data.message);
       }
     }
   }

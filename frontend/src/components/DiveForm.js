@@ -8,7 +8,7 @@ import handleChange from './handleChange';
 import handleSubmit from './handleSubmit';
 
 const DiveForm = () => {
-  const totalSteps = 4;
+  const totalSteps = 5;
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState(() => {
     const defaultData = {};
@@ -26,10 +26,24 @@ const DiveForm = () => {
 
   const [sightingData, setSightingData] = useState(sightingsData);
   const [submitted, setSubmitted] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    handleSubmit(e, formData, sightingData, step, totalSteps, setSubmitted);
+    try {
+      await handleSubmit(e, formData, sightingData, step, totalSteps, setSubmitted, setConfirmationMessage, setErrorMessage);
+    } catch (error) {
+      console.error("An error occurred:", error);
+      if (error.response) {
+        console.log("Response data:", error.response.data);
+        console.log("Response status:", error.response.status);
+        console.log("Response headers:", error.response.headers);
+        setErrorMessage("An error occurred: " + error.response.data.message);
+      } else {
+        setErrorMessage("An error occurred: " + error.message);
+      }
+    }
   };
 
   const handleChangeFn = handleChange(setFormData, setSightingData, step, totalSteps);
@@ -37,6 +51,10 @@ const DiveForm = () => {
   const handlePrevious = () => {
     if (step > 1) {
       setStep((prevStep) => prevStep - 1);
+      if (step === totalSteps) {
+        setErrorMessage("");
+        setConfirmationMessage("");
+      }
     }
   };
 
@@ -47,7 +65,7 @@ const DiveForm = () => {
     }
   };
 
-  const handleReset = () => {
+  const handleReseForm = () => {
     setStep(1);
     setFormData(() => {
       const defaultData = {};
@@ -64,22 +82,12 @@ const DiveForm = () => {
     });
     setSightingData(sightingsData);
     setSubmitted(false);
+    setErrorMessage("");
+    setConfirmationMessage("");
   };
 
-  const renderConfirmationScreen = () => {
-    return (
-      <div className="confirmation">
-        <h2>Thank you for logging your dive!</h2>
-        <Button onClick={handleReset}>Log another dive</Button>
-      </div>
-    );
-  }
-
   const renderStep = () => {
-    if (submitted) {
-      return renderConfirmationScreen();
-    }
-
+  
     switch (step) {
       case 1:
         return (
@@ -105,75 +113,113 @@ const DiveForm = () => {
                 )}
               </Form.Field>
             ))}
+            <p></p>
           </div>
         );
       case 2:
         return (
           <div>
             <h2>Sightings</h2>
-              {sightingData
-                .filter((item) => item.step === step)
-                .map((item) => {
-                  const fieldValue = sightingData.find(
-                    (data) => data.name === item.name)?.defaultValue || "";
-                  return (
-                    <Form.Field key={item.name}>
-                      <label>{item.name}</label>
-                      <Input
-                        type="number"
-                        name={item.name}
-                        value={fieldValue}
-                        onChange={handleChangeFn}
-                      />
-                    </Form.Field>
-                  )
-                })}
+            {sightingData
+              .filter((item) => item.step === step)
+              .map((item) => {
+                const fieldValue = sightingData.find(
+                  (data) => data.name === item.name)?.defaultValue || "";
+                return (
+                  <Form.Field key={item.name}>
+                    <label>{item.name}</label>
+                    <Input
+                      type="number"
+                      name={item.name}
+                      value={fieldValue}
+                      onChange={handleChangeFn}
+                    />
+                  </Form.Field>
+                )
+              })}
+            <p></p>
           </div>
         );
       case 3:
         return (
           <div>
             <h2>Sightings cont.</h2>
-              {sightingData
-                .filter((item) => item.step === step)
-                .map((item) => {
-                  const fieldValue = sightingData.find(
-                    (data) => data.name === item.name)?.defaultValue || "";
-                  return (
-                    <Form.Field key={item.name}>
-                      <label>{item.name}</label>
-                      <Input
-                        type="number"
-                        name={item.name}
-                        value={fieldValue}
-                        onChange={handleChangeFn}
-                      />
-                    </Form.Field>
-                  )
-                })}
+            {sightingData
+              .filter((item) => item.step === step)
+              .map((item) => {
+                const fieldValue = sightingData.find(
+                  (data) => data.name === item.name)?.defaultValue || "";
+                return (
+                  <Form.Field key={item.name}>
+                    <label>{item.name}</label>
+                    <Input
+                      type="number"
+                      name={item.name}
+                      value={fieldValue}
+                      onChange={handleChangeFn}
+                    />
+                  </Form.Field>
+                )
+              })}
+            <p></p>
           </div>
         );
       case 4:
         return (
           <div>
             <h2>Sightings cont.</h2>
-              {sightingData
-                .filter((item) => item.step === step)
-                .map((item) => {
-                  const fieldValue = sightingData.find(
-                    (data) => data.name === item.name)?.defaultValue || "";
-                  return (
-                    <Form.Field key={item.name}>
-                      <label>{item.name}</label>
-                      <Input
-                        type="number"
-                        name={item.name}
-                        value={fieldValue}
-                        onChange={handleChangeFn}
-                      />
-                    </Form.Field>
-                  )
-                })}
+            {sightingData
+              .filter((item) => item.step === step)
+              .map((item) => {
+                const fieldValue = sightingData.find(
+                  (data) => data.name === item.name)?.defaultValue || "";
+                return (
+                  <Form.Field key={item.name}>
+                    <label>{item.name}</label>
+                    <Input
+                      type="number"
+                      name={item.name}
+                      value={fieldValue}
+                      onChange={handleChangeFn}
+                    />
+                  </Form.Field>
+                )
+              })}
+            <p></p>
+          </div>
+        );
+      case 5:
+        return (
+          <div>
+            <h2>Please confirm your dive</h2>
+            <div className="confirmation">
+              <div className="confirmation__item">
+                <h3>Dive Information</h3>
+                <ul>
+                  {Object.entries(diveFormData).map(([key, value]) => (
+                    <li key={key}>
+                      <strong>{value.label}:</strong> {formData[value.name]}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="confirmation__item">
+                <h3>Sightings</h3>
+                <ul>
+                  {sightingData.map((item) => (
+                    <li key={item.name}>
+                      <strong>{item.name}:</strong> {item.defaultValue}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            {/* Display messages here */}
+            <h3>
+              {confirmationMessage && <p className="confirmation-message">{confirmationMessage}</p>}
+              {errorMessage && <p className="error-message">{errorMessage}</p>}
+            </h3>
+            <p></p>
           </div>
         );
 
@@ -187,11 +233,16 @@ const DiveForm = () => {
       <Form onSubmit={handleFormSubmit}>
         {renderStep()}
         <div className="buttons">
+          {step > 1 && !submitted ? (
           <Button type="button" onClick={handlePrevious}>Previous</Button>
+          ) : (
+            <Button type="button" onClick={handleReseForm}>Reset Form</Button>
+          )}
+
           {step < totalSteps ? (
             <Button type="button" onClick={handleNext}>Next</Button>
           ) : (
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={submitted}>Submit</Button>
           )}
         </div>
       </Form>
