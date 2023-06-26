@@ -8,7 +8,7 @@ import handleChange from './handleChange';
 import handleSubmit from './handleSubmit';
 
 const DiveForm = () => {
-  const totalSteps = 5;
+  const totalSteps = 7;
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState(() => {
     const defaultData = {};
@@ -87,7 +87,7 @@ const DiveForm = () => {
   };
 
   const renderStep = () => {
-  
+
     switch (step) {
       case 1:
         return (
@@ -119,7 +119,7 @@ const DiveForm = () => {
       case 2:
         return (
           <div>
-            <h2>Sightings</h2>
+            <h2>Sharks & Turtles</h2>
             {sightingData
               .filter((item) => item.step === step)
               .map((item) => {
@@ -143,7 +143,7 @@ const DiveForm = () => {
       case 3:
         return (
           <div>
-            <h2>Sightings cont.</h2>
+            <h2>Rays & Groupers</h2>
             {sightingData
               .filter((item) => item.step === step)
               .map((item) => {
@@ -167,7 +167,7 @@ const DiveForm = () => {
       case 4:
         return (
           <div>
-            <h2>Sightings cont.</h2>
+            <h2>Urchins</h2>
             {sightingData
               .filter((item) => item.step === step)
               .map((item) => {
@@ -189,6 +189,54 @@ const DiveForm = () => {
           </div>
         );
       case 5:
+        return (
+          <div>
+            <h2>Gastropods</h2>
+            {sightingData
+              .filter((item) => item.step === step)
+              .map((item) => {
+                const fieldValue = sightingData.find(
+                  (data) => data.name === item.name)?.defaultValue || "";
+                return (
+                  <Form.Field key={item.name}>
+                    <label>{item.name}</label>
+                    <Input
+                      type="number"
+                      name={item.name}
+                      value={fieldValue}
+                      onChange={handleChangeFn}
+                    />
+                  </Form.Field>
+                )
+              })}
+            <p></p>
+          </div>
+        );
+      case 6:
+        return (
+          <div>
+            <h2>Other Sightings</h2>
+            {sightingData
+              .filter((item) => item.step === step)
+              .map((item) => {
+                const fieldValue = sightingData.find(
+                  (data) => data.name === item.name)?.defaultValue || "";
+                return (
+                  <Form.Field key={item.name}>
+                    <label>{item.name}</label>
+                    <Input
+                      type="number"
+                      name={item.name}
+                      value={fieldValue}
+                      onChange={handleChangeFn}
+                    />
+                  </Form.Field>
+                )
+              })}
+            <p></p>
+          </div>
+        );
+      case 7:
         return (
           <div>
             <h2>Please confirm your dive</h2>
@@ -234,7 +282,7 @@ const DiveForm = () => {
         {renderStep()}
         <div className="buttons">
           {step > 1 && !submitted ? (
-          <Button type="button" onClick={handlePrevious}>Previous</Button>
+            <Button type="button" onClick={handlePrevious}>Previous</Button>
           ) : (
             <Button type="button" onClick={handleReseForm}>Reset Form</Button>
           )}
