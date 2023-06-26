@@ -13,3 +13,4 @@ pytest
 python-dotenv
 SQLAlchemy
 Werkzeug
+sqlalchemy.dialects.postgresql
