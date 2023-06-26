@@ -27,14 +27,14 @@ class TestingConfig(Config):
 
 
 # Create an instance of the appropriate configuration class based on the environment
-def get_app_config():
-    app_env = os.environ.get('FLASK_ENV')
-    if app_env == 'production':
-        return ProductionConfig()
-    elif app_env == 'testing':
-        return TestingConfig()
-    else:
-        return DevelopmentConfig()
+# def get_app_config():
+#     app_env = os.environ.get('FLASK_ENV')
+#     if app_env == 'production':
+#         return ProductionConfig()
+#     elif app_env == 'testing':
+#         return TestingConfig()
+#     elif app_env == 'development':
+#         return DevelopmentConfig()
 
 
-app_config = get_app_config()
+app_config = ProductionConfig()
