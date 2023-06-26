@@ -12,12 +12,12 @@ class Config:
 
 
 class DevelopmentConfig(Config):
-    DEBUG = True
+    debug = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
 
 
 class ProductionConfig(Config):
-    DEBUG = False
+    debug = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('PRODUCTION_DATABASE_URL')
 
 
@@ -38,4 +38,3 @@ def get_app_config():
 
 
 app_config = get_app_config()
-print(app_config)

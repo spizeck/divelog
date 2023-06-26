@@ -1,7 +1,11 @@
 import axios from 'axios';
 
 // Define the base URL for your API
-const BASE_URL = 'http://localhost:5000/';
+// const apiUrl = process.env.REACT_APP_LOCAL_API; // For local environment
+const apiUrl = process.env.REACT_APP_LIVE_API; // For live environment
+
+// Use the apiUrl variable to make API calls
+
 
 let userId = null; // Set userId to null to avoid error
 
@@ -35,7 +39,7 @@ const api = {
     // Login endpoint
     login: async (username, password) => {
         try {
-            const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.login}`, {
+            const response = await axios.post(`${apiUrl}${API_ENDPOINTS.login}`, {
                 username,
                 password,
             });
@@ -48,7 +52,7 @@ const api = {
     // Register endpoint
     register: async (username, email, password) => {
         try {
-            const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.register}`, {
+            const response = await axios.post(`${apiUrl}${API_ENDPOINTS.register}`, {
                 username,
                 email,
                 password,
@@ -62,7 +66,7 @@ const api = {
     // Logout endpoint
     logout: async () => {
         try {
-            const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.logout}`);
+            const response = await axios.post(`${apiUrl}${API_ENDPOINTS.logout}`);
             return response.data;
         } catch (error) {
             throw error.response.data;
@@ -72,7 +76,7 @@ const api = {
     // Forgot password endpoint
     forgotPassword: async (email) => {
         try {
-            const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.forgotPassword}`, {
+            const response = await axios.post(`${apiUrl}${API_ENDPOINTS.forgotPassword}`, {
                 email,
             });
             return response.data;
@@ -84,7 +88,7 @@ const api = {
     // Create dive endpoint
     createDive: async (diveData) => {
         try {
-            const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.createDive}`, diveData);
+            const response = await axios.post(`${apiUrl}${API_ENDPOINTS.createDive}`, diveData);
             return response.data;
         } catch (error) {
             throw error.response.data;
@@ -94,7 +98,7 @@ const api = {
     // Create sighting endpoint
     createSighting: async (sightingData) => {
         try {
-            const response = await axios.post(`${BASE_URL}${API_ENDPOINTS.createSighting}`, sightingData);
+            const response = await axios.post(`${apiUrl}${API_ENDPOINTS.createSighting}`, sightingData);
             return response.data;
         } catch (error) {
             throw error.response.data;
