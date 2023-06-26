@@ -32,7 +32,7 @@ const diveFormData = {
         name: "diveGuide",
         label: "Dive Guide",
         type: "text",
-        defaultValue: "Jimbob", //user.username,
+        defaultValue: "", //user.username,
     },
     diveSiteOptions: {
         name: "diveSite",
