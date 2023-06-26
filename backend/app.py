@@ -28,7 +28,6 @@ def create_app(config_class=app_config):
     
     # Create database tables
     with app.app_context():
-        db.drop_all() # Remove this line when deploying to production
         db.create_all()
 
     @app.route('/')
