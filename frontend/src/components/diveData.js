@@ -121,13 +121,13 @@ const diveFormData = {
         defaultValue: 0,
         validate: (value) => {
             if (value < 0) {
-                return "Depth must be a positive number";
+                return "Must be a positive number";
             }
             if (value % 1 !== 0) {
-                return "Depth must be a whole number";
+                return "Must be a whole number";
             }
             return "";
-        }
+        },
     },
 };
 
