@@ -10,11 +10,11 @@ const diveFormData = {
         label: "Dive Number",
         type: "select",
         options: [
-            { key: "1", text: "9:00 am", value: "1" },
-            { key: "2", text: "11:00 am", value: "2" },
-            { key: "3", text: "1:00 pm", value: "3" },
-            { key: "4", text: "3:00 pm", value: "4" },
-            { key: "5", text: "Night Dive", value: "5" },
+            { key: "1", text: "9:00 am", value: 1 },
+            { key: "2", text: "11:00 am", value: 2 },
+            { key: "3", text: "1:00 pm", value: 3 },
+            { key: "4", text: "3:00 pm", value: 4 },
+            { key: "5", text: "Night Dive", value: 5 },
         ]
     },
     boatOptions: {
@@ -79,6 +79,20 @@ const diveFormData = {
             { key: "38", text: "Saba Bank", value: "Saba Bank" },
             { key: "39", text: "Blackwater", value: "Blackwater" },
         ]
+    },
+
+    maxDepth: {
+        name: "maxDepth",
+        label: "Max Depth (ft)",
+        type: "number",
+        defaultValue: 0,
+    },
+
+    waterTemperature: {
+        name: "waterTemperature",
+        label: "Water Temperature (F)",
+        type: "number",
+        defaultValue: 0,
     },
 };
 

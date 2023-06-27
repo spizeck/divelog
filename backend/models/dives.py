@@ -7,10 +7,12 @@ class Dive(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     date = db.Column(db.Date, nullable=False)
-    dive_number = db.Column(db.String, nullable=False)
+    dive_number = db.Column(db.Integer, nullable=False)
     boat = db.Column(db.String, nullable=False)
     dive_guide = db.Column(db.String, nullable=False)
     dive_site = db.Column(db.String, nullable=False)
+    max_depth = db.Column(db.Integer, nullable=False)
+    water_temperature = db.Column(db.Integer, nullable=False)
 
     sightings = db.relationship('Sightings', back_populates='dive')
 

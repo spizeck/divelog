@@ -254,7 +254,9 @@ const DiveForm = () => {
               <div className="confirmation__item">
                 <h3>Sightings</h3>
                 <ul>
-                  {sightingData.map((item) => (
+                  {sightingData
+                  .filter((item) => item.defaultValue > 0)
+                  .map((item) => (
                     <li key={item.name}>
                       <strong>{item.name}:</strong> {item.defaultValue}
                     </li>

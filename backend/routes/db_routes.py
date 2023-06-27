@@ -34,7 +34,9 @@ def create_dive():
             dive_number=data['diveNumber'],
             boat=data['boat'],
             dive_guide=data['diveGuide'],
-            dive_site=data['diveSite']
+            dive_site=data['diveSite'],
+            max_depth=data['maxDepth'],
+            water_temperature=data['waterTemperature'],
         )
 
         # Validate that the dive is unique
