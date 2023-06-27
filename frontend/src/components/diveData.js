@@ -4,6 +4,18 @@ const diveFormData = {
         label: "Date",
         type: "date",
         defaultValue: new Date().toISOString().slice(0, 10),
+        validate: (value) => {
+            const today = new Date();
+            const date = new Date(value);
+            const diffTime = Math.abs(date - today);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays > 7) {
+                return "Date must be within the last 7 days";
+            }
+            if (date > today) {
+                return "Date cannot be in the future";
+            }
+        }
     },
     diveNumberOptions: {
         name: "diveNumber",
@@ -33,6 +45,11 @@ const diveFormData = {
         label: "Dive Guide",
         type: "text",
         defaultValue: "", //user.username,
+        validate: (value) => {
+            if (value.length > 20) {
+                return "Dive Guide must be 20 characters or less";
+            }
+        }
     },
     diveSiteOptions: {
         name: "diveSite",
@@ -86,6 +103,15 @@ const diveFormData = {
         label: "Max Depth (ft)",
         type: "number",
         defaultValue: 0,
+        validate: (value) => {
+            if (value < 0) {
+                return "Depth must be a positive number";
+            }
+            if (value % 1 !== 0) {
+                return "Depth must be a whole number";
+            }
+            return "";
+        }
     },
 
     waterTemperature: {
@@ -93,6 +119,15 @@ const diveFormData = {
         label: "Water Temperature (F)",
         type: "number",
         defaultValue: 0,
+        validate: (value) => {
+            if (value < 0) {
+                return "Depth must be a positive number";
+            }
+            if (value % 1 !== 0) {
+                return "Depth must be a whole number";
+            }
+            return "";
+        }
     },
 };
 
