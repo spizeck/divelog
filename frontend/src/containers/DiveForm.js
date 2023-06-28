@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Form, Input, Button } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import '../styles/DiveForm.css'
-import sightingsData from './sightingsData';
-import diveFormData from './diveData';
-import handleChange from './handleChange';
-import handleSubmit from './handleSubmit';
+import sightingsData from '../components/sightingsData';
+import diveFormData from '../components/diveData';
+import handleChange from '../components/handleChange';
+import handleSubmit from '../components/handleSubmit';
 
 const DiveForm = () => {
   const totalSteps = 7;

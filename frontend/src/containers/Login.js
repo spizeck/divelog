@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../styles/Login.css';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -36,7 +37,9 @@ const Login = () => {
 
   return (
     <div className="login-container">
+      
       <form className="login-form" onSubmit={handleLogin}>
+        <h1>Please Log In</h1>
         <input
           type="text"
           placeholder="Username"
@@ -51,6 +54,8 @@ const Login = () => {
         />
         <button type="submit">Log In</button>
         {errorMessage && <div className="error-message">{errorMessage}</div>}
+        <p></p>
+        <button type="button" onClick={() => window.location.href = '/register'}>Register</button>
       </form>
     </div>
   );
