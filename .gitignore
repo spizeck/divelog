@@ -41,5 +41,7 @@ backend/tests/.pytest_cache/
 
 .pytest_cache/
 backend/tests/__pycache__/
-frontend/.env
+
 backend/tests/__pycache__/
+
+frontend/.env

@@ -3,13 +3,16 @@ import React from 'react';
 // import Navigation from './Navigation';
 import DiveForm from './components/DiveForm';
 // import {ReactComponent as Logo} from "./logo.svg"
+import './styles/DiveForm.css'
 
 const App = () => {
   return (
     <div>
       {/* <Header /> */}
       {/* <Navigation /> */}
+      <div className="form-container">
       <DiveForm />
+      </div>
     </div>
   );
 };
