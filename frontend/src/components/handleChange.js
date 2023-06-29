@@ -1,7 +1,8 @@
 // handleChange.js is a function that handles the change of the form data and sighting data
 // handleChange.js is imported into DiveForm.js
+
 const handleChange = (setFormData, setSightingData, setFieldError, setFormError, diveFormData, step, totalSteps) => (e, { name, value }) => {
-  console.log('Changing value of', name, 'to', value, 'in step', step, 'of', totalSteps, 'steps')
+  // console.log('Changing value of', name, 'to', value, 'in step', step, 'of', totalSteps, 'steps')
 
   if (step === 1) {
     setFormData((prevData) => ({
@@ -10,9 +11,9 @@ const handleChange = (setFormData, setSightingData, setFieldError, setFormError,
     }));
     // After updating the state, run validation for this specific input field
     const fieldDefinition = diveFormData[name];
-    const fieldValue = parseFloat(value, 10);
-    console.log('Field Value:', fieldValue);
     if (fieldDefinition) {
+      const fieldValue = fieldDefinition.type === 'number' ? parseFloat(value, 10) : value;
+
       const { validate } = fieldDefinition;
       const error = validate(fieldValue);
 

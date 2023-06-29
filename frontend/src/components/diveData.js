@@ -4,17 +4,19 @@ const diveFormData = {
         label: "Date",
         type: "date",
         defaultValue: new Date().toISOString().slice(0, 10),
+        // Validate that the date is within the last 7 days and not in the future
         validate: (value) => {
-            const today = new Date();
             const date = new Date(value);
-            const diffTime = Math.abs(date - today);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            if (diffDays > 7) {
+            const today = new Date();
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(today.getDate() - 7);
+            if (date > today) {
+                return "Date must not be in the future";
+            }
+            if (date < sevenDaysAgo) {
                 return "Date must be within the last 7 days";
             }
-            if (date > today) {
-                return "Date cannot be in the future";
-            }
+            return null;
         }
     },
     diveNumberOptions: {
@@ -49,6 +51,7 @@ const diveFormData = {
             if (value.length > 20) {
                 return "Dive Guide must be 20 characters or less";
             }
+            return null;
         }
     },
     diveSiteOptions: {
@@ -102,7 +105,7 @@ const diveFormData = {
         name: "maxDepth",
         label: "Max Depth (ft)",
         type: "number",
-        defaultValue: 0,
+        defaultValue: 70,
         validate: (value) => {
             if (value < 0) {
                 return "Depth must be a positive number";
@@ -110,7 +113,10 @@ const diveFormData = {
             if (value % 1 !== 0) {
                 return "Depth must be a whole number";
             }
-            return "";
+            if (value > 200 || value < 15) {
+                return "Please verify your depth";
+            }
+            return null;
         }
     },
 
@@ -118,7 +124,7 @@ const diveFormData = {
         name: "waterTemperature",
         label: "Water Temperature (F)",
         type: "number",
-        defaultValue: 0,
+        defaultValue: 80,
         validate: (value) => {
             if (value < 0) {
                 return "Must be a positive number";
@@ -126,7 +132,10 @@ const diveFormData = {
             if (value % 1 !== 0) {
                 return "Must be a whole number";
             }
-            return "";
+            if (value > 90 || value < 70) {
+                return "Are you sure about that temperature?";
+            }
+            return null;
         },
     },
 };
