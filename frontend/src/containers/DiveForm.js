@@ -28,6 +28,8 @@ const DiveForm = () => {
   const [submitted, setSubmitted] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [fieldError, setFieldError] = useState({});
+  const [formError, setFormError] = useState(false);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -46,7 +48,7 @@ const DiveForm = () => {
     }
   };
 
-  const handleChangeFn = handleChange(setFormData, setSightingData, step, totalSteps);
+  const handleChangeFn = handleChange(setFormData, setSightingData, setFieldError, setFormError, diveFormData, step, totalSteps);
 
   const handlePrevious = () => {
     if (step > 1) {
@@ -111,6 +113,7 @@ const DiveForm = () => {
                     onChange={handleChangeFn}
                   />
                 )}
+                {fieldError[value.name] && <div className="error-message"> {fieldError[value.name]} </div>}
               </Form.Field>
             ))}
             <p></p>
@@ -255,12 +258,12 @@ const DiveForm = () => {
                 <h3>Sightings</h3>
                 <ul>
                   {sightingData
-                  .filter((item) => item.defaultValue > 0)
-                  .map((item) => (
-                    <li key={item.name}>
-                      <strong>{item.name}:</strong> {item.defaultValue}
-                    </li>
-                  ))}
+                    .filter((item) => item.defaultValue > 0)
+                    .map((item) => (
+                      <li key={item.name}>
+                        <strong>{item.name}:</strong> {item.defaultValue}
+                      </li>
+                    ))}
                 </ul>
               </div>
             </div>
@@ -290,7 +293,7 @@ const DiveForm = () => {
           )}
 
           {step < totalSteps ? (
-            <Button type="button" onClick={handleNext}>Next</Button>
+            <Button type="button" onClick={handleNext} disabled={formError} >Next</Button>
           ) : (
             <Button type="submit" disabled={submitted}>Submit</Button>
           )}
