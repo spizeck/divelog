@@ -1,3 +1,4 @@
+from flask_bcrypt import generate_password_hash, check_password_hash
 from app import db
 from datetime import datetime
 from utils.validators import validate_email_format, validate_password_strength, validate_username
@@ -12,6 +13,7 @@ class User(db.Model):
     is_approved = db.Column(db.Boolean, default=False)
     admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    password_hash = db.Column(db.String(255), nullable=False)
 
     def __init__(self, username, email, password, is_approved=False, admin=False):
         self.username = username
@@ -35,3 +37,14 @@ class User(db.Model):
     @staticmethod
     def validate_username(username):
         return validate_username(username)
+    
+    @property
+    def password(self):
+        raise AttributeError("Password is not a readable attribute")
+    
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password).decode("utf-8")
+        
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)

@@ -19,7 +19,7 @@ def create_user(username, email, password, is_approved=False, admin=False):
 
 def get_user_by_id(user_id):
     # Retrieve the user from the database
-    return User.query.get(user_id)
+    return db.session.get(User, user_id)
 
 
 def get_user_by_username(username):

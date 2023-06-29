@@ -15,11 +15,15 @@ def login():
     # Check if the user exists
     user = get_user_by_username(username)
 
-    if user is None or not user.check_password(password):
+    if user is None or not user.verify_password(password):
         return jsonify({'status':401, 'message': 'Invalid credentials'}), 401
 
     # If the user exists, generate an access token for them
     token = user.generate_access_token()
+    
+    # Save the token to the session
+    session['token'] = token
+    
     return jsonify({'status':200, 'message':'Login successful', 'token':token}), 200
 
 
@@ -52,14 +56,20 @@ def register():
     user = create_user(username=username, email=email, password=password)
 
     # Save the user to the database
-    db.session.add(user)
-    db.session.commit()
+    try:
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        return jsonify({'status':500, 'message':e}), 500
+        
 
     return jsonify({'status':201, 'message':'User created successfully'}), 201
 
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
+    # Invalidate the token
+    session.pop('token', None)
     # Clear the session
     session.clear()
 
@@ -77,14 +87,18 @@ def forgot_password():
         return jsonify({'status':404, 'message':'User does not exist'}), 404
 
     # Generate a new password for the user
-    new_password = user.generate_password()
-
+    new_password = User.generate_password()
+    
     user.password = new_password
-    db.session.commit()
-
+    try:
+        db.session.commit()
+    except Exception as e:
+        return jsonify({'status':500, 'message':e}), 500
+    
     # Send the new password to the user's email
     # TODO: Implement email sending
-    return jsonify({'status':200, 'message':'New password sent to email'}), 200
+    # TODO: Replace with a link to reset password
+    return jsonify({'status':200, 'message':'New password has been sent'}), 200
 
 
 def register_routes(app):

@@ -1,6 +1,7 @@
 blinker
 click
 Flask
+flask_bcrypt
 Flask-Cors
 Flask-SQLAlchemy
 Flask-Testing

@@ -40,7 +40,7 @@ class UserModelTestCase(unittest.TestCase):
         # Assert that the saved user attributes match the original values
         self.assertEqual(saved_user.username, 'testuser')
         self.assertEqual(saved_user.email, 'test@example.com')
-        self.assertEqual(saved_user.password, 'password')
+        self.assertTrue(saved_user.verify_password('password'))
         self.assertTrue(saved_user.is_approved)
         self.assertFalse(saved_user.admin)
 

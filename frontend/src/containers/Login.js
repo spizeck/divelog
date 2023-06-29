@@ -14,28 +14,18 @@ const Login = () => {
 
     try {
       // Send login request to the backend
-      const response = await api.login({
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
+      const loginResponse = await api.login(username, password);
 
-      if (response.ok) {
-        // Login successful, redirect to the dashboard or home page
-        window.location.href = '/'; // Replace with the desired URL
-      } else if (response.status === 401) {
-        // Invalid credentials
-        setErrorMessage('Invalid credentials');
-      } else {
-        // Other error
-        setErrorMessage('An error occurred');
+      if (loginResponse.status === 200) {
+        // Login successful, save the token, and re-render the page
+        localStorage.setItem('token', loginResponse.data.token);
+        window.location.reload();
       }
     } catch (error) {
-      console.error(error);
-      setErrorMessage('An error occurred');
+      setErrorMessage(error.message);
     }
+    
+        
   };
 
   return (
