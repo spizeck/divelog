@@ -5,6 +5,7 @@ flask_bcrypt
 Flask-Cors
 Flask-SQLAlchemy
 Flask-Testing
+flask_jwt_extended
 gunicorn
 itsdangerous
 Jinja2

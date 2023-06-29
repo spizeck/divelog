@@ -15,10 +15,11 @@ const Login = () => {
     try {
       // Send login request to the backend
       const loginResponse = await api.login(username, password);
+      console.log(loginResponse);
 
       if (loginResponse.status === 200) {
         // Login successful, save the token, and re-render the page
-        localStorage.setItem('token', loginResponse.data.token);
+        localStorage.setItem('token', loginResponse.token);
         window.location.reload();
       }
     } catch (error) {

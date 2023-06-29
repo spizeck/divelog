@@ -1,9 +1,10 @@
 from flask_bcrypt import generate_password_hash, check_password_hash
+from flask_login import UserMixin, LoginManager
 from app import db
 from datetime import datetime
 from utils.validators import validate_email_format, validate_password_strength, validate_username
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -14,6 +15,7 @@ class User(db.Model):
     admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     password_hash = db.Column(db.String(255), nullable=False)
+      
 
     def __init__(self, username, email, password, is_approved=False, admin=False):
         self.username = username
@@ -25,7 +27,7 @@ class User(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
-
+        
     @staticmethod
     def validate_email_format(email):
         return validate_email_format(email)

@@ -2,6 +2,8 @@ from flask import Blueprint, jsonify, request, session
 from services.user_service import create_user, get_user_by_username, get_user_by_email
 from models.users import User
 from extensions import db
+from flask_jwt_extended import create_access_token
+
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 
@@ -12,14 +14,18 @@ def login():
     username = data['username']
     password = data['password']
 
-    # Check if the user exists
-    user = get_user_by_username(username)
-
+    # Check if the user exists, wrapped in a try block in case of database error
+    try:
+        user = get_user_by_username(username)
+    except Exception as e:
+        return jsonify({'status':500, 'message':e}), 500
+        
+    
     if user is None or not user.verify_password(password):
         return jsonify({'status':401, 'message': 'Invalid credentials'}), 401
 
     # If the user exists, generate an access token for them
-    token = user.generate_access_token()
+    token = create_access_token(identity=user.id)
     
     # Save the token to the session
     session['token'] = token
