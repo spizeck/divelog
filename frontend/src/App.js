@@ -7,7 +7,7 @@ import Login from './containers/Login';
 
 
 const App = () => {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(true);
 
   useEffect(() => {
     if (localStorage.getItem('token')) {
