@@ -29,7 +29,13 @@ const diveFormData = {
             { key: "3", text: "1:00 pm", value: 3 },
             { key: "4", text: "3:00 pm", value: 4 },
             { key: "5", text: "Night Dive", value: 5 },
-        ]
+        ],
+        validate: (value) => {
+            if (value.length === 0) {
+                return "Please select a dive number";
+            }
+            return null;
+        }
     },
     boatOptions: {
         name: "boat",
@@ -40,7 +46,13 @@ const diveFormData = {
             { key: "2", text: "Fin & Tonic", value: "Fin and Tonic " },
             { key: "3", text: "Northern Sky", value: "Northern Sky" },
             { key: "4", text: "Private Boat", value: "Private Boat" },
-        ]
+        ],
+        validate: (value) => {
+            if (value.length === 0) {
+                return "Please select a boat";
+            }
+            return null;
+        }
     },
     diveGuide: {
         name: "diveGuide",
@@ -50,6 +62,9 @@ const diveFormData = {
         validate: (value) => {
             if (value.length > 20) {
                 return "Dive Guide must be 20 characters or less";
+            }
+            if (value.length < 1) {
+                return "Dive Guide is required";
             }
             return null;
         }
@@ -98,7 +113,14 @@ const diveFormData = {
             { key: "37", text: "Ghost Wreck", value: "Ghost Wreck" },
             { key: "38", text: "Saba Bank", value: "Saba Bank" },
             { key: "39", text: "Blackwater", value: "Blackwater" },
-        ]
+        ],
+        validate: (value) => {
+            if (value.length === 0) {
+                return "Please select a dive site";
+            }
+            return null;
+        }
+
     },
 
     maxDepth: {

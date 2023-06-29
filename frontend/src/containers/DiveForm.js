@@ -25,6 +25,7 @@ const DiveForm = () => {
   });
 
   const [sightingData, setSightingData] = useState(sightingsData);
+  // todo: Add otherSightings options
   const [submitted, setSubmitted] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -67,7 +68,7 @@ const DiveForm = () => {
     }
   };
 
-  const handleReseForm = () => {
+  const handleResetForm = () => {
     setStep(1);
     setFormData(() => {
       const defaultData = {};
@@ -101,6 +102,7 @@ const DiveForm = () => {
                 <label className='dive-form-label'>{item.name}</label>
                 <Input className='dive-form-input'
                   type="number"
+                  min="0"
                   name={item.name}
                   value={fieldValue}
                   onChange={handleChangeFn}
@@ -205,20 +207,20 @@ const DiveForm = () => {
     <div>
       <Form onSubmit={handleFormSubmit}>
         <div className='dive-form'>
-        {renderStep()}
-        <div className="buttons">
-          {step > 1 && !submitted ? (
-            <Button type="button" className='dive-form-button' onClick={handlePrevious}>Previous</Button>
-          ) : (
-            <Button type="button" className='dive-form-button' onClick={handleReseForm}>Reset Form</Button>
-          )}
+          {renderStep()}
+          <div className="buttons">
+            {step > 1 && !submitted ? (
+              <Button type="button" className='dive-form-button' onClick={handlePrevious}>Previous</Button>
+            ) : (
+              <Button type="button" className='dive-form-button' onClick={handleResetForm}>Reset Form</Button>
+            )}
 
-          {step < totalSteps ? (
-            <Button type="button" className='dive-form-button' onClick={handleNext} disabled={formError} >Next</Button>
-          ) : (
-            <Button type="submit" className='dive-form-button' disabled={submitted}>Submit</Button>
-          )}
-        </div>
+            {step < totalSteps ? (
+              <Button type="button" className='dive-form-button' onClick={handleNext} disabled={formError} >Next</Button>
+            ) : (
+              <Button type="submit" className='dive-form-button' disabled={submitted}>Submit</Button>
+            )}
+          </div>
         </div>
       </Form>
     </div>
