@@ -1,18 +1,44 @@
-.form-container {
-    display: flex;
-    padding: 20pt;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  label {
-    display: block;
-    font-weight: bold;
-  }
-  
-  input[type='date'],
-  input[type='text'] {
-    width: 100%;
-    padding: 0.5rem;
-  }
-  
+.dive-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.dive-form {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  padding: 20px;
+  /* Add this if you want the form to have a white background */
+}
+
+.dive-form button {
+  box-sizing: border-box;
+  width: calc(50% - 10px);
+  padding: 10px;
+  margin: 5px;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer; /* Changes the mouse cursor when hovering over the button */
+}
+
+.dive-form button:disabled {
+  background-color: #ccc; /* Changes the button color when it's disabled */
+  cursor: not-allowed; /* Changes the mouse cursor when hovering over a disabled button */
+}
+
+.error-message {
+  color: #ff0000; /* Error messages are usually displayed in red */
+  margin-bottom: 10px;
+}
+
+.buttons {
+  display: flex;
+  padding-top: 10px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}

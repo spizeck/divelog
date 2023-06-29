@@ -4,10 +4,10 @@ import React, { useEffect, useState } from 'react';
 import DiveForm from './containers/DiveForm';
 import Login from './containers/Login';
 // import {ReactComponent as Logo} from "./logo.svg"
-import './styles/DiveForm.css'
+
 
 const App = () => {
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem('token')) {

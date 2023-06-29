@@ -14,7 +14,7 @@ const Login = () => {
 
     try {
       // Send login request to the backend
-      const response = await fetch(api.login, {
+      const response = await api.login({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
