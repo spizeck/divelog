@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
+import { Button, Form, Message } from 'semantic-ui-react';
+import 'semantic-ui-css/semantic.min.css';
 import '../styles/Login.css';
 import api from '../utils/api';
 import Register from './Register';
+import ForgotPassword from './ForgotPassword';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [showRegisterForm, setShowRegisterForm] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -25,38 +29,38 @@ const Login = () => {
     } catch (error) {
       setErrorMessage(error.message);
     }
-    
-        
   };
 
   return (
-    <div className="login-container">
-      {!showRegisterForm ? ( // If showRegisterForm is false, show the login form
-        <form className="login-form" onSubmit={handleLogin}>
-          <h1>Please Log In</h1>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button type="submit">Log In</button>
-          {errorMessage && <div className="error-message">{errorMessage}</div>}
-          <p></p>
-          <button type="button" onClick={() => setShowRegisterForm(true)}>Register</button>
-        </form>
-      ) : (
-        <Register setShowRegisterForm={setShowRegisterForm}/>
-      )}
+    <div className='login-container'>
+      <Form className="login-form" onSubmit={handleLogin}>
+        <h1>Please Log In</h1>
+        <Form.Input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e, { value }) => setUsername(value)}
+        />
+        <Form.Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e, { value }) => setPassword(value)}
+        />
+        <Button type="submit" primary>Log In</Button>
+        {errorMessage && <Message negative>{errorMessage}</Message>}
+        <div className='login-footer'>
+          <Button.Group style={{width:'100%'}}>
+            <Button className='small-button' type="button" onClick={() => setShowRegisterForm(true)}>Register</Button>
+            <Button.Or />
+            <Button className='small-button' type="button" onClick={() => setShowForgotPassword(true)}>Forgot Password</Button>
+          </Button.Group>
+        </div>
+      </Form>
+      {showRegisterForm && <Register setShowRegisterForm={setShowRegisterForm} />}
+      {showForgotPassword && <ForgotPassword setShowForgotPassword={setShowForgotPassword} />}
     </div>
   );
 };
-
 
 export default Login;

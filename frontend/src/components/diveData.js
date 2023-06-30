@@ -58,7 +58,7 @@ const diveFormData = {
         name: "diveGuide",
         label: "Dive Guide",
         type: "text",
-        defaultValue: "", //user.username,
+        defaultValue: localStorage.getItem("username") || "",
         validate: (value) => {
             if (value.length > 20) {
                 return "Dive Guide must be 20 characters or less";

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import api from '../utils/api';
-import '../styles/Register.css';
+import '../styles/Login.css';
 
 const Register = ({ setShowRegisterForm }) => {
     const [username, setUsername] = useState('');
@@ -35,9 +35,9 @@ const Register = ({ setShowRegisterForm }) => {
     };
 
     return (
-        <div className="register-container">
+        <div className="login-container">
 
-            <form className="register-form" onSubmit={handleRegister}>
+            <form className="login-form" onSubmit={handleRegister}>
                 <h1>Please Register</h1>
                 <input
                     type="text"

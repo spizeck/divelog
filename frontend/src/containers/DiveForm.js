@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Button } from 'semantic-ui-react';
+import { Form, Input } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import '../styles/DiveForm.css'
 import sightingsData from '../components/sightingsData';
@@ -210,15 +210,15 @@ const DiveForm = () => {
           {renderStep()}
           <div className="buttons">
             {step > 1 && !submitted ? (
-              <Button type="button" className='dive-form-button' onClick={handlePrevious}>Previous</Button>
+              <button type="button" className='dive-form-button' onClick={handlePrevious}>Previous</button>
             ) : (
-              <Button type="button" className='dive-form-button' onClick={handleResetForm}>Reset Form</Button>
+              <button type="button" className='dive-form-button' onClick={handleResetForm}>Reset Form</button>
             )}
 
             {step < totalSteps ? (
-              <Button type="button" className='dive-form-button' onClick={handleNext} disabled={formError} >Next</Button>
+              <button type="button" className='dive-form-button' onClick={handleNext} disabled={formError} >Next</button>
             ) : (
-              <Button type="submit" className='dive-form-button' disabled={submitted}>Submit</Button>
+              <button type="submit" className='dive-form-button' disabled={submitted}>Submit</button>
             )}
           </div>
         </div>
