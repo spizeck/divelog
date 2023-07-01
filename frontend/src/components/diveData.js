@@ -1,3 +1,10 @@
+const capitalizeFirstLetter = (string) => {
+    if (!string) {
+        return "";
+    }
+    return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
 const diveFormData = {
     date: {
         name: "date",
@@ -58,7 +65,7 @@ const diveFormData = {
         name: "diveGuide",
         label: "Dive Guide",
         type: "text",
-        defaultValue: localStorage.getItem("username") || "",
+        defaultValue: capitalizeFirstLetter(localStorage.getItem("username")) || "",
         validate: (value) => {
             if (value.length > 20) {
                 return "Dive Guide must be 20 characters or less";
@@ -161,5 +168,7 @@ const diveFormData = {
         },
     },
 };
+
+
 
 export default diveFormData;
