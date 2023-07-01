@@ -30,7 +30,7 @@ def login():
     # Save the token to the session
     session['token'] = token
     
-    return jsonify({'status':200, 'message':'Login successful', 'token':token}), 200
+    return jsonify({'status':200, 'message':'Login successful', 'token':token, 'username':username}), 200
 
 
 @auth_bp.route('/register', methods=['POST'])

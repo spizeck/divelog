@@ -30,6 +30,7 @@ const Login = ({handleLoginSuccess}) => {
       if (loginResponse.status === 200) {
         // Login successful, save the token, and navigate to the home page
         localStorage.setItem('token', loginResponse.token);
+        localStorage.setItem('username', loginResponse.username);
         setSuccessMessage(loginResponse.message);
         handleLoginSuccess(loginResponse.token);
       }

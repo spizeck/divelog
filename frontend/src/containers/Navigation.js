@@ -17,7 +17,7 @@ export default class Navigation extends Component {
           this.props.handleLogout();
           setTimeout(() => {
             // refresh the page after logging out
-            window.location.reload(false);
+            this.setState({ logoutMessage: '' });
           }, 3000);
         })
         .catch((error) => {

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
-import { Container } from 'semantic-ui-react';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Outlet } from 'react-router-dom';
+import { Container, Loader, Dimmer } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import AppHeader from './containers/Header';
 import HomePage from './containers/HomePage';
@@ -11,38 +10,51 @@ import Register from './containers/Register';
 import ForgotPassword from './containers/ForgotPassword';
 import api from './utils/api';
 
+const AppRoutes = ({ loggedIn, username, handleLoginSuccess }) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loggedIn) {
+      navigate('/home', { replace: true });
+    } else {
+      navigate('/login', { replace: true });
+    }
+  }, [loggedIn, navigate]);
+
+  return (
+    <Routes>
+      <Route path="/" element={<Outlet />} >
+        <Route path="home" element={<HomePage username={username} />} />
+        <Route path="register" element={<Register />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="login" element={<Login handleLoginSuccess={handleLoginSuccess} />} />
+      </Route>
+    </Routes>
+  );
+};
+
 const App = () => {
+  const [loading, setLoading] = useState(true);
   const [loggedIn, setLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
 
   useEffect(() => {
     // Check if the user is logged in based on the token presence
     const token = localStorage.getItem('token');
+    const localUsername = localStorage.getItem('username');
+
+
     if (token) {
-      // Get the user details from the backend
-      try {
-        api.getCurrentUser()
-          .then((response) => {
-            if (response.status === 200) {
-              // User is logged in
-              setLoggedIn(true);
-              setUsername(response.username.charAt(0).toUpperCase() + response.username.slice(1));
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-            setLoggedIn(false);
-            setUsername('');
-          });
-      } catch (error) {
-        console.log(error);
-        setLoggedIn(false);
-        setUsername('');
-      }
+      // User is logged in
+      setLoggedIn(true);
+      setLoading(false);
+      setUsername(localUsername.charAt(0).toUpperCase() + localUsername.slice(1));
+
     } else {
       // User is not logged in
       setLoggedIn(false);
       setUsername('');
+      setLoading(false);
     }
   }, []);
 
@@ -55,38 +67,24 @@ const App = () => {
   const handleLogout = () => {
     // Remove the token from localStorage and update loggedIn state
     localStorage.removeItem('token');
+    localStorage.removeItem('username');
     setLoggedIn(false);
   };
+
+if (loading) {
+    return (
+      <Dimmer active>
+        <Loader>Loading...</Loader>
+      </Dimmer>
+    );
+  }
 
   return (
     <Router>
       <Container>
         <AppHeader />
         <Navigation loggedIn={loggedIn} handleLogout={handleLogout} />
-        <Routes>
-          {/* Use / as a landing to apply logic check */}
-          <Route
-            path="/"
-            element={loggedIn ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/home"
-            element={loggedIn ? <HomePage username={username} /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/register"
-            element={!loggedIn ? <Register /> : <Navigate to="/home" replace />}
-          />
-          <Route
-            path="/forgot-password"
-            element={!loggedIn ? <ForgotPassword /> : <Navigate to="/home" replace />}
-          />
-          {/* Route to /login only if logged in is false */}
-          <Route
-            path="/login"
-            element={!loggedIn ? <Login handleLoginSuccess={handleLoginSuccess} /> : <Navigate to="/home" replace />}
-          />
-        </Routes>
+        <AppRoutes loggedIn={loggedIn} username={username} handleLoginSuccess={handleLoginSuccess} />
       </Container>
     </Router>
   );
