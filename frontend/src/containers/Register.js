@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
-import { Form, Button } from 'semantic-ui-react';
+import { Form, Button, Message } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import '../styles/Login.css';
 
@@ -11,6 +11,7 @@ const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [email, setEmail] = useState('');
     const [errorMessage, setErrorMessage] = useState([]);
+    const [successMessage, setSuccessMessage] = useState('');
 
     const navigate = useNavigate();
 
@@ -28,7 +29,7 @@ const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
 
             if (registerResponse.status === 201) {
                 // Registration successful, show login form
-                setErrorMessage([registerResponse.message])
+                setSuccessMessage(registerResponse.message)
                 setTimeout(() => {
                     navigate('/login');
                 }, 3000);
@@ -86,9 +87,8 @@ const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
                 <Button type="button" onClick={() => {
                     navigate('/login');
                 }}>Back</Button>
-                {errorMessage && errorMessage.map((error, index) =>
-                    <div key={index} className="error-message">{error}</div>
-                )}
+                {successMessage && <Message positive>{successMessage}</Message>}
+                {errorMessage && <Message negative>{errorMessage.map((error, index) => <p key={index}>{error}</p>)}</Message>}
             </Form>
         </div>
     );

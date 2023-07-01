@@ -8,6 +8,7 @@ import '../styles/Login.css';
 const ForgotPassword = ({ setShowForgotPassword }) => {
     const [email, setEmail] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
 
     const navigate = useNavigate();
 
@@ -24,7 +25,7 @@ const ForgotPassword = ({ setShowForgotPassword }) => {
 
             if (forgotPasswordResponse.status === 200) {
                 // Password reset email sent
-                setErrorMessage(forgotPasswordResponse.message);
+                setSuccessMessage(forgotPasswordResponse.message);
                 setTimeout(() => {
                     navigate('/login');
                 }, 3000);
@@ -53,7 +54,8 @@ const ForgotPassword = ({ setShowForgotPassword }) => {
                 <Button type='button' onClick={() => {
                     navigate('/login');
                 }}>Back</Button>
-                {Message && <div className="error-message">{errorMessage}</div>}
+                {successMessage && <Message positive>{successMessage}</Message>}
+                {errorMessage && <Message negative>{errorMessage}</Message>}
             </Form>
         </div>
     );
