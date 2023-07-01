@@ -37,11 +37,7 @@ const DiveForm = () => {
     try {
       await handleSubmit(e, formData, sightingData, step, totalSteps, setSubmitted, setConfirmationMessage, setErrorMessage);
     } catch (error) {
-      console.error("An error occurred:", error);
       if (error.response) {
-        console.log("Response data:", error.response.data);
-        console.log("Response status:", error.response.status);
-        console.log("Response headers:", error.response.headers);
         setErrorMessage("An error occurred: " + error.response.data.message);
       } else {
         setErrorMessage("An error occurred: " + error.message);

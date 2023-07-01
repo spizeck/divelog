@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
+import { Form, Button } from 'semantic-ui-react';
+import 'semantic-ui-css/semantic.min.css';
 import '../styles/Login.css';
 
-const Register = ({ setShowRegisterForm }) => {
+const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [email, setEmail] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState([]);
+
+    const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -23,13 +28,29 @@ const Register = ({ setShowRegisterForm }) => {
 
             if (registerResponse.status === 201) {
                 // Registration successful, show login form
-                setShowRegisterForm(false);
+                setErrorMessage([registerResponse.message])
+                setTimeout(() => {
+                    navigate('/login');
+                }, 3000);
             } else {
-                // Other error
-                setErrorMessage('An error occurred');
+                console.log("in the else")
+                console.log(registerResponse)
+                // Server error or Validation error
+                const errorMessage = Array.isArray(registerResponse.data.message)
+                    ? registerResponse.data.message
+                    : [registerResponse.data.message];
+                setErrorMessage(errorMessage);
             }
         } catch (error) {
-            setErrorMessage(error.message);
+            console.log("in the catch")
+            if (error.response) {
+                const errorMessage = Array.isArray(error.response.data.message)
+                    ? error.response.data.message
+                    : [error.response.data.message];
+                setErrorMessage(errorMessage);
+            } else {
+                setErrorMessage([error.message]);
+            }
         }
 
     };
@@ -37,35 +58,37 @@ const Register = ({ setShowRegisterForm }) => {
     return (
         <div className="login-container">
 
-            <form className="login-form" onSubmit={handleRegister}>
+            <Form onSubmit={handleRegister} className='login-form'>
                 <h1>Please Register</h1>
-                <input
+                <Form.Input
                     type="text"
                     placeholder="Username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                 />
-                <input
+                <Form.Input
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                <input
+                <Form.Input
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <input
+                <Form.Input
                     type="password"
                     placeholder="Confirm Password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                 />
-                <button type="submit">Register</button>
-                {errorMessage && <div className="error-message">{errorMessage}</div>}
-            </form>
+                <Button type="submit" primary>Register</Button>
+                {errorMessage && errorMessage.map((error, index) =>
+                    <div key={index} className="error-message">{error}</div>
+                )}
+            </Form>
         </div>
     );
 };

@@ -40,6 +40,14 @@ class User(UserMixin, db.Model):
     def validate_username(username):
         return validate_username(username)
     
+    @staticmethod
+    def validate_email_availability(email):
+        return User.query.filter_by(email=email).first() is None
+    
+    @staticmethod
+    def validate_username_availability(username):
+        return User.query.filter_by(username=username).first() is None
+    
     @property
     def password(self):
         raise AttributeError("Password is not a readable attribute")

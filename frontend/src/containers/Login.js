@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Form, Message } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import '../styles/Login.css';
 import api from '../utils/api';
-import Register from './Register';
-import ForgotPassword from './ForgotPassword';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [showRegisterForm, setShowRegisterForm] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,7 +18,6 @@ const Login = () => {
     try {
       // Send login request to the backend
       const loginResponse = await api.login(username, password);
-      console.log(loginResponse);
 
       if (loginResponse.status === 200) {
         // Login successful, save the token, and re-render the page
@@ -50,15 +48,18 @@ const Login = () => {
         <Button type="submit" primary>Log In</Button>
         {errorMessage && <Message negative>{errorMessage}</Message>}
         <div className='login-footer'>
-          <Button.Group style={{width:'100%'}}>
-            <Button className='small-button' type="button" onClick={() => setShowRegisterForm(true)}>Register</Button>
+          <Button.Group style={{ width: '100%' }}>
+            <Button className='small-button' type="button" onClick={() => 
+              navigate('/register') }
+              >Register</Button>
             <Button.Or />
-            <Button className='small-button' type="button" onClick={() => setShowForgotPassword(true)}>Forgot Password</Button>
+            <Button className='small-button' type="button" onClick={() => {
+              navigate('/forgot-password');
+            }}
+            >Forgot Password</Button>
           </Button.Group>
         </div>
       </Form>
-      {showRegisterForm && <Register setShowRegisterForm={setShowRegisterForm} />}
-      {showForgotPassword && <ForgotPassword setShowForgotPassword={setShowForgotPassword} />}
     </div>
   );
 };

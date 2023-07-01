@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { Button, Form, Message } from 'semantic-ui-react';
+import 'semantic-ui-css/semantic.min.css';
 import api from '../utils/api';
-import '../styles/ForgotPassword.css';
+import '../styles/Login.css';
 
 const ForgotPassword = ({ setShowForgotPassword }) => {
     const [email, setEmail] = useState('');
@@ -31,18 +33,18 @@ const ForgotPassword = ({ setShowForgotPassword }) => {
     };
 
     return (
-        <div className="forgot-password-container">
-            <form className="forgot-password-form" onSubmit={handleForgotPassword}>
+        <div className="login-container">
+            <Form className="login-form" onSubmit={handleForgotPassword}>
                 <h1>Forgot Password</h1>
-                <input
+                <Form.Input
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                <button type="submit">Reset Password</button>  
-                {errorMessage && <div className="error-message">{errorMessage}</div>}
-            </form>
+                <Button type="submit" primary>Reset Password</Button>  
+                {Message && <div className="error-message">{errorMessage}</div>}
+            </Form>
         </div>
     );
 };

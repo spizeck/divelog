@@ -59,7 +59,11 @@ const api = {
             });
             return response.data;
         } catch (error) {
-            throw error.response.data;
+            if (error.response) {
+                return error.response;
+            } else {
+                throw error;
+            }
         }
     },
 

@@ -18,7 +18,7 @@ def login():
     try:
         user = get_user_by_username(username)
     except Exception as e:
-        return jsonify({'status':500, 'message':e}), 500
+        return jsonify({'status':500, 'message':str(e)}), 500
         
     
     if user is None or not user.verify_password(password):
@@ -47,10 +47,20 @@ def register():
     # Validate username
     if not User.validate_username(username):
         return jsonify({'status':400, 'message':'Invalid username'}), 400
+    
+    # Check if the username is already taken
+    if not User.validate_username_availability(username):
+        return jsonify({'status':409, 'message':'Username already exists'}), 409
+    
+    # Check if the email is already taken
+    if not User.validate_email_availability(email):
+        return jsonify({'status':409, 'message':'Email already exists'}), 409
 
     # Validate password strength
     if not User.validate_password_strength(password):
-        return jsonify({'status':400, 'message':'Invalid password'}), 400
+        return jsonify({'status':400, 
+                        'message':'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'
+                        }), 400
 
     # Check if the user exists
     user = get_user_by_username(username)
@@ -66,7 +76,7 @@ def register():
         db.session.add(user)
         db.session.commit()
     except Exception as e:
-        return jsonify({'status':500, 'message':e}), 500
+        return jsonify({'status':500, 'message':str(e)}), 500
         
 
     return jsonify({'status':201, 'message':'User created successfully'}), 201
@@ -99,7 +109,7 @@ def forgot_password():
     try:
         db.session.commit()
     except Exception as e:
-        return jsonify({'status':500, 'message':e}), 500
+        return jsonify({'status':500, 'message':str(e)}), 500
     
     # Send the new password to the user's email
     # TODO: Implement email sending

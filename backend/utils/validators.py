@@ -16,3 +16,11 @@ def validate_username(username):
     regex = r"^[a-zA-Z0-9_.-]+$"
     if re.match(regex, username):
         return True
+    
+# Validate username availability
+def validate_username_availability(username, User):
+    return User.query.filter_by(username=username).first() is None
+
+# Validate email availability
+def validate_email_availability(email, User):
+    return User.query.filter_by(email=email).first() is None
