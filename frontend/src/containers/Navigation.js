@@ -1,20 +1,36 @@
 import React, { Component } from 'react';
-import { Menu } from 'semantic-ui-react';
+import { Menu, Message } from 'semantic-ui-react';
+import api from '../utils/api';
 import 'semantic-ui-css/semantic.min.css'
 
 export default class Navigation extends Component {
-  state = { activeItem: 'home' }
+  state = {
+    activeItem: 'home',
+    logoutMessage: '',
+  }
 
   handleItemClick = (e, { name }) => {
     if (name === 'logout') {
-      this.props.handleLogout();
+      api.logout()
+        .then((response) => {
+          this.setState({ logoutMessage: response.message });
+          this.props.handleLogout();
+          setTimeout(() => {
+            // refresh the page after logging out
+            window.location.reload(false);
+          }, 3000);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     } else {
-      this.setState({ activeItem: name })
+      this.setState({ activeItem: name });
     }
-  }
+  };
+
 
   render() {
-    const { activeItem } = this.state
+    const { activeItem , logoutMessage } = this.state
     const { loggedIn } = this.props
 
     return (
@@ -53,6 +69,7 @@ export default class Navigation extends Component {
             />
           </Menu.Menu>
         </Menu>
+        {logoutMessage && <Message positive>{logoutMessage}</Message>}
       </div>
     );
   };

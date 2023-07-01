@@ -8,6 +8,15 @@ const apiUrl = process.env.REACT_APP_LIVE_API; // For live environment
 
 let userId = null; // Set userId to null to avoid error
 
+// Create an axios instance with the base URL and headers
+const axiosInstance = axios.create({
+  baseURL: apiUrl,
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${localStorage.getItem('token')}`,
+  },
+});
+
 // API endpoints
 const API_ENDPOINTS = {
   homepage: '/',
@@ -116,7 +125,7 @@ const api = {
 // Get current user endpoint
   getCurrentUser: async () => {
     try {
-      const response = await axios.get(`${apiUrl}/auth/current_user`);
+      const response = await axiosInstance.get(`${API_ENDPOINTS.getCurrentUser}`);
       return response.data;
     } catch (error) {
       throw error.response.data;

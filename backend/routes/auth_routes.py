@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, session
-from services.user_service import create_user, get_user_by_username, get_user_by_email
+from services.user_service import create_user, get_user_by_username, get_user_by_email, get_user_by_id
 from models.users import User
 from extensions import db
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
@@ -121,16 +121,14 @@ def forgot_password():
 def get_current_user():
     # Get the user's id from the token
     current_idenity = get_jwt_identity()
-    
-    # Get the user from the database
-    user = User.query.get_user_by_id(current_idenity)
-    
+
+    if not (user := get_user_by_id(current_idenity)):
+        return jsonify({'status':404, 'message':'User not found'}), 404
     # Return the user's information
-    username = user.username
-    email = user.email
-    
-    return jsonify({'status':200, 'message':'User found', 'username':username, 'email':email}), 200
-    
+    username = user.username if hasattr(user, 'username') else None
+    email = user.email if hasattr(user, 'email') else None
+    print(username, email)
+    return jsonify({'status':200, 'message':'User found', 'username':username, 'email':email}), 200    
 
 def register_routes(app):
     app.register_blueprint(auth_bp)

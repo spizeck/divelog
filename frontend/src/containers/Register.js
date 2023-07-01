@@ -10,7 +10,7 @@ const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [email, setEmail] = useState('');
-    const [errorMessage, setErrorMessage] = useState([]);
+    const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
     const navigate = useNavigate();
@@ -35,20 +35,10 @@ const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
                 }, 3000);
             } else {
                 // Server error or Validation error
-                const errorMessage = Array.isArray(registerResponse.data.message)
-                    ? registerResponse.data.message
-                    : [registerResponse.data.message];
-                setErrorMessage(errorMessage);
+                setErrorMessage(registerResponse.data.message);
             }
         } catch (error) {
-            if (error.response) {
-                const errorMessage = Array.isArray(error.response.data.message)
-                    ? error.response.data.message
-                    : [error.response.data.message];
-                setErrorMessage(errorMessage);
-            } else {
-                setErrorMessage([error.message]);
-            }
+            setErrorMessage(error.response.data.message);
         }
 
     };
@@ -84,11 +74,9 @@ const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
                 />
                 <Button type="submit" primary>Register</Button>
                 <p></p>
-                <Button type="button" onClick={() => {
-                    navigate('/login');
-                }}>Back</Button>
+                <Button type="button" onClick={() => navigate('/login')}>Back</Button>
                 {successMessage && <Message positive>{successMessage}</Message>}
-                {errorMessage && <Message negative>{errorMessage.map((error, index) => <p key={index}>{error}</p>)}</Message>}
+                {errorMessage && <Message negative>{errorMessage}</Message>}
             </Form>
         </div>
     );
