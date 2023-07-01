@@ -5,7 +5,7 @@ import 'semantic-ui-css/semantic.min.css';
 import '../styles/Login.css';
 import api from '../utils/api';
 
-const Login = ({handleLoginSuccess}) => {
+const Login = ({ handleLoginSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -41,7 +41,8 @@ const Login = ({handleLoginSuccess}) => {
 
   return (
     <div className='login-container'>
-      <Form className="login-form" onSubmit={handleLogin}>
+      <div className="login-form">
+      <Form  onSubmit={handleLogin}>
         <h1>Please Log In</h1>
         <Form.Input
           type="text"
@@ -55,22 +56,18 @@ const Login = ({handleLoginSuccess}) => {
           value={password}
           onChange={(e, { value }) => setPassword(value)}
         />
+        
         <Button type="submit" primary>Log In</Button>
         {successMessage && <Message positive>{successMessage}</Message>}
         {errorMessage && <Message negative>{errorMessage}</Message>}
+        </Form>
         <div className='login-footer'>
-          <Button.Group style={{ width: '100%' }}>
-            <Button className='small-button' type="button" onClick={() =>
-              navigate('/register')}
-            >Register</Button>
-            <Button.Or />
-            <Button className='small-button' type="button" onClick={() => {
-              navigate('/forgot-password');
-            }}
-            >Forgot Password</Button>
+          <Button.Group fluid>
+            <Button className='small-button' onClick={() => navigate('/register')}>Register</Button>
+            <Button className='small-button' onClick={() => navigate('/forgot-password')}>Forgot Password</Button>
           </Button.Group>
         </div>
-      </Form>
+      </div>
     </div>
   );
 };
