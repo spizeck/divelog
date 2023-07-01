@@ -38,7 +38,7 @@ export default class Navigation extends Component {
     
     let content;
     if (activeItem === 'home') {
-      content = <Home username={username} />;
+      content = <Home username={username} loggedIn={loggedIn} />;
     } else if (activeItem === 'Dive Log Entry') {
       content = <DiveForm username={username} />;
     }

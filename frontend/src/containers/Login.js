@@ -16,7 +16,7 @@ const Login = ({handleLoginSuccess}) => {
   useEffect(() => {
     // Check if the user is already logged in
     if (localStorage.getItem('token')) {
-      navigate('/');
+      navigate('/home');
     }
   }, [navigate]);
 

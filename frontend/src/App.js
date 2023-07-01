@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate, Outlet } from 'rea
 import { Container, Loader, Dimmer } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import AppHeader from './containers/Header';
-import HomePage from './containers/HomePage';
+import BasePage from './containers/BasePage';
 import Navigation from './containers/Navigation';
 import Login from './containers/Login';
 import Register from './containers/Register';
@@ -13,17 +13,19 @@ const AppRoutes = ({ loggedIn, username, handleLoginSuccess }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (loggedIn) {
-      navigate('/home', { replace: true });
-    } else {
-      navigate('/login', { replace: true });
+    if (loggedIn && window.location.pathname !== '/home') {
+      navigate('/home');
+      console.log('I went home')
+    } else if (!loggedIn && !['/login', '/register', '/forgot-password'].includes(window.location.pathname)) {
+      navigate('/login');
+      console.log('I went to login')
     }
   }, [loggedIn, navigate]);
 
   return (
     <Routes>
       <Route path="/" element={<Outlet />} >
-        <Route path="home" element={<HomePage username={username} />} />
+        <Route path="home" element={<BasePage />} />
         <Route path="register" element={<Register />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="login" element={<Login handleLoginSuccess={handleLoginSuccess} />} />
@@ -70,7 +72,7 @@ const App = () => {
     setLoggedIn(false);
   };
 
-if (loading) {
+  if (loading) {
     return (
       <Dimmer active>
         <Loader>Loading...</Loader>

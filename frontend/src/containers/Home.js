@@ -2,7 +2,11 @@ import React from 'react';
 import { Container, Header} from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 
-const Home = ({ username }) => {
+const Home = ({ username, loggedIn }) => {
+if (!loggedIn) {
+  return null;
+}
+
   return (
     <div>
 <Container>
