@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Form, Message } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import api from '../utils/api';
@@ -7,6 +8,8 @@ import '../styles/Login.css';
 const ForgotPassword = ({ setShowForgotPassword }) => {
     const [email, setEmail] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+
+    const navigate = useNavigate();
 
     const handleForgotPassword = async (e) => {
         e.preventDefault();
@@ -21,7 +24,10 @@ const ForgotPassword = ({ setShowForgotPassword }) => {
 
             if (forgotPasswordResponse.status === 200) {
                 // Password reset email sent
-                setShowForgotPassword(false);
+                setErrorMessage(forgotPasswordResponse.message);
+                setTimeout(() => {
+                    navigate('/login');
+                }, 3000);
             } else {
                 // Other error
                 setErrorMessage('An error occurred');
@@ -43,6 +49,10 @@ const ForgotPassword = ({ setShowForgotPassword }) => {
                     onChange={(e) => setEmail(e.target.value)}
                 />
                 <Button type="submit" primary>Reset Password</Button>  
+                <p></p>
+                <Button type='button' onClick={() => {
+                    navigate('/login');
+                }}>Back</Button>
                 {Message && <div className="error-message">{errorMessage}</div>}
             </Form>
         </div>

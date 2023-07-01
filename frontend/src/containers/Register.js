@@ -33,8 +33,6 @@ const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
                     navigate('/login');
                 }, 3000);
             } else {
-                console.log("in the else")
-                console.log(registerResponse)
                 // Server error or Validation error
                 const errorMessage = Array.isArray(registerResponse.data.message)
                     ? registerResponse.data.message
@@ -42,7 +40,6 @@ const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
                 setErrorMessage(errorMessage);
             }
         } catch (error) {
-            console.log("in the catch")
             if (error.response) {
                 const errorMessage = Array.isArray(error.response.data.message)
                     ? error.response.data.message
@@ -85,6 +82,10 @@ const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 <Button type="submit" primary>Register</Button>
+                <p></p>
+                <Button type="button" onClick={() => {
+                    navigate('/login');
+                }}>Back</Button>
                 {errorMessage && errorMessage.map((error, index) =>
                     <div key={index} className="error-message">{error}</div>
                 )}

@@ -64,6 +64,37 @@ class UserModelTestCase(unittest.TestCase):
         self.assertTrue(User.validate_username(username))
         username = 'testuser!'
         self.assertFalse(User.validate_username(username))
+        
+    def test_validate_email_availability(self):
+        # Test valididate email availability
+        user = User(
+            username='testuser',
+            email='test@example.com',
+            password='password',
+            is_approved=True,
+            admin=False
+        )
+        user.save()
+        
+        email = 'test@example.com'
+        self.assertFalse(User.validate_email_availability(email))
+        email = 'test1@example.com'
+        self.assertTrue(User.validate_email_availability(email))        
+        
+    def test_validate_username_availability(self):
+        # Test valididate username availability
+        user = User(
+            username='testuser',
+            email='test@example.com',
+            password='password',
+            is_approved=True,
+            admin=False
+        )
+        user.save()
+        uesrnmae = 'testuser'
+        self.assertFalse(User.validate_username_availability(uesrnmae))
+        username = 'testuser1'
+        self.assertTrue(User.validate_username_availability(username))        
 
     
 if __name__ == '__main__':

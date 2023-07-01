@@ -103,7 +103,7 @@ def forgot_password():
         return jsonify({'status':404, 'message':'User does not exist'}), 404
 
     # Generate a new password for the user
-    new_password = User.generate_password()
+    new_password = 'Password123'
     
     user.password = new_password
     try:

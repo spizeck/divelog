@@ -5,6 +5,7 @@ import 'semantic-ui-css/semantic.min.css'
 const AppHeader = () => {
   return (
     <Header>
+      <p></p> 
       <h1>Welcome to the Sea Saba Dive Log App</h1>
       <p></p>
     </Header>
