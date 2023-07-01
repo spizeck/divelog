@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Menu, Message } from 'semantic-ui-react';
 import api from '../utils/api';
 import 'semantic-ui-css/semantic.min.css'
+import Home from './Home';
+import DiveForm from './DiveForm';
 
 export default class Navigation extends Component {
   state = {
@@ -28,10 +30,19 @@ export default class Navigation extends Component {
     }
   };
 
+  
 
   render() {
     const { activeItem , logoutMessage } = this.state
-    const { loggedIn } = this.props
+    const {loggedIn, username} = this.props;
+    
+    let content;
+    if (activeItem === 'home') {
+      content = <Home username={username} />;
+    } else if (activeItem === 'Dive Log Entry') {
+      content = <DiveForm username={username} />;
+    }
+  
 
     return (
       <div >
@@ -69,6 +80,7 @@ export default class Navigation extends Component {
             />
           </Menu.Menu>
         </Menu>
+        {content}
         {logoutMessage && <Message positive>{logoutMessage}</Message>}
       </div>
     );

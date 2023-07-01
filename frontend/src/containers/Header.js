@@ -6,7 +6,7 @@ const AppHeader = () => {
   return (
     <Header>
       <p></p> 
-      <h1>Welcome to the Sea Saba Dive Log App</h1>
+      <h1>Sea Saba's Dive Log App</h1>
       <p></p>
     </Header>
   );

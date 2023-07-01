@@ -8,7 +8,6 @@ import Navigation from './containers/Navigation';
 import Login from './containers/Login';
 import Register from './containers/Register';
 import ForgotPassword from './containers/ForgotPassword';
-import api from './utils/api';
 
 const AppRoutes = ({ loggedIn, username, handleLoginSuccess }) => {
   const navigate = useNavigate();
@@ -83,7 +82,7 @@ if (loading) {
     <Router>
       <Container>
         <AppHeader />
-        <Navigation loggedIn={loggedIn} handleLogout={handleLogout} />
+        <Navigation username={username} loggedIn={loggedIn} handleLogout={handleLogout} />
         <AppRoutes loggedIn={loggedIn} username={username} handleLoginSuccess={handleLoginSuccess} />
       </Container>
     </Router>
