@@ -206,15 +206,15 @@ const DiveForm = () => {
           {renderStep()}
           <Button.Group fluid style={{marginTop:'10px'}}>
             {step > 1 && !submitted ? (
-              <Button color='grey' type="button" onClick={handlePrevious}>Previous</Button>
+              <Button className="form-buttons"color='grey' type="button" onClick={handlePrevious}>Previous</Button>
             ) : (
-              <Button negative type="button" onClick={handleResetForm}>Reset Form</Button>
+              <Button className="form-buttons" negative type="button" onClick={handleResetForm}>Reset Form</Button>
             )}
             <Button.Or className='or-button'/>
             {step < totalSteps ? (
-              <Button primary type="button" onClick={handleNext} disabled={formError} >Next</Button>
+              <Button className="form-buttons" primary type="button" onClick={handleNext} disabled={formError} >Next</Button>
             ) : (
-              <Button positive type="submit" disabled={submitted}>Submit</Button>
+              <Button className="form-buttons" positive type="submit" disabled={submitted}>Submit</Button>
             )}
           </Button.Group>
         </div>

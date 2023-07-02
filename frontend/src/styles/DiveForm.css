@@ -21,3 +21,7 @@
 .or-button {
   margin: 2px;
 }
+
+.dive-form .form-buttons {
+  width: calc(50% - 2px);
+}
