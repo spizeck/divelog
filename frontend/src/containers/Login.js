@@ -5,7 +5,7 @@ import 'semantic-ui-css/semantic.min.css';
 import '../styles/Login.css';
 import api from '../utils/api';
 
-const Login = ({ handleLoginSuccess }) => {
+const Login = ({ handleLoginSuccess, loggedIn }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -15,10 +15,10 @@ const Login = ({ handleLoginSuccess }) => {
 
   useEffect(() => {
     // Check if the user is already logged in
-    if (localStorage.getItem('token')) {
+    if (loggedIn) {
       navigate('/home');
     }
-  }, [navigate]);
+  }, [loggedIn, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();

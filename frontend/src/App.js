@@ -27,7 +27,7 @@ const AppRoutes = ({ loggedIn, username, handleLoginSuccess }) => {
         <Route path="home" element={<BasePage />} />
         <Route path="register" element={<Register />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
-        <Route path="login" element={<Login handleLoginSuccess={handleLoginSuccess} />} />
+        <Route path="login" element={<Login handleLoginSuccess={handleLoginSuccess} loggedIn={loggedIn}/>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
