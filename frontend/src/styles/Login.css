@@ -3,12 +3,10 @@
   justify-content: center;
   align-items: center;
   height: auto;
-  width: auto;
   min-height: 70vh;
 }
 
 .login-form {
-  width: auto;
   min-width: 350px;
   padding: 20px;
   border: 1px solid #ccc;
@@ -30,7 +28,7 @@
   box-sizing: border-box; 
 }
 
-.login-form button {
+.login-form .login.button {
   width: 100%;
   padding: 8px;
   border-radius: 4px;
@@ -46,17 +44,14 @@
 }
 
 .login-form .login-footer {
-  display: flex;
+  display: inline-block;
   justify-content: left;
-  margin-top: 6px;
+  margin-top: 12px;
   text-align: center;
   width: 100%;
+  box-sizing: border-box;
 }
 
-.login-form .small-button {
-  width: 47.75%;
-  padding: 12px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
+.login-footer .small-buttons {
+  width: calc(50% - 2px);
 }

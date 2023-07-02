@@ -72,9 +72,9 @@ const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                 />
-                <Button type="submit" primary>Register</Button>
+                <Button fluid type="submit" primary>Register</Button>
                 <p></p>
-                <Button type="button" onClick={() => navigate('/login')}>Back</Button>
+                <Button fluid type="button" onClick={() => navigate('/login')}>Back</Button>
                 {successMessage && <Message positive>{successMessage}</Message>}
                 {errorMessage && <Message negative>{errorMessage}</Message>}
             </Form>

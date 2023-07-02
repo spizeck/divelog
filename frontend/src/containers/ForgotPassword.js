@@ -49,9 +49,9 @@ const ForgotPassword = ({ setShowForgotPassword }) => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                <Button type="submit" primary>Reset Password</Button>  
+                <Button fluid type="submit" primary>Reset Password</Button>  
                 <p></p>
-                <Button type='button' onClick={() => {
+                <Button fluid type='button' onClick={() => {
                     navigate('/login');
                 }}>Back</Button>
                 {successMessage && <Message positive>{successMessage}</Message>}

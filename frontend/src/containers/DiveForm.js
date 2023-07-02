@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input } from 'semantic-ui-react';
+import { Button, Form, Input } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import '../styles/DiveForm.css'
 import sightingsData from '../components/sightingsData';
@@ -204,19 +204,19 @@ const DiveForm = () => {
       <Form onSubmit={handleFormSubmit}>
         <div className='dive-form'>
           {renderStep()}
-          <div className="buttons">
+          <Button.Group fluid style={{marginTop:'10px'}}>
             {step > 1 && !submitted ? (
-              <button type="button" className='dive-form-button' onClick={handlePrevious}>Previous</button>
+              <Button color='grey' type="button" onClick={handlePrevious}>Previous</Button>
             ) : (
-              <button type="button" className='dive-form-button' onClick={handleResetForm}>Reset Form</button>
+              <Button negative type="button" onClick={handleResetForm}>Reset Form</Button>
             )}
-
+            <Button.Or className='or-button'/>
             {step < totalSteps ? (
-              <button type="button" className='dive-form-button' onClick={handleNext} disabled={formError} >Next</button>
+              <Button primary type="button" onClick={handleNext} disabled={formError} >Next</Button>
             ) : (
-              <button type="submit" className='dive-form-button' disabled={submitted}>Submit</button>
+              <Button positive type="submit" disabled={submitted}>Submit</Button>
             )}
-          </div>
+          </Button.Group>
         </div>
       </Form>
     </div>

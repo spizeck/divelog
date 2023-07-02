@@ -42,29 +42,30 @@ const Login = ({ handleLoginSuccess }) => {
   return (
     <div className='login-container'>
       <div className="login-form">
-      <Form  onSubmit={handleLogin}>
-        <h1>Please Log In</h1>
-        <Form.Input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e, { value }) => setUsername(value)}
-        />
-        <Form.Input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e, { value }) => setPassword(value)}
-        />
-        
-        <Button type="submit" primary>Log In</Button>
-        {successMessage && <Message positive>{successMessage}</Message>}
-        {errorMessage && <Message negative>{errorMessage}</Message>}
+        <Form onSubmit={handleLogin}>
+          <h1>Please Log In</h1>
+          <Form.Input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e, { value }) => setUsername(value)}
+          />
+          <Form.Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e, { value }) => setPassword(value)}
+          />
+
+          <Button fluid className='login-button' type="submit" primary>Log In</Button>
+          {successMessage && <Message positive>{successMessage}</Message>}
+          {errorMessage && <Message negative>{errorMessage}</Message>}
         </Form>
         <div className='login-footer'>
           <Button.Group fluid>
-            <Button className='small-button' onClick={() => navigate('/register')}>Register</Button>
-            <Button className='small-button' onClick={() => navigate('/forgot-password')}>Forgot Password</Button>
+            <Button className='small-buttons' positive onClick={() => navigate('/register')}>Register</Button>
+            <Button.Or className='or-button'/>
+            <Button className='small-buttons' negative onClick={() => navigate('/forgot-password')}>Forgot Password</Button>
           </Button.Group>
         </div>
       </div>

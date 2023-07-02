@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, Outlet } from 'react-router-dom';
 import { Container, Loader, Dimmer } from 'semantic-ui-react';
-import 'semantic-ui-css/semantic.min.css';
 import AppHeader from './containers/Header';
 import BasePage from './containers/BasePage';
 import Navigation from './containers/Navigation';
