@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Container, Loader, Dimmer } from 'semantic-ui-react';
 import AppHeader from './containers/Header';
 import BasePage from './containers/BasePage';
@@ -7,28 +8,27 @@ import Navigation from './containers/Navigation';
 import Login from './containers/Login';
 import Register from './containers/Register';
 import ForgotPassword from './containers/ForgotPassword';
+import NotFound from './containers/NotFound.js';
 
 const AppRoutes = ({ loggedIn, username, handleLoginSuccess }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (loggedIn && window.location.pathname !== '/home') {
+    if (loggedIn && location.pathname !== '/home') {
       navigate('/home');
-      console.log('I went home')
-    } else if (!loggedIn && !['/login', '/register', '/forgot-password'].includes(window.location.pathname)) {
+    } else if (!loggedIn && !['/login', '/register', '/forgot-password'].includes(location.pathname)) {
       navigate('/login');
-      console.log('I went to login')
     }
-  }, [loggedIn, navigate]);
+  }, [loggedIn, navigate, location.pathname]);
 
   return (
     <Routes>
-      <Route path="/" element={<Outlet />} >
         <Route path="home" element={<BasePage />} />
         <Route path="register" element={<Register />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="login" element={<Login handleLoginSuccess={handleLoginSuccess} />} />
-      </Route>
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
