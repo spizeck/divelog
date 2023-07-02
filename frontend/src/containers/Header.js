@@ -4,11 +4,10 @@ import 'semantic-ui-css/semantic.min.css'
 
 const AppHeader = () => {
   return (
-    <Header>
-      <p></p> 
-      <h1>Sea Saba's Dive Log App</h1>
-      <p></p>
-    </Header>
+    <div>
+    <p></p>
+    <Header as='h1' textAlign='center'>Sea Saba's Dive Log App</Header>
+    </div>
   );
 };
 
