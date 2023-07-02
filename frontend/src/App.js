@@ -58,9 +58,11 @@ const App = () => {
     }
   }, []);
 
-  const handleLoginSuccess = (token) => {
+  const handleLoginSuccess = (token, username) => {
     // Update the loggedIn state
     localStorage.setItem('token', token);
+    localStorage.setItem('username', username);
+    setUsername(username.charAt(0).toUpperCase() + username.slice(1));
     setLoggedIn(true);
   };
 

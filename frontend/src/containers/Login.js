@@ -28,11 +28,9 @@ const Login = ({ handleLoginSuccess }) => {
       const loginResponse = await api.login(username, password);
 
       if (loginResponse.status === 200) {
-        // Login successful, save the token, and navigate to the home page
-        localStorage.setItem('token', loginResponse.token);
-        localStorage.setItem('username', loginResponse.username);
+        // Login successful, display message and execute handleLoginSuccess
         setSuccessMessage(loginResponse.message);
-        handleLoginSuccess(loginResponse.token);
+        handleLoginSuccess(loginResponse.token, loginResponse.username);
       }
     } catch (error) {
       setErrorMessage(error.message);
