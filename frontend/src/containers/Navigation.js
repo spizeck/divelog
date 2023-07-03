@@ -5,6 +5,7 @@ import 'semantic-ui-css/semantic.min.css'
 import '../styles/Navigation.css';
 import Home from './Home';
 import DiveForm from './DiveForm';
+import Preferences from './Preferences';
 
 export default class Navigation extends Component {
   state = {
@@ -39,13 +40,17 @@ export default class Navigation extends Component {
 
   render() {
     const { activeItem , logoutMessage, sidebarOpened } = this.state
-    const {loggedIn, username} = this.props;
+    const {loggedIn, username, handleLoginSuccess} = this.props;
     
     let content;
     if (activeItem === 'home') {
       content = <Home username={username} loggedIn={loggedIn} />;
     } else if (activeItem === 'Dive Log Entry') {
       content = <DiveForm username={username} />;
+    } else if (activeItem === 'Previous Entries') {
+      content = <div>Previous Entries</div>;
+    } else if (activeItem === 'Preferences') {
+      content = <Preferences username={username} loggedIn={loggedIn} handleLoginSuccess={handleLoginSuccess} />;
     }
   
 
@@ -107,5 +112,3 @@ export default class Navigation extends Component {
     );
   }
 }
-
-

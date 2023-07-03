@@ -71,4 +71,8 @@ const Login = ({ handleLoginSuccess, loggedIn }) => {
   );
 };
 
+// TODO: Make the login accept either username 
+// OR email in a single box. Perhaps the logic can look for 
+// an @ symbol and then decide which to use.
+
 export default Login;

@@ -10,7 +10,7 @@ import Register from './containers/Register';
 import ForgotPassword from './containers/ForgotPassword';
 import NotFound from './containers/NotFound.js';
 
-const AppRoutes = ({ loggedIn, username, handleLoginSuccess }) => {
+const AppRoutes = ({ loggedIn, handleLoginSuccess }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -71,6 +71,7 @@ const App = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     setLoggedIn(false);
+    window.location.reload();
   };
 
   if (loading) {
@@ -85,7 +86,7 @@ const App = () => {
     <Router>
       <Container>
         <AppHeader />
-        <Navigation username={username} loggedIn={loggedIn} handleLogout={handleLogout} />
+        <Navigation username={username} loggedIn={loggedIn} handleLoginSuccess={handleLoginSuccess} handleLogout={handleLogout} />
         <AppRoutes loggedIn={loggedIn} username={username} handleLoginSuccess={handleLoginSuccess} />
       </Container>
     </Router>

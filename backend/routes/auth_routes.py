@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, session
 from services.user_service import create_user, get_user_by_username, get_user_by_email, get_user_by_id
 from models.users import User
+from models.user_preferences import UserPreferences
 from extensions import db
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
@@ -38,6 +39,7 @@ def register():
     username = data['username']
     email = data['email']
     password = data['password']
+    
 
     # Validate email format
     if not User.validate_email_format(email):
@@ -69,10 +71,20 @@ def register():
 
     # If the user doesn't exist, create a new user
     user = create_user(username=username, email=email, password=password)
-
+    
     # Save the user to the database
     try:
         db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        return jsonify({'status': 500, 'message': str(e)}), 500
+    
+    # Create a user preference record for the user
+    user_preferences = UserPreferences(user_id=user.id, preferred_units='imperial')
+
+    # Save the user preferences to the database
+    try:
+        db.session.add(user_preferences)
         db.session.commit()
     except Exception as e:
         return jsonify({'status': 500, 'message': str(e)}), 500
@@ -129,7 +141,8 @@ def get_current_user():
     email = user.email if hasattr(user, 'email') else None
     is_approved = user.is_approved if hasattr(user, 'is_approved') else None
     admin = user.admin if hasattr(user, 'admin') else None
-    preferred_units = user.user_preferences.preferred_units if hasattr(user, 'user_preferences') else None
+    user_preferences = user.user_preferences
+    preferred_units = user_preferences.get_user_preferences() if user_preferences else 'imperial'
     
     return jsonify({'status': 200, 'message': 'User found', 'is_approved': is_approved, 'admin': admin, 'username': username, 'email': email, 'preferred_units': preferred_units}), 200
 

@@ -26,6 +26,8 @@ const API_ENDPOINTS = {
   logout: '/auth/logout',
   forgotPassword: '/auth/forgot_password',
   getCurrentUser: '/auth/current_user',
+  updateUser: '/auth/update_user',
+  preferences: '/auth/preferences',
   // Admin endpoints
   getUsers: 'admin/users',
   approveUser: `admin/users/:userId/approve`,
@@ -132,7 +134,37 @@ const api = {
     }
   },
 
-  // Set userId endpoint
+  // Update user endpoint
+  updateUser: async (userData) => {
+    try {
+      const response = await axiosInstance.put(`${API_ENDPOINTS.updateUser}`, userData);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+
+  // Get user preferences endpoint
+  getPreferences: async () => {
+    try {
+      const response = await axiosInstance.get(`${API_ENDPOINTS.preferences}`);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  // Update user preferences endpoint
+  updatePreferences: async (preferencesData) => {
+    try {
+      const response = await axiosInstance.put(`${API_ENDPOINTS.preferences}`, preferencesData);
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
   setUserId,
 
   // Replace userId placeholder in endpoint paths with the actual userId
