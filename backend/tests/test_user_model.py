@@ -132,7 +132,7 @@ class UserModelTestCase(unittest.TestCase):
         user.save()
 
         # Change the user's password
-        user.update('password', 'newpassword')
+        user.update(password='newpassword')
 
         # Assert that the new password is verified correctly
         self.assertTrue(user.verify_password('newpassword'))

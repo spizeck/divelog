@@ -31,19 +31,10 @@ class User(UserMixin, db.Model):
         db.session.add(self)
         db.session.commit()
         
-    def update(self, username=None, password=None, email=None, preferred_units=None):
-        if username:
-            self.username = username
-        if email:
-            self.email = email
-        if password:
-            self.password = password
-        if preferred_units:
-            if user_preferences := self.user_preferences:
-                user_preferences.update(preferred_units)
-            else:
-                user_preferences = UserPreferences(self.id, preferred_units)
-                user_preferences.save()
+    def update(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+                
         db.session.commit()
         
     @staticmethod

@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, request, session
 from services.user_service import create_user, get_user_by_username, get_user_by_email, get_user_by_id
 from models.users import User
-from models.user_preferences import UserPreferences
 from extensions import db
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
@@ -120,42 +119,50 @@ def forgot_password():
 @jwt_required()
 def get_current_user():
     # Get the user's id from the token
-    current_idenity = get_jwt_identity()
-
-    if not (user := get_user_by_id(current_idenity)):
-        return jsonify({'status': 404, 'message': 'User not found'}), 404
-    
-    # Return the user's information
-    username = user.username if hasattr(user, 'username') else None
-    email = user.email if hasattr(user, 'email') else None
-    
-    return jsonify({'status': 200, 'message': 'User found', 'username': username, 'email': email}), 200
-
-
-@auth_bp.route('/change_password', methods=['PUT'])
-@jwt_required
-def change_password():
     current_identity = get_jwt_identity()
 
     if not (user := get_user_by_id(current_identity)):
         return jsonify({'status': 404, 'message': 'User not found'}), 404
     
+    # Return the user's information
+    username = user.username if hasattr(user, 'username') else None
+    email = user.email if hasattr(user, 'email') else None
+    is_approved = user.is_approved if hasattr(user, 'is_approved') else None
+    admin = user.admin if hasattr(user, 'admin') else None
+    preferred_units = user.user_preferences.preferred_units if hasattr(user, 'user_preferences') else None
+    
+    return jsonify({'status': 200, 'message': 'User found', 'is_approved': is_approved, 'admin': admin, 'username': username, 'email': email, 'preferred_units': preferred_units}), 200
+
+@auth_bp.route('/update_user', methods=['PUT'])
+@jwt_required
+def update_user():
+    current_identity = get_jwt_identity()
+    
+    if not (user := get_user_by_id(current_identity)):
+        return jsonify({'status': 404, 'message': 'User not found'}), 404
+    
     data = request.json
-    old_password = data['old_password']
+    username = data['username']
+    email = data['email']
     new_password = data['new_password']
+    old_password = data['old_password']
     
-    if not user.verify_password(old_password):
-        return jsonify({'status': 401, 'message': 'Invalid credentials'}), 401
+    if email and not User.validate_email_format(email):
+        return jsonify({'status': 400, 'message': 'Invalid email format'}), 400
     
-    if not User.validate_password_strength(new_password):
-        return jsonify({'status': 400,
-                        'message': 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'
-                        }), 400
+    if username and not User.validate_username(username):
+        return jsonify({'status': 400, 'message': 'Invalid username'}), 400
     
-    user.password = new_password
-    db.session.commit()
+    if new_password:
+        if not User.validate_password_strength(new_password):
+            return jsonify({'status': 400,
+                            'message': 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'}), 400
+        if not old_password or not user.check_password(old_password):
+            return jsonify({'status': 400, 'message': 'Incorrect existing password'}), 400
     
-    return jsonify({'status': 200, 'message': 'Password changed successfully'}), 200
+    user.update(username=username, email=email, password=new_password)
+    
+    return jsonify({'status': 200, 'message': 'User updated successfully'}), 200
 
 
 @auth_bp.route('/preferences', methods=['GET', 'PUT'])
@@ -188,3 +195,4 @@ def register_routes(app):
     app.register_blueprint(auth_bp)
     app.add_url_rule('/auth/preferences',
                      view_func=user_preferences, methods=['GET', 'PUT'])
+
