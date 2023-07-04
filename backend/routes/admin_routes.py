@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 from services.user_service import delete_user, get_user_by_id, get_all_users
+import logging
 
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
 
@@ -21,7 +22,7 @@ def get_users():
         }
         user_list.append(user_date)
 
-    return jsonify(users=user_list), 200
+    return jsonify({'users':user_list}), 200
 
 
 @admin_bp.route('/users/<int:user_id>/approve', methods=['PUT'])
@@ -30,13 +31,13 @@ def approve_user(user_id):
     user = get_user_by_id(user_id)
 
     if user is None:
-        return jsonify(message='User not found'), 404
+        return jsonify({'message': 'User not found'}), 404
 
     # Approve the user
     user.is_approved = True
     user.update()
 
-    return jsonify(message='User approved'), 200
+    return jsonify({'message': 'User approved'}), 200
 
 
 @admin_bp.route('/users/<int:user_id>/disapprove', methods=['PUT'])
@@ -45,13 +46,14 @@ def disapprove_user(user_id):
     user = get_user_by_id(user_id)
 
     if user is None:
-        return jsonify(message='User not found'), 404
+        logging.info('User not found')
+        return jsonify({'message': 'User not found'}), 404
 
     # Disapprove the user
     user.is_approved = False
     user.update()
 
-    return jsonify(message='User disapproved'), 200
+    return jsonify({'message': 'User disapproved'}), 200
 
 
 @admin_bp.route('/users/<int:user_id>/promote', methods=['PUT'])
@@ -60,13 +62,13 @@ def promote_user(user_id):
     user = get_user_by_id(user_id)
 
     if user is None:
-        return jsonify(message='User not found'), 404
+        return jsonify({'message': 'User not found'}), 404
 
     # Promote the user
     user.admin = True
     user.update()
 
-    return jsonify(message='User promoted'), 200
+    return jsonify({'message': 'User promoted'}), 200
 
 
 @admin_bp.route('/users/<int:user_id>/demote', methods=['PUT'])
@@ -75,13 +77,13 @@ def demote_user(user_id):
     user = get_user_by_id(user_id)
 
     if user is None:
-        return jsonify(message='User not found'), 404
+        return jsonify({'message': 'User not found'}), 404
 
     # Demote the user
     user.admin = False
     user.update()
 
-    return jsonify(message='User demoted'), 200
+    return jsonify({'message': 'User demoted'}), 200
 
 @admin_bp.route('/users/<int:user_id>/delete', methods=['DELETE'])
 def delete_user_route(user_id):
@@ -89,9 +91,9 @@ def delete_user_route(user_id):
     user = get_user_by_id(user_id)
     
     if user is None:
-        return jsonify(message='User not found'), 404
+        return jsonify({'message': 'User not found'}), 404
     
     # Delete the user
     delete_user(user)
     
-    return jsonify(message='User deleted'), 200
+    return jsonify({'message': 'User deleted'}), 200

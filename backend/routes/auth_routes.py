@@ -4,6 +4,7 @@ from models.users import User
 from models.user_preferences import UserPreferences
 from extensions import db
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+import logging
 
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
@@ -22,6 +23,7 @@ def login():
         return jsonify({'status': 500, 'message': str(e)}), 500
 
     if user is None or not user.verify_password(password):
+        logging.info(f'User {username} failed to log in')
         return jsonify({'status': 401, 'message': 'Invalid credentials'}), 401
 
     # If the user exists, generate an access token for them
@@ -67,6 +69,7 @@ def register():
     user = get_user_by_username(username)
 
     if user is not None:
+        logging.info(f'User {username} already exists')
         return jsonify({'status': 409, 'message': 'Username already exists'}), 409
 
     # If the user doesn't exist, create a new user
@@ -77,7 +80,8 @@ def register():
         db.session.add(user)
         db.session.commit()
     except Exception as e:
-        return jsonify({'status': 500, 'message': str(e)}), 500
+        logging.error(f'Error saving user {username} to the database: {e}')
+        return jsonify({'status': 500, 'message': 'Database Connection Error'}), 500
     
     # Create a user preference record for the user
     user_preferences = UserPreferences(user_id=user.id, preferred_units='imperial')
@@ -87,7 +91,8 @@ def register():
         db.session.add(user_preferences)
         db.session.commit()
     except Exception as e:
-        return jsonify({'status': 500, 'message': str(e)}), 500
+        logging.error(f'Error saving user preferences for user {username} to the database: {e}')
+        return jsonify({'status': 500, 'message': 'Database Connection Error'}), 500
 
     return jsonify({'status': 201, 'message': 'User created successfully'}), 201
 
@@ -119,7 +124,8 @@ def forgot_password():
     try:
         db.session.commit()
     except Exception as e:
-        return jsonify({'status': 500, 'message': str(e)}), 500
+        logging.error(f'Error saving new password for user {user.username} to the database: {e}')
+        return jsonify({'status': 500, 'message': 'Database Connection Error'}), 500
 
     # Send the new password to the user's email
     # TODO: Implement email sending
@@ -134,6 +140,7 @@ def get_current_user():
     current_identity = get_jwt_identity()
 
     if not (user := get_user_by_id(current_identity)):
+        logging.info(f'User {current_identity} not found')
         return jsonify({'status': 404, 'message': 'User not found'}), 404
     
     # Return the user's information
