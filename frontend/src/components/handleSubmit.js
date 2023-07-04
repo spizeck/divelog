@@ -17,7 +17,7 @@ const handleSubmit = async (
     try {
       const diveResponse = await api.createDive(formData);
       const { diveId } = diveResponse;
-      console.log("Dive ID:", diveId);
+      // console.log("Dive ID:", diveId);
 
       // Create a new sighting instance using the form data and the dive ID
       const sightings = sightingData.map((item) => {
@@ -29,14 +29,14 @@ const handleSubmit = async (
         };
       });
 
-      console.log("Sightings:", sightings);
+      // console.log("Sightings:", sightings);
 
       // Submit sightings data to the /sightings endpoint
       const sightingsResponse = await api.createSighting({ sightings });
-      console.log("Sightings response:", sightingsResponse, sightingsResponse.status);
+      // console.log("Sightings response:", sightingsResponse, sightingsResponse.status);
 
       if (sightingsResponse.status === 201) {
-        console.log("Sightings logged successfully");
+        // console.log("Sightings logged successfully");
         setConfirmationMessage("Dive logged successfully");
         setErrorMessage("");
         setSubmitted(true);
@@ -44,12 +44,12 @@ const handleSubmit = async (
         throw new Error("Failed to create sightings");
       }
     } catch (error) {
-      console.error("An error occurred:", error);
+      // console.error("An error occurred:", error);
       setErrorMessage("An error occurred: " + error.message);
       if (error.response) {
-        console.log("Response data:", error.response.data);
-        console.log("Response status:", error.response.status);
-        console.log("Response headers:", error.response.headers);
+        // console.log("Response data:", error.response.data);
+        // console.log("Response status:", error.response.status);
+        // console.log("Response headers:", error.response.headers);
         setErrorMessage("An error occurred: " + error.response.data.message);
       }
     }

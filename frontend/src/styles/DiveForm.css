@@ -1,18 +1,27 @@
-.form-container {
-    display: flex;
-    padding: 20pt;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  label {
-    display: block;
-    font-weight: bold;
-  }
-  
-  input[type='date'],
-  input[type='text'] {
-    width: 100%;
-    padding: 0.5rem;
-  }
-  
+.dive-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.dive-form {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  padding: 20px;
+  /* Add this if you want the form to have a white background */
+}
+
+.error-message {
+  color: #ff0000; /* Error messages are usually displayed in red */
+  margin-bottom: 10px;
+}
+
+.or-button {
+  margin: 2px;
+}
+
+.dive-form .form-buttons {
+  width: calc(50% - 2px);
+}

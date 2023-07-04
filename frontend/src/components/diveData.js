@@ -1,9 +1,30 @@
+const capitalizeFirstLetter = (string) => {
+    if (!string) {
+        return "";
+    }
+    return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
 const diveFormData = {
     date: {
         name: "date",
         label: "Date",
         type: "date",
         defaultValue: new Date().toISOString().slice(0, 10),
+        // Validate that the date is within the last 7 days and not in the future
+        validate: (value) => {
+            const date = new Date(value);
+            const today = new Date();
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(today.getDate() - 7);
+            if (date > today) {
+                return "Date must not be in the future";
+            }
+            if (date < sevenDaysAgo) {
+                return "Date must be within the last 7 days";
+            }
+            return null;
+        }
     },
     diveNumberOptions: {
         name: "diveNumber",
@@ -15,7 +36,13 @@ const diveFormData = {
             { key: "3", text: "1:00 pm", value: 3 },
             { key: "4", text: "3:00 pm", value: 4 },
             { key: "5", text: "Night Dive", value: 5 },
-        ]
+        ],
+        validate: (value) => {
+            if (value.length === 0) {
+                return "Please select a dive number";
+            }
+            return null;
+        }
     },
     boatOptions: {
         name: "boat",
@@ -26,13 +53,28 @@ const diveFormData = {
             { key: "2", text: "Fin & Tonic", value: "Fin and Tonic " },
             { key: "3", text: "Northern Sky", value: "Northern Sky" },
             { key: "4", text: "Private Boat", value: "Private Boat" },
-        ]
+        ],
+        validate: (value) => {
+            if (value.length === 0) {
+                return "Please select a boat";
+            }
+            return null;
+        }
     },
     diveGuide: {
         name: "diveGuide",
         label: "Dive Guide",
         type: "text",
-        defaultValue: "", //user.username,
+        defaultValue: capitalizeFirstLetter(localStorage.getItem("username")) || "",
+        validate: (value) => {
+            if (value.length > 20) {
+                return "Dive Guide must be 20 characters or less";
+            }
+            if (value.length < 1) {
+                return "Dive Guide is required";
+            }
+            return null;
+        }
     },
     diveSiteOptions: {
         name: "diveSite",
@@ -78,22 +120,55 @@ const diveFormData = {
             { key: "37", text: "Ghost Wreck", value: "Ghost Wreck" },
             { key: "38", text: "Saba Bank", value: "Saba Bank" },
             { key: "39", text: "Blackwater", value: "Blackwater" },
-        ]
+        ],
+        validate: (value) => {
+            if (value.length === 0) {
+                return "Please select a dive site";
+            }
+            return null;
+        }
+
     },
 
     maxDepth: {
         name: "maxDepth",
         label: "Max Depth (ft)",
         type: "number",
-        defaultValue: 0,
+        defaultValue: 70,
+        validate: (value) => {
+            if (value < 0) {
+                return "Depth must be a positive number";
+            }
+            if (value % 1 !== 0) {
+                return "Depth must be a whole number";
+            }
+            if (value > 200 || value < 15) {
+                return "Please verify your depth";
+            }
+            return null;
+        }
     },
 
     waterTemperature: {
         name: "waterTemperature",
         label: "Water Temperature (F)",
         type: "number",
-        defaultValue: 0,
+        defaultValue: 80,
+        validate: (value) => {
+            if (value < 0) {
+                return "Must be a positive number";
+            }
+            if (value % 1 !== 0) {
+                return "Must be a whole number";
+            }
+            if (value > 90 || value < 70) {
+                return "Are you sure about that temperature?";
+            }
+            return null;
+        },
     },
 };
+
+
 
 export default diveFormData;

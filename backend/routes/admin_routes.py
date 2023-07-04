@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from services.user_service import delete_user, get_user_by_id, update_user, get_all_users
+from services.user_service import delete_user, get_user_by_id, get_all_users
 
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
 
@@ -34,7 +34,7 @@ def approve_user(user_id):
 
     # Approve the user
     user.is_approved = True
-    update_user(user)
+    user.update()
 
     return jsonify(message='User approved'), 200
 
@@ -49,7 +49,7 @@ def disapprove_user(user_id):
 
     # Disapprove the user
     user.is_approved = False
-    update_user(user)
+    user.update()
 
     return jsonify(message='User disapproved'), 200
 
@@ -64,7 +64,7 @@ def promote_user(user_id):
 
     # Promote the user
     user.admin = True
-    update_user(user)
+    user.update()
 
     return jsonify(message='User promoted'), 200
 
@@ -79,7 +79,7 @@ def demote_user(user_id):
 
     # Demote the user
     user.admin = False
-    update_user(user)
+    user.update()
 
     return jsonify(message='User demoted'), 200
 

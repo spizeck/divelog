@@ -16,7 +16,7 @@ def test_database_connection():
         db.session.execute(text('SELECT 1'))
 
         # If the queries executed successfully, the database connection is working
-        return jsonify(message='Database connection successful'), 200
+        return jsonify({'message':'Database connection successful'}), 200
     except Exception as e:
         # If there's an exception, there is an issue with the database connection
         logging.error(e)
@@ -52,7 +52,7 @@ def create_dive():
         # Fetch the generated dive ID
         dive_id = dive.id
 
-        return jsonify(message='Dive created successfully', diveId=dive_id, status=201), 201
+        return jsonify({'message':'Dive created successfully', 'diveId':dive_id, 'status':201}), 201
 
     except DiveIntegrityError as e:
         logging.error(e)
@@ -92,7 +92,7 @@ def create_sighting():
             db.session.add_all(sightings_to_save)
             db.session.commit()  # Commit the session to save the sightings
 
-        return jsonify(message='Sightings created successfully', status=201), 201
+        return jsonify({'message':'Sightings created successfully', 'status':201}), 201
     except Exception as e:
         logging.error(e)
         db.session.rollback()

@@ -1,9 +1,12 @@
 blinker
 click
 Flask
+flask_bcrypt
 Flask-Cors
 Flask-SQLAlchemy
 Flask-Testing
+flask_jwt_extended
+flask_login
 gunicorn
 itsdangerous
 Jinja2

@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from config import app_config
 from errors import register_error_handlers
-from extensions import db
+from extensions import db, jwt
 
 
 def create_app(config_class=app_config):
@@ -14,6 +14,7 @@ def create_app(config_class=app_config):
 
     # Initialize Flask extensions
     db.init_app(app)
+    jwt.init_app(app)
 
     # Register error handlers
     register_error_handlers(app)

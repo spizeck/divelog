@@ -19,7 +19,7 @@ def create_user(username, email, password, is_approved=False, admin=False):
 
 def get_user_by_id(user_id):
     # Retrieve the user from the database
-    return User.query.get(user_id)
+    return db.session.get(User, user_id)
 
 
 def get_user_by_username(username):
@@ -32,15 +32,11 @@ def get_user_by_email(email):
     return User.query.filter_by(email=email).first()
 
 
-def update_user(user):
-    # Update the user in the database
-    db.session.commit()
-
-
 def delete_user(user):
     # Delete the user from the database
     db.session.delete(user)
     db.session.commit()
+
 
 def get_all_users():
     # Retrieve all users from the database
