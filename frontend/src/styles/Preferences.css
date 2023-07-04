@@ -1,0 +1,57 @@
+.preferences-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+  min-height: 70vh;
+}
+
+.preferences-form {
+  min-width: 350px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.preferences-form h1 {
+  margin: 0;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.preferences-form input {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box; 
+}
+
+.preferences-form .preferences.button {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.preferences-form .error-message {
+  color: #ff0000;
+  margin-bottom: 10px;
+}
+
+.preferences-form .preferences-footer {
+  display: inline-block;
+  justify-content: left;
+  margin-top: 12px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.preferences-footer .small-buttons {
+  width: calc(50% - 2px);
+}

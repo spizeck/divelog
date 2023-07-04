@@ -133,9 +133,13 @@ const api = {
   },
 
   // Get current user endpoint
-  getCurrentUser: async () => {
+  getCurrentUser: async (token) => {
     try {
-      const response = await axiosInstance.get(`${API_ENDPOINTS.getCurrentUser}`);
+      const response = await axiosInstance.get(`${API_ENDPOINTS.getCurrentUser}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       if (error.response && error.response.data.message) {
@@ -147,9 +151,13 @@ const api = {
   },
 
   // Update user endpoint
-  updateUser: async (userData) => {
+  updateUser: async (token, userData) => {
     try {
-      const response = await axiosInstance.put(`${API_ENDPOINTS.updateUser}`, userData);
+      const response = await axiosInstance.put(`${API_ENDPOINTS.updateUser}`, userData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       throw error.response.data;
@@ -158,9 +166,13 @@ const api = {
 
 
   // Get user preferences endpoint
-  getPreferences: async () => {
+  getPreferences: async (token) => {
     try {
-      const response = await axiosInstance.get(`${API_ENDPOINTS.preferences}`);
+      const response = await axiosInstance.get(`${API_ENDPOINTS.preferences}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       throw error.response.data;
@@ -168,9 +180,13 @@ const api = {
   },
 
   // Update user preferences endpoint
-  updatePreferences: async (preferencesData) => {
+  updatePreferences: async (token, preferencesData) => {
     try {
-      const response = await axiosInstance.put(`${API_ENDPOINTS.preferences}`, preferencesData);
+      const response = await axiosInstance.put(`${API_ENDPOINTS.preferences}`, preferencesData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       throw error.response.data;

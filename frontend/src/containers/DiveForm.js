@@ -7,7 +7,7 @@ import diveFormData from '../components/diveData';
 import handleChange from '../components/handleChange';
 import handleSubmit from '../components/handleSubmit';
 
-const DiveForm = ({username}) => {
+const DiveForm = ({ username }) => {
   const totalSteps = 7;
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState(() => {
@@ -208,13 +208,13 @@ const DiveForm = ({username}) => {
       <Form onSubmit={handleFormSubmit}>
         <div className='dive-form'>
           {renderStep()}
-          <Button.Group fluid style={{marginTop:'10px'}}>
+          <Button.Group fluid style={{ marginTop: '10px' }}>
             {step > 1 && !submitted ? (
-              <Button className="form-buttons"color='grey' type="button" onClick={handlePrevious}>Previous</Button>
+              <Button className="form-buttons" color='grey' type="button" onClick={handlePrevious}>Previous</Button>
             ) : (
               <Button className="form-buttons" negative type="button" onClick={handleResetForm}>Reset Form</Button>
             )}
-            <Button.Or className='or-button'/>
+            <Button.Or className='or-button' />
             {step < totalSteps ? (
               <Button className="form-buttons" primary type="button" onClick={handleNext} disabled={formError} >Next</Button>
             ) : (
