@@ -7,7 +7,7 @@ import diveFormData from '../components/diveData';
 import handleChange from '../components/handleChange';
 import handleSubmit from '../components/handleSubmit';
 
-const DiveForm = () => {
+const DiveForm = ({username}) => {
   const totalSteps = 7;
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState(() => {
@@ -20,6 +20,10 @@ const DiveForm = () => {
         defaultData[key] = "";
       }
     });
+
+    if (username) {
+      defaultData.diveGuide = username;
+    }
 
     return defaultData;
   });
