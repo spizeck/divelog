@@ -151,6 +151,7 @@ def get_current_user():
     user_preferences = user.user_preferences
     preferred_units = user_preferences.get_user_preferences() if user_preferences else 'imperial'
     
+    logging.info(f'User {username} found')
     return jsonify({'status': 200, 'message': 'User found', 'is_approved': is_approved, 'admin': admin, 'username': username, 'email': email, 'preferred_units': preferred_units}), 200
 
 @auth_bp.route('/update_user', methods=['PUT'])

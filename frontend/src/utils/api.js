@@ -17,6 +17,11 @@ const axiosInstance = axios.create({
   },
 });
 
+// Function to update the token in the Axios instance
+const updateToken = (token) => {
+  axiosInstance.defaults.headers.common.Authorization = `Bearer ${token}`;
+};
+
 // API endpoints
 const API_ENDPOINTS = {
   homepage: '/',
@@ -58,6 +63,9 @@ const api = {
         username,
         password,
       });
+
+      updateToken(response.data.token);
+
       return response.data;
     } catch (error) {
       throw error.response.data;
@@ -124,13 +132,17 @@ const api = {
     }
   },
 
-// Get current user endpoint
+  // Get current user endpoint
   getCurrentUser: async () => {
     try {
       const response = await axiosInstance.get(`${API_ENDPOINTS.getCurrentUser}`);
       return response.data;
     } catch (error) {
-      throw error.response.data;
+      if (error.response && error.response.data.message) {
+        throw new Error(error.response.data.message);
+      } else {
+        throw new Error('An error occurred while fetching the current user');
+      }
     }
   },
 

@@ -64,6 +64,8 @@ const App = () => {
     localStorage.setItem('username', username);
     setUsername(username.charAt(0).toUpperCase() + username.slice(1));
     setLoggedIn(true);
+    // TODO: Find a way to load the username and token without refreshing the page
+    window.location.reload();
   };
 
   const handleLogout = () => {
