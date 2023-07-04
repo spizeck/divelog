@@ -3,7 +3,8 @@ from flask import Blueprint, jsonify, request
 from models.dives import Dive
 from models.sightings import Sightings
 from sqlalchemy import text
-from errors import DiveIntegrityError
+from errors import DiveIntegrityError, DiveInfoMissingError
+import logging
 
 db_bp = Blueprint('db_bp', __name__, url_prefix='/db')
 
@@ -18,7 +19,8 @@ def test_database_connection():
         return jsonify(message='Database connection successful'), 200
     except Exception as e:
         # If there's an exception, there is an issue with the database connection
-        return jsonify(message=f'Error connecting to database: {str(e)}'), 500
+        logging.error(e)
+        return jsonify(message='Error connecting to database'), 500
 
 
 @db_bp.route('/dives/entries', methods=['POST'])
@@ -39,7 +41,8 @@ def create_dive():
             water_temperature=data['waterTemperature'],
         )
 
-        # Validate that the dive is unique
+        # Validate that the dive
+        dive.validate()
         dive.validate_unique()
 
         # Save the dive to the dive table in the database
@@ -52,11 +55,19 @@ def create_dive():
         return jsonify(message='Dive created successfully', diveId=dive_id, status=201), 201
 
     except DiveIntegrityError as e:
-        return jsonify({'status': 409, 'message': f'Failed to create dive: {str(e)}'}), 409
+        logging.error(e)
+        db.session.rollback()
+        return jsonify({'status': 409, 'message': 'Dive already exists'}), 409
+    
+    except DiveInfoMissingError as e:
+        logging.error(e)
+        db.session.rollback()
+        return jsonify({'status': 400, 'message': 'Dive information is incomplete'}), 400
 
     except Exception as e:
+        logging.error(e)
         db.session.rollback()
-        return jsonify({'status': 500, 'message': f'Failed to create dive: {str(e)}'}), 500
+        return jsonify({'status': 500, 'message': 'Failed to create dive - Database Connection Error'}), 500
 
 
 @db_bp.route("/sightings/entries", methods=["POST"])
@@ -83,7 +94,9 @@ def create_sighting():
 
         return jsonify(message='Sightings created successfully', status=201), 201
     except Exception as e:
-        return jsonify(message='Failed to create sightings', error=str(e), status=400), 400
+        logging.error(e)
+        db.session.rollback()
+        return jsonify(message='Failed to create sightings', status=400), 400
 
 
 def register_routes(app):

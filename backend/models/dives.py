@@ -1,5 +1,5 @@
 from extensions import db
-from errors import DiveIntegrityError
+from errors import DiveIntegrityError, DiveInfoMissingError
 
 
 class Dive(db.Model):
@@ -31,3 +31,8 @@ class Dive(db.Model):
             # Rollback the session to prevent the duplicate dive from being saved
             db.session.rollback()
             raise DiveIntegrityError()
+
+    # check that all fields are present
+    def validate(self):
+        if not self.date or not self.dive_number or not self.boat or not self.dive_guide or not self.dive_site or not self.max_depth or not self.water_temperature:
+            raise DiveInfoMissingError()
