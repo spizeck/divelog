@@ -5,7 +5,7 @@ import '../styles/Preferences.css';
 
 import api from '../utils/api';
 
-const Preferences = ({ token, username, handleLoginSuccess }) => {
+const Preferences = ({ token, handleLoginSuccess }) => {
   const [newUsername, setNewUsername] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -23,7 +23,10 @@ const Preferences = ({ token, username, handleLoginSuccess }) => {
         setNewEmail(userResponse.email);
         setNewUnit(userResponse.preferred_units);
       } catch (error) {
-        setErrorMessage(error.message);
+        setTimeout(() => {
+          setErrorMessage(error.message);
+        }, 1000);
+        window.location.reload();
       }
     };
 
@@ -39,17 +42,16 @@ const Preferences = ({ token, username, handleLoginSuccess }) => {
     }
 
     try {
-      const updateResponse = await api.updateUser(
-        username,
-        newUsername,
-        newEmail,
-        newPassword,
-        newUnit
+      const updateResponse = await api.updateUser(token, {
+        newUsername: newUsername,
+        newEmail: newEmail,
+        newPassword: newPassword,
+      }
       );
 
       if (updateResponse.status === 200) {
         setSuccessMessage(updateResponse.message);
-        handleLoginSuccess(updateResponse.token, updateResponse.username);
+        handleLoginSuccess(updateResponse.token, newUsername); // Might be a better way to do this
         setIsEditing(false);
       }
     } catch (error) {
@@ -59,6 +61,10 @@ const Preferences = ({ token, username, handleLoginSuccess }) => {
 
   const handleEdit = () => {
     setIsEditing(true);
+  };
+
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
   const handleCancel = () => {
@@ -131,6 +137,7 @@ const Preferences = ({ token, username, handleLoginSuccess }) => {
             Update
           </Button>
         </Button.Group>
+        {successMessage && <Message positive>{successMessage}</Message>}
         {errorMessage && <Message negative>{errorMessage}</Message>}
       </div>
     </Form>
@@ -147,12 +154,14 @@ const Preferences = ({ token, username, handleLoginSuccess }) => {
           <strong>Email:</strong> {newEmail}
         </p>
         <p>
-          <strong>Unit:</strong> {newUnit}
+          <strong>Unit:</strong> {capitalizeFirstLetter(newUnit)}
         </p>
         <Button fluid color='grey' className='edit-button' onClick={handleEdit}>
           Edit
         </Button>
       </div>
+      {successMessage && <Message positive>{successMessage}</Message>}
+      {errorMessage && <Message negative>{errorMessage}</Message>}
     </Container>
   );
 

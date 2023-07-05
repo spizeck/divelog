@@ -26,7 +26,7 @@ def create_app(config_class=app_config):
     app.register_blueprint(auth_bp)
     app.register_blueprint(db_bp)
     app.register_blueprint(admin_bp)
-    
+
     # Create database tables
     with app.app_context():
         # db.drop_all() # comment out for production

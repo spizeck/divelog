@@ -20,7 +20,8 @@ def login():
     try:
         user = get_user_by_username(username)
     except Exception as e:
-        return jsonify({'status': 500, 'message': str(e)}), 500
+        logging.error(f'Error retrieving user {username} from the database: {e}')
+        return jsonify({'status': 500, 'message':'Database connection error'}), 500
 
     if user is None or not user.verify_password(password):
         logging.info(f'User {username} failed to log in')
@@ -155,34 +156,45 @@ def get_current_user():
     return jsonify({'status': 200, 'message': 'User found', 'is_approved': is_approved, 'admin': admin, 'username': username, 'email': email, 'preferred_units': preferred_units}), 200
 
 @auth_bp.route('/update_user', methods=['PUT'])
-@jwt_required
+@jwt_required()
 def update_user():
     current_identity = get_jwt_identity()
-    
+
     if not (user := get_user_by_id(current_identity)):
         return jsonify({'status': 404, 'message': 'User not found'}), 404
-    
+
     data = request.json
-    username = data['username']
-    email = data['email']
-    new_password = data['new_password']
-    old_password = data['old_password']
+
+    data_to_update = {
+        'username': data['newUsername'],
+        'email': data['newEmail'],
+        'password': data['newPassword'] 
+    }
     
-    if email and not User.validate_email_format(email):
+    # Remove keys with empty strings
+    data_to_update = {k: v for k, v in data_to_update.items() if v}
+    
+    print(data_to_update)
+
+    # Validate the data
+    if 'email' in data_to_update and not User.validate_email_format(data_to_update['email']):
         return jsonify({'status': 400, 'message': 'Invalid email format'}), 400
     
-    if username and not User.validate_username(username):
-        return jsonify({'status': 400, 'message': 'Invalid username'}), 400
-    
-    if new_password:
-        if not User.validate_password_strength(new_password):
+    if 'email' in data_to_update and not User.validate_email_availability(data_to_update['email']):
+        return jsonify({'status': 409, 'message': 'Email already taken'}), 409
+
+    if 'username' in data_to_update and not User.validate_username_availability(data_to_update['username']):
+        return jsonify({'status': 400, 'message': 'Username already taken'}), 400
+
+    if 'password' in data_to_update and not User.validate_password_strength(data_to_update['password']):
             return jsonify({'status': 400,
                             'message': 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'}), 400
-        if not old_password or not user.check_password(old_password):
-            return jsonify({'status': 400, 'message': 'Incorrect existing password'}), 400
-    
-    user.update(username=username, email=email, password=new_password)
-    
+
+    if not data_to_update:
+        return jsonify({'status': 400, 'message': 'No data to update'}), 400
+
+    user.update(**data_to_update)
+
     return jsonify({'status': 200, 'message': 'User updated successfully'}), 200
 
 
@@ -202,13 +214,13 @@ def user_preferences():
 
     if request.method == 'PUT':
         data = request.json
-        preferred_units = data.get('preferred_units')
+        new_preferred_units = data.get('preferredUnits')
 
-        if not preferred_units:
+        if not new_preferred_units:
             return jsonify({'status': 400, 'message': 'Preferred units not provided'}), 400
 
         # Update the user's preferences
-        user.user_preferences.update(preferred_units=preferred_units)
+        user.user_preferences.update(preferred_units=new_preferred_units)
         return jsonify({'status': 200, 'message': 'User preferences updated'}), 200
 
 

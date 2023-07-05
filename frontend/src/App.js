@@ -9,6 +9,7 @@ import Login from './containers/Login';
 import Register from './containers/Register';
 import ForgotPassword from './containers/ForgotPassword';
 import NotFound from './containers/NotFound.js';
+import api from './utils/api';
 
 const AppRoutes = ({ loggedIn, handleLoginSuccess }) => {
   const navigate = useNavigate();
@@ -41,26 +42,48 @@ const App = () => {
 
   useEffect(() => {
     // Check if the user is logged in based on the token presence
-    const checkLoggedInStatus = () => {
+    const checkLoggedInStatus = async () => {
       const storedToken = localStorage.getItem('token');
       const localUsername = localStorage.getItem('username');
 
       if (storedToken) {
-        // User is logged in
-        setToken(storedToken)
-        setLoggedIn(true);
-        setUsername(localUsername.charAt(0).toUpperCase() + localUsername.slice(1));
-
+        try {
+          const response = await api.getCurrentUser(storedToken);
+          if (response.status === 200) {
+            // User is logged in
+            setToken(storedToken)
+            setLoggedIn(true);
+            setUsername(localUsername.charAt(0).toUpperCase() + localUsername.slice(1));
+          } else {
+            // User is not logged in
+            setToken(null);
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            setLoggedIn(false);
+            setUsername('');
+            window.location.reload();
+          }
+        } catch (error) {
+          // User is not logged in
+          setToken(null);
+          localStorage.removeItem('token');
+          localStorage.removeItem('username');
+          setLoggedIn(false);
+          setUsername('');
+          window.location.reload();
+        }
       } else {
         // User is not logged in
         setToken(null);
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
         setLoggedIn(false);
         setUsername('');
       }
       setLoading(false);
     };
     checkLoggedInStatus();
-    }, []);
+  }, []);
 
   const handleLoginSuccess = (newToken, newUsername) => {
     localStorage.setItem('token', newToken);

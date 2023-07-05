@@ -33,8 +33,9 @@ class User(UserMixin, db.Model):
         
     def update(self, **kwargs):
         for key, value in kwargs.items():
+            print(f"Updating {key} to {value}")
             setattr(self, key, value)
-                
+        print("I am updating the user now...")        
         db.session.commit()
         
     @staticmethod
