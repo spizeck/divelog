@@ -1,47 +1,61 @@
-import React, { useState } from 'react';
-import { Sidebar, Menu, Message, Icon } from 'semantic-ui-react';
-import api from '../utils/api';
-import 'semantic-ui-css/semantic.min.css';
-import '../styles/Navigation.css';
-import Home from './Home';
-import DiveForm from './DiveForm';
-import Preferences from './Preferences';
+import React, { useState } from 'react'
+import { Sidebar, Menu, Message, Icon } from 'semantic-ui-react'
+import api from '../utils/api'
+import 'semantic-ui-css/semantic.min.css'
+import '../styles/Navigation.css'
+import Home from './Home'
+import DiveForm from './DiveForm'
+import Preferences from './Preferences'
 
-const Navigation = ({ loggedIn, username, setUsername, handleLogout, handleLoginSuccess, token}) => {
-  const [activeItem, setActiveItem] = useState('home');
-  const [logoutMessage, setLogoutMessage] = useState('');
-  const [sidebarOpened, setSidebarOpened] = useState(false);
+const Navigation = ({
+  loggedIn,
+  username,
+  setUsername,
+  handleLogout,
+  handleLoginSuccess,
+  token
+}) => {
+  const [activeItem, setActiveItem] = useState('home')
+  const [logoutMessage, setLogoutMessage] = useState('')
+  const [sidebarOpened, setSidebarOpened] = useState(false)
 
-  const handleSidebarToggle = () => setSidebarOpened(!sidebarOpened);
+  const handleSidebarToggle = () => setSidebarOpened(!sidebarOpened)
 
   const handleItemClick = (e, { name }) => {
-    setSidebarOpened(false);
+    setSidebarOpened(false)
     if (name === 'logout') {
-      api.logout()
-        .then((response) => {
-          setLogoutMessage(response.message);
-          handleLogout();
+      api
+        .logout()
+        .then(response => {
+          setLogoutMessage(response.message)
+          handleLogout()
           setTimeout(() => {
-            setLogoutMessage('');
-          }, 3000);
+            setLogoutMessage('')
+          }, 3000)
         })
-        .catch((error) => {
-          console.log(error);
-        });
+        .catch(error => {
+          console.log(error)
+        })
     } else {
-      setActiveItem(name);
+      setActiveItem(name)
     }
-  };
+  }
 
-  let content;
+  let content
   if (activeItem === 'home') {
-    content = <Home username={username} loggedIn={loggedIn} />;
+    content = <Home username={username} loggedIn={loggedIn} />
   } else if (activeItem === 'Dive Log Entry') {
-    content = <DiveForm username={username} />;
+    content = <DiveForm username={username} token={token} />
   } else if (activeItem === 'Previous Entries') {
-    content = <div>Previous Entries</div>;
+    content = <div>Previous Entries</div>
   } else if (activeItem === 'Preferences') {
-    content = <Preferences token={token} setUsername={setUsername} handleLoginSuccess={handleLoginSuccess} />;
+    content = (
+      <Preferences
+        token={token}
+        setUsername={setUsername}
+        handleLoginSuccess={handleLoginSuccess}
+      />
+    )
   }
 
   return (
@@ -90,8 +104,16 @@ const Navigation = ({ loggedIn, username, setUsername, handleLogout, handleLogin
       </Menu>
       <Sidebar.Pushable>
         <Sidebar as={Menu} animation='push' vertical visible={sidebarOpened}>
-          <Menu.Item name='Preferences' active={activeItem === 'Preferences'} onClick={handleItemClick} />
-          <Menu.Item name='logout' active={activeItem === 'logout'} onClick={handleItemClick} />
+          <Menu.Item
+            name='Preferences'
+            active={activeItem === 'Preferences'}
+            onClick={handleItemClick}
+          />
+          <Menu.Item
+            name='logout'
+            active={activeItem === 'logout'}
+            onClick={handleItemClick}
+          />
         </Sidebar>
         <Sidebar.Pusher dimmed={sidebarOpened}>
           {content}
@@ -99,7 +121,7 @@ const Navigation = ({ loggedIn, username, setUsername, handleLogout, handleLogin
         </Sidebar.Pusher>
       </Sidebar.Pushable>
     </div>
-  );
-};
+  )
+}
 
-export default Navigation;
+export default Navigation
