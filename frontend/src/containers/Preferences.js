@@ -54,7 +54,8 @@ const Preferences = ({ token, setUsername }) => {
     }
 
     fetchCurrentUser()
-  }, [token, setUsername])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token])
 
   const handleUpdate = async e => {
     e.preventDefault()
