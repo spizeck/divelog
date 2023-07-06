@@ -25,7 +25,12 @@ const Login = ({ handleLoginSuccess, loggedIn }) => {
 
     try {
       // Send login request to the backend
-      const loginResponse = await api.login(username, password);
+      let loginResponse;
+      if (username.includes('@')) {
+        loginResponse = await api.loginWithEmail(username, password);
+      } else {
+        loginResponse = await api.loginWithUsername(username, password);
+      }
 
       if (loginResponse.status === 200) {
         // Login successful, display message and execute handleLoginSuccess
@@ -44,7 +49,7 @@ const Login = ({ handleLoginSuccess, loggedIn }) => {
           <h1>Please Log In</h1>
           <Form.Input
             type="text"
-            placeholder="Username"
+            placeholder="Username or Email"
             value={username}
             onChange={(e, { value }) => setUsername(value)}
           />

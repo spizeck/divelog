@@ -17,12 +17,12 @@ auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.json
-    username = data['username']
+    username = data['username'] if 'username' in data else None
+    email = data['email'] if 'email' in data else None
     password = data['password']
-    # TODO: Add functionality to allow users to log in with their email address
-    # Check if the user exists, wrapped in a try block in case of database error
+    
     try:
-        user = get_user_by_username(username)
+        user = get_user_by_username(username) if username else get_user_by_email(email)
     except Exception as e:
         logging.error(
             f'Error retrieving user {username} from the database: {e}')

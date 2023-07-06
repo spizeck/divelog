@@ -57,13 +57,28 @@ const replaceUserId = (path) => {
 
 const api = {
   // Login endpoint
-  login: async (username, password) => {
+  loginWithUsername: async (username, password) => {
     try {
       const response = await axios.post(`${apiUrl}${API_ENDPOINTS.login}`, {
         username,
         password,
       });
 
+      updateToken(response.data.token);
+
+      return response.data;
+    } catch (error) {
+      throw error.response.data;
+    }
+  },
+
+  loginWithEmail: async (username, password) => {
+    try {
+      const response = await axios.post(`${apiUrl}${API_ENDPOINTS.login}`, {
+        email: username,
+        password,
+      });
+    
       updateToken(response.data.token);
 
       return response.data;
