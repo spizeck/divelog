@@ -114,7 +114,7 @@ const App = () => {
     <Router>
       <Container>
         <AppHeader />
-        <Navigation token={token} username={username} loggedIn={loggedIn} handleLoginSuccess={handleLoginSuccess} handleLogout={handleLogout} />
+        <Navigation token={token} username={username} setUsername={setUsername} loggedIn={loggedIn} handleLoginSuccess={handleLoginSuccess} handleLogout={handleLogout} />
         <AppRoutes loggedIn={loggedIn} username={username} handleLoginSuccess={handleLoginSuccess} />
       </Container>
     </Router>

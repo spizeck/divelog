@@ -7,7 +7,7 @@ import Home from './Home';
 import DiveForm from './DiveForm';
 import Preferences from './Preferences';
 
-const Navigation = ({ loggedIn, username, handleLogout, handleLoginSuccess, token}) => {
+const Navigation = ({ loggedIn, username, setUsername, handleLogout, handleLoginSuccess, token}) => {
   const [activeItem, setActiveItem] = useState('home');
   const [logoutMessage, setLogoutMessage] = useState('');
   const [sidebarOpened, setSidebarOpened] = useState(false);
@@ -41,7 +41,7 @@ const Navigation = ({ loggedIn, username, handleLogout, handleLoginSuccess, toke
   } else if (activeItem === 'Previous Entries') {
     content = <div>Previous Entries</div>;
   } else if (activeItem === 'Preferences') {
-    content = <Preferences token={token} handleLoginSuccess={handleLoginSuccess} />;
+    content = <Preferences token={token} setUsername={setUsername} handleLoginSuccess={handleLoginSuccess} />;
   }
 
   return (

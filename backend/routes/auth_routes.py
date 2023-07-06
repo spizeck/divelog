@@ -7,7 +7,9 @@ from flask_jwt_extended import (create_access_token, get_jwt_identity,
 from models.user_preferences import UserPreferences
 from models.users import User
 from services.user_service import (create_user, get_user_by_email,
-                                   get_user_by_id, get_user_by_username)
+                                   get_user_by_id, get_user_by_username,
+                                   update_username, update_email, change_password)
+
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 
@@ -154,12 +156,15 @@ def get_current_user():
     email = user.email if hasattr(user, 'email') else None
     is_approved = user.is_approved if hasattr(user, 'is_approved') else None
     admin = user.admin if hasattr(user, 'admin') else None
-    user_preferences = user.user_preferences
-    preferred_units = user_preferences.get_user_preferences(
-    ) if user_preferences else 'imperial'
 
-    logging.info(f'User {username} found')
-    return jsonify({'status': 200, 'message': 'User found', 'is_approved': is_approved, 'admin': admin, 'username': username, 'email': email, 'preferred_units': preferred_units}), 200
+    return jsonify({
+        'status': 200,
+        'message': 'User found',
+        'is_approved': is_approved,
+        'admin': admin,
+        'username': username,
+        'email': email
+    }), 200
 
 
 @auth_bp.route('/update_user', methods=['PUT'])
@@ -171,34 +176,37 @@ def update_user():
         return jsonify({'status': 404, 'message': 'User not found'}), 404
 
     data = request.json
+    allowed_keys = ['newUsername', 'newEmail', 'newPassword']
+    data_to_update = {k: v for k, v in data.items() if k in allowed_keys}
 
-    data_to_update = {
-        'username': data['newUsername'],
-        'email': data['newEmail'],
-        'password': data['newPassword']
-    }
+    if 'newUsername' in data_to_update:
+        try:
+            update_username(user, data_to_update['newUsername'])
+            return jsonify({'status': 200, 'message': 'Username updated successfully'}), 200
+        except Exception as e:
+            logging.error(f'Error updating username for user {user.username}: {e}')
+            return jsonify({'status': 409, 'message': 'Username already exists'}), 409
 
-    # Remove keys with empty strings
-    data_to_update = {k: v for k, v in data_to_update.items() if v}
+    if 'newEmail' in data_to_update:
+        try: 
+            update_email(user, data_to_update['newEmail'])
+            return jsonify({'status': 200, 'message': 'Email updated successfully'}), 200
+        except Exception as e:
+            logging.error(f'Error updating email for user {user.username}: {e}')
+            return jsonify({'status': 409, 'message': 'Email already exists'}), 409
 
-    # Validate the data
-    if 'email' in data_to_update and not User.validate_email_format(data_to_update['email']):
-        return jsonify({'status': 400, 'message': 'Invalid email format'}), 400
-
-    if 'email' in data_to_update and not User.validate_email_availability(data_to_update['email']):
-        return jsonify({'status': 409, 'message': 'Email already taken'}), 409
-
-    if 'username' in data_to_update and not User.validate_username_availability(data_to_update['username']):
-        return jsonify({'status': 400, 'message': 'Username already taken'}), 400
-
-    if 'password' in data_to_update and not User.validate_password_strength(data_to_update['password']):
-        return jsonify({'status': 400,
-                        'message': 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'}), 400
-
+    if 'newPassword' in data_to_update:
+        try:
+            change_password(user, data_to_update['newPassword'])
+            return jsonify({'status': 200, 'message': 'Password updated successfully'}), 200
+        except Exception as e:
+            logging.error(f'Error updating password for user {user.username}: {e}')
+            return jsonify({'status': 400,
+                        'message': 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'
+                        }), 400
+            
     if not data_to_update:
         return jsonify({'status': 400, 'message': 'No data to update'}), 400
-
-    user.update(**data_to_update)
 
     return jsonify({'status': 200, 'message': 'User updated successfully'}), 200
 
@@ -215,11 +223,11 @@ def user_preferences():
     if request.method == 'GET':
         # Get the user's current preferences
         preferred_units = user.user_preferences.get_user_preferences()
-        return jsonify({'status': 200, 'preferred_units': preferred_units}), 200
+        return jsonify({'status': 200, 'preferredUnits': preferred_units}), 200
 
     if request.method == 'PUT':
         data = request.json
-        new_preferred_units = data.get('preferredUnits')
+        new_preferred_units = data.get('newPreferredUnits')
 
         if not new_preferred_units:
             return jsonify({'status': 400, 'message': 'Preferred units not provided'}), 400

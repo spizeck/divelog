@@ -41,3 +41,22 @@ def delete_user(user):
 def get_all_users():
     # Retrieve all users from the database
     return User.query.all()
+
+def update_username(user, new_username):
+    # Update the user's username
+    if User.validate_username_availability(new_username):
+        user.username = new_username
+        db.session.commit()
+    
+def update_email(user, new_email):
+    # Update the user's email
+    if User.validate_email_availability(new_email) and User.validate_email_format(new_email):
+        user.email = new_email
+        db.session.commit()
+    
+def change_password(user, new_password):
+    # Update the user's password
+    if User.validate_password_strength(new_password):
+        user.password = new_password
+        db.session.commit()
+    
