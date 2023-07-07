@@ -5,7 +5,7 @@ import '../styles/Navigation.css'
 import Home from './Home'
 import DiveForm from './DiveForm'
 import Preferences from './Preferences'
-// import PreviousEntries from './PreviousEntries'
+import PreviousEntries from './PreviousEntries'
 
 const Navigation = ({
   loggedIn,
@@ -46,8 +46,8 @@ const Navigation = ({
     content = <Home username={username} loggedIn={loggedIn} />
   } else if (activeItem === 'Dive Log Entry') {
     content = <DiveForm username={username} token={token} />
-  // } else if (activeItem === 'Previous Entries') {
-  //   content = <PreviousEntries token={token} />
+  } else if (activeItem === 'Previous Entries') {
+    content = <PreviousEntries token={token} />
   } else if (activeItem === 'Preferences') {
     content = (
       <Preferences

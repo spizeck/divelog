@@ -4,6 +4,7 @@ from models.dives import Dive
 from models.sightings import Sightings
 from sqlalchemy import text
 from errors import DiveIntegrityError, DiveInfoMissingError
+from dateutil.parser import parse
 import logging
 
 db_bp = Blueprint('db_bp', __name__, url_prefix='/db')
@@ -97,7 +98,89 @@ def create_sighting():
         logging.error(e)
         db.session.rollback()
         return jsonify(message='Failed to create sightings', status=400), 400
+    
+# Get dives filtered by date    
+@db_bp.route('/dives/bydate', methods=['GET'])
+def get_dives_by_date():
+    data = request.json
+    
+    try:
+        if 'startDate' not in data or 'endDate' not in data:
+            return jsonify({'status': 400, 'message': 'Missing start or end date'}), 400
+        
+        try:
+            start_date = parse(data['startDate']).date()
+            end_date = parse(data['endDate']).date()
+        except ValueError:
+            return jsonify({'status': 400, 'message': 'Invalid date format'}), 400
+        
+        dives = Dive.query.filter(Dive.date.between(start_date, end_date)).all()
+        
+        result = [dive.serialize() for dive in dives]
+        
+        return jsonify({'dives': result, 'status': 200}), 200
+    
+    except Exception as e:
+        logging.error(e)
+        return jsonify({'status': 500, 'message': 'Failed to get dives'}), 500
 
+@db_bp.route('/dives/byguide', methods=['GET'])
+def get_dives_by_guide():
+    data = request.json
+    
+    try:
+        if 'guide' not in data:
+            return jsonify({'status': 400, 'message': 'Missing guide'}), 400
+        
+        page = int(data.get('page', 1))
+        if page < 1:
+            return jsonify({'status': 400, 'message': 'Invalid page number'}), 400
+        offset = (page - 1) * 20
+        
+        dives = Dive.query.filter(Dive.dive_guide == data['guide']).offset(offset).limit(20).all()
+        
+        result = [dive.serialize() for dive in dives]
+        
+        return jsonify({'dives': result, 'status': 200}), 200
+    
+    except Exception as e:
+        logging.error(e)
+        return jsonify({'status': 500, 'message': 'Failed to get dives'}), 500
+    
+@db_bp.route('/dives/edit', methods=['POST'])
+def edit_dive():
+    data = request.json
+    
+    try:
+        if 'diveId' not in data:
+            return jsonify({'status': 400, 'message': 'Missing dive ID'}), 400
+        
+        dive_id = data['diveId'],
+        
+        # Fetch the existing dive
+        dive = Dive.query.filter(Dive.id == dive_id).first()
+        
+        if dive is None:
+            return jsonify({'status': 404, 'message': 'Dive not found'}), 404
+        
+        # Update the dive with the new data
+        required_fields = ['date', 'diveNumber', 'boat', 'diveGuide', 'diveSite', 'maxDepth', 'waterTemperature']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'status': 400, 'message': 'Missing field: {}'.format(field)}), 400
+            setattr(dive, field, data[field])
+        
+        # Validate that the dive
+        dive.validate()
+        
+        # Save the dive to the dive table in the database
+        db.session.commit()
+        
+    except Exception as e:
+        logging.error(e)
+        db.session.rollback()
+        return jsonify({'status': 500, 'message': 'Failed to edit dive'}), 500
+        
 
 def register_routes(app):
     app.register_blueprint(db_bp)
