@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Form, Message } from 'semantic-ui-react'
-import 'semantic-ui-css/semantic.min.css'
 import '../styles/Login.css'
 import api from '../utils/api'
 

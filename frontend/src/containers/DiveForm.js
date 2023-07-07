@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { Button, Form, Input } from 'semantic-ui-react'
-import 'semantic-ui-css/semantic.min.css'
 import '../styles/DiveForm.css'
 import sightingsData from '../components/sightingsData'
 import diveFormData from '../components/diveData'

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import { Form, Button, Message } from 'semantic-ui-react';
-import 'semantic-ui-css/semantic.min.css';
 import '../styles/Login.css';
 
 const Register = ({ setShowRegisterForm, setShowLoginForm }) => {

@@ -2,7 +2,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Header } from 'semantic-ui-react';
-import 'semantic-ui-css/semantic.min.css';
 
 const NotFound = () => {
     const navigate = useNavigate();

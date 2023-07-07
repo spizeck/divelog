@@ -7,6 +7,8 @@ import {
 } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
 import { Container, Loader, Dimmer } from 'semantic-ui-react'
+import 'semantic-ui-css/semantic.min.css'
+
 import AppHeader from './containers/Header'
 import BasePage from './containers/BasePage'
 import Navigation from './containers/Navigation'
