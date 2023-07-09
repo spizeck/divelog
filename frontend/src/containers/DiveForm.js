@@ -247,8 +247,7 @@ const DiveForm = ({ username, token }) => {
                 return (
                   <Form.Field className='dive-form-field' key={key}>
                     <label className='dive-form-label'>
-                      {value.label} (
-                      {units.temp})
+                      {value.label} ({units.temp})
                     </label>
                     <Input
                       className='dive-form-input'

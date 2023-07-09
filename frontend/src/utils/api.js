@@ -177,15 +177,15 @@ const api = {
   },
 
   // Get dives by guide endpoint
-  getDivesByGuide: async guide => {
+  getDivesByGuide: async (diveGuide, page) => {
     try {
       const response = await axios.get(
-        `${apiUrl}${API_ENDPOINTS.getDivesByGuide}`,
-        {
-          params: {
-            guide
-          }
+        `${apiUrl}${API_ENDPOINTS.getDivesByGuide}`, {
+        params: {
+          diveGuide,
+          page
         }
+      }
       )
       return response.data
     } catch (error) {

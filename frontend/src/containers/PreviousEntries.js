@@ -7,16 +7,18 @@ import {
   Container,
   Message,
   Modal,
-  Form
+  Form,
+  Input
 } from 'semantic-ui-react'
 import diveFormData from '../components/diveData'
 
-const PreviousEntries = token => {
+const PreviousEntries = ({ username, token }) => {
   const [entries, setEntries] = useState([])
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const [editOpen, setEditOpen] = useState(false)
   const [formState, setFormState] = useState({})
+  const [units, setUnits] = useState({})
 
   const handleEditOpen = entry => {
     setFormState(entry)
@@ -29,16 +31,49 @@ const PreviousEntries = token => {
   }
 
   useEffect(() => {
-    api
-      .getDivesByGuide(token)
-      .then(response => {
-        setEntries(response.data)
-        console.log(response.data)
-      })
-      .catch(error => {
-        setErrorMessage(error.message)
-      })
-  }, [token])
+    const fetchData = async () => {
+      try {
+        const divesResponse = await api.getDivesByGuide(username, 1);
+        console.log(divesResponse); // Need to update to pull page number from state
+
+        if (Array.isArray(divesResponse.dives)) {
+          const dives = divesResponse.dives.map(dive => ({
+            id: dive.id,
+            date: dive.date,
+            diveNumber: dive.diveNumber, // Update property name according to the response
+            boatName: dive.boat,
+            diveSite: dive.diveSite,
+            maxDepth: dive.maxDepth,
+            waterTemperature: dive.waterTemperature,
+          }));
+          setEntries(dives);
+          console.log(dives)
+
+          const unitsResponse = await api.getPreferences(token);
+          if (unitsResponse.status === 200) {
+            if (unitsResponse.preferredUnits === 'metric') {
+              setUnits({
+                units: 'metric',
+                depth: 'm',
+                temp: '°C',
+              })
+            } else {
+              setUnits({
+                units: 'imperial',
+                depth: 'ft',
+                temp: '°F',
+              })
+            }
+          }
+        }
+        } catch (error) {
+          setErrorMessage(error.message);
+        }
+      };
+
+      fetchData();
+    }, [username, token]);
+
 
   const handleInputChange = (e, { name, value }) => {
     setFormState({ ...formState, [name]: value })
@@ -51,7 +86,7 @@ const PreviousEntries = token => {
       .then(response => {
         // if successful, call the API again to get the updated list of entries
         api
-          .getDivesByGuide(token)
+          .getDivesByGuide(username)
           .then(response => {
             setEntries(response.data)
             setSuccessMessage(response.message)
@@ -97,7 +132,6 @@ const PreviousEntries = token => {
   return (
     <>
       <Container>
-        <h2>Previous Entries</h2>
         {errorMessage && (
           <Message negative>
             <Message.Header>Error</Message.Header>
@@ -122,36 +156,35 @@ const PreviousEntries = token => {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {entries.map(entry => {
-              return (
-                <Table.Row key={entry.id}>
-                  <Table.Cell>{entry.date}</Table.Cell>
-                  <Table.Cell>{entry.dive_number}</Table.Cell>
-                  <Table.Cell>{entry.boat_name}</Table.Cell>
-                  <Table.Cell>{entry.dive_site}</Table.Cell>
-                  <Table.Cell>{entry.max_depth}</Table.Cell>
-                  <Table.Cell>{entry.water_temperature}</Table.Cell>
-                  <Table.Cell>
-                    <Button
-                      icon
-                      labelPosition='left'
-                      onClick={() => handleEditOpen(entry.id)}
-                    >
-                      <Icon name='edit' />
-                      Edit
-                    </Button>
-                    <Button
-                      icon
-                      labelPosition='left'
-                      onClick={() => handleDelete(entry.id)}
-                    >
-                      <Icon name='trash' />
-                      Delete
-                    </Button>
-                  </Table.Cell>
-                </Table.Row>
-              )
-            })}
+            {entries.map(entry => (
+              <Table.Row key={entry.id}>
+                <Table.Cell>{entry.date}</Table.Cell>
+                <Table.Cell>{entry.diveNumber}</Table.Cell>
+                <Table.Cell>{entry.boatName}</Table.Cell>
+                <Table.Cell>{entry.diveSite}</Table.Cell>
+                <Table.Cell>{entry.maxDepth}</Table.Cell>
+                <Table.Cell>{entry.waterTemperature}</Table.Cell>
+                <Table.Cell>
+                  <Button
+                    icon
+                    labelPosition='left'
+                    onClick={() => handleEditOpen(entry.id)}
+                  >
+                    <Icon name='edit' />
+                    Edit
+                  </Button>
+                  <Button
+                    icon
+                    labelPosition='left'
+                    onClick={() => handleDelete(entry.id)}
+                  >
+                    <Icon name='trash' />
+                    Delete
+                  </Button>
+                </Table.Cell>
+              </Table.Row>
+            )
+            )}
           </Table.Body>
         </Table>
       </Container>
@@ -164,19 +197,64 @@ const PreviousEntries = token => {
           <Modal.Description>
             <Form onSubmit={handleEditSubmit}>
               {/* Iterate through diveFormData */}
-              {diveFormData.map((data, index) => {
-                return (
-                  <Form.Field key={index}>
-                    <label>{data.label}</label>
-                    <input
-                      type={data.type}
-                      name={data.name}
-                      value={formState[data.name] || ''}
-                      onChange={handleInputChange}
-                    />
-                  </Form.Field>
-                )
+              {Object.entries(diveFormData).map(([key, value]) => {
+                if (value.type === 'select') {
+                  return (
+                    <Form.Field key={key}>
+                      <label>{value.label}</label>
+                      <Form.Select
+                        name={value.name}
+                        options={value.options}
+                        value={formState[value.name]}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Field>
+                  );
+                } else if (value.name === 'waterTemperature') {
+                  return (
+                    <Form.Field key={key}>
+                      <label>
+                        {value.label} ({units.temp})
+                      </label>
+                      <Input
+                        type={value.type}
+                        name={value.name}
+                        value={formState[value.name]}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Field>
+                  );
+                } else if (value.name === 'maxDepth') {
+                  return (
+                    <Form.Field key={key}>
+                      <label>
+                        {value.label} ({units.depth})
+                      </label>
+                      <Input
+                        type={value.type}
+                        name={value.name}
+                        value={formState[value.name]}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Field>
+                  );
+                } else {
+                  return (
+                    <Form.Field key={key}>
+                      <label>{value.label}</label>
+                      <Input
+                        type={value.type}
+                        name={value.name}
+                        value={formState[value.name]}
+                        onChange={handleInputChange}
+                      />
+                    </Form.Field>
+                  );
+                }
               })}
+              <Button type='button' onClick={handleEditClose}>
+                Cancel
+              </Button>
               <Button type='submit'>Submit</Button>
             </Form>
           </Modal.Description>

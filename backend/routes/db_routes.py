@@ -126,10 +126,12 @@ def get_dives_by_date():
 
 @db_bp.route('/dives/byguide', methods=['GET'])
 def get_dives_by_guide():
-    data = request.json
+    print('get dives by guide')
+    data = request.args
+    print(data)
     
     try:
-        if 'guide' not in data:
+        if 'diveGuide' not in data:
             return jsonify({'status': 400, 'message': 'Missing guide'}), 400
         
         page = int(data.get('page', 1))
@@ -137,7 +139,7 @@ def get_dives_by_guide():
             return jsonify({'status': 400, 'message': 'Invalid page number'}), 400
         offset = (page - 1) * 20
         
-        dives = Dive.query.filter(Dive.dive_guide == data['guide']).offset(offset).limit(20).all()
+        dives = Dive.query.filter(Dive.dive_guide == data['diveGuide']).offset(offset).limit(20).all()
         
         result = [dive.serialize() for dive in dives]
         

@@ -36,3 +36,15 @@ class Dive(db.Model):
     def validate(self):
         if not self.date or not self.dive_number or not self.boat or not self.dive_guide or not self.dive_site or not self.max_depth or not self.water_temperature:
             raise DiveInfoMissingError()
+        
+    def serialize(self):
+        return {
+            "id": self.id,
+            "date": self.date.strftime("%Y-%m-%d"),
+            "diveNumber": self.dive_number,
+            "boat": self.boat,
+            "diveGuide": self.dive_guide,
+            "diveSite": self.dive_site,
+            "maxDepth": self.max_depth,
+            "waterTemperature": self.water_temperature,
+        }

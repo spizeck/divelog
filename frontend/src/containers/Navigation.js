@@ -47,7 +47,7 @@ const Navigation = ({
   } else if (activeItem === 'Dive Log Entry') {
     content = <DiveForm username={username} token={token} />
   } else if (activeItem === 'Previous Entries') {
-    content = <PreviousEntries token={token} />
+    content = <PreviousEntries username={username} token={token} />
   } else if (activeItem === 'Preferences') {
     content = (
       <Preferences
