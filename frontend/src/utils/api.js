@@ -45,6 +45,7 @@ const API_ENDPOINTS = {
   getDivesByDate: '/db/dives/bydate',
   getDivesByGuide: '/db/dives/byguide',
   editDive: '/db/dives/editDive',
+  deleteDive: '/db/dives/deleteDive',
   getPages: '/db/dives/pages'
 }
 
@@ -217,6 +218,22 @@ const api = {
       const response = await axios.put(
         `${apiUrl}${API_ENDPOINTS.editDive}`,
         diveData
+      )
+      return response.data
+    } catch (error) {
+      throw error.response.data
+    }
+  },
+
+  // Delete dive endpoint
+  deleteDive: async (diveId) => {
+    try {
+      const response = await axios.delete(
+        `${apiUrl}${API_ENDPOINTS.deleteDive}`, {
+        params: {
+          diveId
+        }
+      }
       )
       return response.data
     } catch (error) {

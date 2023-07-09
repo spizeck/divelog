@@ -14,7 +14,7 @@ class Dive(db.Model):
     max_depth = db.Column(db.Integer, nullable=False)
     water_temperature = db.Column(db.Integer, nullable=False)
 
-    sightings = db.relationship('Sightings', back_populates='dive')
+    sightings = db.relationship('Sightings', back_populates='dive', cascade='all, delete-orphan')
 
     def save(self):
         self.validate_unique()

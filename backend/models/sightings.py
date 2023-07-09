@@ -6,7 +6,7 @@ class Sightings(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     species = db.Column(db.String, nullable=False)
     count = db.Column(db.Integer, nullable=False)
-    dive_id = db.Column(db.Integer, db.ForeignKey('dives.id'), nullable=False)
+    dive_id = db.Column(db.Integer, db.ForeignKey('dives.id', ondelete='CASCADE'), nullable=False)
 
     dive = db.relationship('Dive', back_populates='sightings')
 

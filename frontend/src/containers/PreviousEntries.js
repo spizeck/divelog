@@ -58,6 +58,10 @@ const PreviousEntries = ({ username, token }) => {
     const fetchData = async () => {
       try {
         const divesResponse = await api.getDivesByGuide(username, page);
+        if (divesResponse.status !== 200) {
+          setErrorMessage(divesResponse.message);
+          return;
+        }
         if (Array.isArray(divesResponse.dives)) {
           const dives = divesResponse.dives.map(dive => ({
             diveId: dive.id,
@@ -69,7 +73,14 @@ const PreviousEntries = ({ username, token }) => {
             maxDepth: unitConverter.convertDepthToForm(dive.maxDepth, units.units),
             waterTemperature: unitConverter.convertTempToForm(dive.waterTemperature, units.units),
           }));
-          console.log(dives);
+          dives.sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            if (dateA.getTime() === dateB.getTime()) {
+              return a.diveNumber - b.diveNumber;
+            }
+            return dateB.getTime() - dateA.getTime();
+          })
           setEntries(dives);
         }
       } catch (error) {
@@ -103,6 +114,10 @@ const PreviousEntries = ({ username, token }) => {
     const fetchTotalPages = async () => {
       try {
         const totalPagesResponse = await api.getPages("diveGuide", username);
+        if (totalPagesResponse.status !== 200) {
+          setErrorMessage(totalPagesResponse.message);
+          return;
+        }
         setTotalPages(Math.ceil(totalPagesResponse.count / entriesPerPage));
       } catch (error) {
         setErrorMessage(error.message);
@@ -119,7 +134,6 @@ const PreviousEntries = ({ username, token }) => {
   }
 
   const handleEditSubmit = () => {
-    console.log(formState);
     api
       .editDive(formState)
       .then(response => {
@@ -134,8 +148,8 @@ const PreviousEntries = ({ username, token }) => {
                 diveNumber: formState.diveNumber,
                 boatName: formState.boatName,
                 diveSite: formState.diveSite,
-                maxDepth: unitConverter.convertDepthToForm(formState.maxDepth, units.units),
-                waterTemperature: unitConverter.convertTempToForm(formState.waterTemperature, units.units),
+                maxDepth: formState.maxDepth,
+                waterTemperature: formState.waterTemperature,
               }
             } else {
               return entry
@@ -157,30 +171,35 @@ const PreviousEntries = ({ username, token }) => {
   };
 
 
-  // const handleDelete = diveId => {
-  //   api
-  //     .deleteDive(diveId)
-  //     // check if response is successful
-  //     .then(response => {
-  //       if (response.status === 200) {
-  //         api
-  //           .getDivesByGuide(token)
-  //           .then(response => {
-  //             setEntries(response.data)
-  //             setSuccessMessage(response.message)
-  //             setErrorMessage('')
-  //           })
-  //           .catch(error => {
-  //             setSuccessMessage('')
-  //             setErrorMessage(error.message)
-  //           })
-  //       }
-  //     })
-  //     .catch(error => {
-  //       setSuccessMessage('')
-  //       setErrorMessage(error.message)
-  //     })
-  // }
+  const handleDelete = diveId => {
+    api
+      .deleteDive(diveId)
+      // check if response is successful
+      .then(response => {
+        if (response.status === 200) {
+          // remove the deleted entry from the entries array
+          const updatedEntries = entries.filter(entry => entry.diveId !== diveId)
+          setEntries(updatedEntries)
+          setSuccessMessage(response.message);
+          setErrorMessage('');
+        } else {
+          setSuccessMessage('');
+          setErrorMessage(response.message);
+        }
+      })
+      .catch(error => {
+        setSuccessMessage('');
+        setErrorMessage(error.message);
+      });
+  };
+
+  const timeMap = {
+    1: '9:00 am',
+    2: '11:00 am',
+    3: '1:00 pm',
+    4: '3:00 pm',
+    5: 'Night Dive',
+  }
 
   // Main content
   return (
@@ -215,11 +234,7 @@ const PreviousEntries = ({ username, token }) => {
               <Table.Row key={entry.diveId}>
                 <Table.Cell>{entry.date}</Table.Cell>
                 <Table.Cell>
-                  {entry.diveNumber === 1 && '9:00 am'}
-                  {entry.diveNumber === 2 && '11:00 am'}
-                  {entry.diveNumber === 3 && '1:00 pm'}
-                  {entry.diveNumber === 4 && '3:00 pm'}
-                  {entry.diveNumber === 5 && 'Night Dive'}
+                  {timeMap[entry.diveNumber]}
                 </Table.Cell>
                 <Table.Cell>{entry.boatName}</Table.Cell>
                 <Table.Cell>{entry.diveSite}</Table.Cell>
@@ -236,7 +251,7 @@ const PreviousEntries = ({ username, token }) => {
                   <Button
                     size='tiny'
                     icon
-                  // onClick={() => handleDelete(entry.diveId)}
+                    onClick={() => handleDelete(entry.diveId)}
                   >
                     <Icon name='trash' />
                   </Button>
