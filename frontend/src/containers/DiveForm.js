@@ -6,28 +6,12 @@ import diveFormData from '../components/diveData'
 import handleChange from '../components/handleChange'
 import handleSubmit from '../components/handleSubmit'
 import api from '../utils/api'
+import unitConverter from '../components/convertUnits'
 
 const DiveForm = ({ username, token }) => {
   const totalSteps = 7
   const [step, setStep] = useState(1)
-  const [formData, setFormData] = useState(() => {
-    const defaultData = {}
-
-    Object.entries(diveFormData).forEach(([key, value]) => {
-      if (value.defaultValue) {
-        defaultData[key] = value.defaultValue
-      } else {
-        defaultData[key] = ''
-      }
-    })
-
-    if (username) {
-      defaultData.diveGuide = username
-    }
-
-    return defaultData
-  })
-
+  
   const [sightingData, setSightingData] = useState(sightingsData)
   // todo: Add otherSightings options
   const [submitted, setSubmitted] = useState(false)
@@ -35,15 +19,36 @@ const DiveForm = ({ username, token }) => {
   const [errorMessage, setErrorMessage] = useState('')
   const [fieldError, setFieldError] = useState({})
   const [formError, setFormError] = useState(false)
+  const [unitsLoaded, setUnitsLoaded] = useState(false)
+  const [formData, setFormData] = useState({})
+ 
+  const [units, setUnits] = useState({
+    units: '',
+    depth: '',
+    temp: '',
+  })
 
   // Get preferred units from api
-  const [units, setUnits] = useState({})
   useEffect(() => {
+
     const getUnits = async () => {
       try {
-        const response = await api.getPreferredUnits(token)
+        const response = await api.getPreferences(token)
         if (response.status === 200) {
-          setUnits(response.data)
+          if (response.preferredUnits === 'metric') {
+            setUnits({
+              units: 'metric',
+              depth: 'm',
+              temp: '°C',
+            })
+          } else {
+            setUnits({
+              units: 'imperial',
+              depth: 'ft',
+              temp: '°F',
+            })
+          }
+          setUnitsLoaded(true)
         }
       } catch (error) {
         if (error.response) {
@@ -55,6 +60,36 @@ const DiveForm = ({ username, token }) => {
     }
     getUnits()
   }, [token])
+
+  useEffect(() => {
+    if (unitsLoaded){
+    const defaultData = {}
+
+      Object.entries(diveFormData).forEach(([key, value]) => {
+        if (value.defaultValue) {
+          if (key === 'maxDepth') {
+            defaultData[key] = unitConverter.convertDepthToForm(
+              value.defaultValue,
+              units.units,
+            )
+          } else if (key === 'waterTemperature') {
+            defaultData[key] = unitConverter.convertTempToForm(
+              value.defaultValue,
+              units.units
+            )
+          } else {
+            defaultData[key] = value.defaultValue
+          }
+        } else {
+          defaultData[key] = ''
+        }
+      })
+      if (username) {
+        defaultData.diveGuide = username
+      }
+      setFormData(defaultData)
+    }
+  }, [unitsLoaded, username, units])
 
   const handleFormSubmit = async e => {
     e.preventDefault()
@@ -85,7 +120,8 @@ const DiveForm = ({ username, token }) => {
     setFormError,
     diveFormData,
     step,
-    totalSteps
+    totalSteps,
+    units
   )
 
   const handlePrevious = () => {
@@ -112,12 +148,26 @@ const DiveForm = ({ username, token }) => {
 
       Object.entries(diveFormData).forEach(([key, value]) => {
         if (value.defaultValue) {
-          defaultData[key] = value.defaultValue
+          if (key === 'maxDepth') {
+            defaultData[key] = unitConverter.convertDepthToForm(
+              value.defaultValue,
+              units.units
+            )
+          } else if (key === 'waterTemperature') {
+            defaultData[key] = unitConverter.convertTempToForm(
+              value.defaultValue,
+              units.units
+            )
+          } else {
+            defaultData[key] = value.defaultValue
+          }
         } else {
           defaultData[key] = ''
         }
       })
-
+      if (username) {
+      defaultData.diveGuide = username
+    }
       return defaultData
     })
     setSightingData(sightingsData)
@@ -170,18 +220,80 @@ const DiveForm = ({ username, token }) => {
         return (
           <div>
             <h2 className='dive-form-heading'>Dive Information</h2>
-            {Object.entries(diveFormData).map(([key, value]) => (
-              <Form.Field className='dive-form-field' key={key}>
-                <label className='dive-form-label'>{value.label}</label>
-                {value.type === 'select' ? (
-                  <Form.Select
-                    className='dive-form-select'
-                    name={value.name}
-                    options={value.options}
-                    value={formData[value.name] || ''}
-                    onChange={handleChangeFn}
-                  />
-                ) : (
+            {Object.entries(diveFormData).map(([key, value]) => {
+              if (value.type === 'select') {
+                return (
+                  <Form.Field className='dive-form-field' key={key}>
+                    <label className='dive-form-label'>{value.label}</label>
+                    <Form.Select
+                      className='dive-form-select'
+                      name={value.name}
+                      options={value.options}
+                      value={formData[value.name] || ''}
+                      onChange={handleChangeFn}
+                    />
+                    <div className='error-message'>
+                      {fieldError[value.name] && (
+                        <div className='error-message'>
+                          {' '}
+                          {fieldError[value.name]}{' '}
+                        </div>
+                      )}
+                    </div>
+                  </Form.Field>
+                );
+              } else if (value.name === 'waterTemperature') {
+                return (
+                  <Form.Field className='dive-form-field' key={key}>
+                    <label className='dive-form-label'>
+                      {value.label} (
+                      {units.temp})
+                    </label>
+                    <Input
+                      className='dive-form-input'
+                      type={value.type}
+                      name={value.name}
+                      value={formData[value.name] || ''}
+                      onChange={handleChangeFn}
+                    />
+                    <div className='error-message'>
+                      {fieldError[value.name] && (
+                        <div className='error-message'>
+                          {' '}
+                          {fieldError[value.name]}{' '}
+                        </div>
+                      )}
+                    </div>
+                  </Form.Field>
+                );
+              } else if (value.name === 'maxDepth') {
+                return (
+                  <Form.Field className='dive-form-field' key={key}>
+                    <label className='dive-form-label'>
+                      {value.label} (
+                      {units.depth})
+                    </label>
+                    <Input
+                      className='dive-form-input'
+                      type={value.type}
+                      name={value.name}
+                      value={formData[value.name] || ''}
+                      onChange={handleChangeFn}
+                    />
+                    <div className='error-message'>
+                      {fieldError[value.name] && (
+                        <div className='error-message'>
+                          {' '}
+                          {fieldError[value.name]}{' '}
+                        </div>
+                      )}
+                    </div>
+                  </Form.Field>
+                );
+              }
+              return (
+                <Form.Field className='dive-form-field' key={key}>
+                  <label className='dive-form-label'>{value.label}</label>
                   <Input
                     className='dive-form-input'
                     type={value.type}
@@ -189,20 +301,19 @@ const DiveForm = ({ username, token }) => {
                     value={formData[value.name] || ''}
                     onChange={handleChangeFn}
                   />
-                )}
-                <div className='error-message'>
-                  {fieldError[value.name] && (
-                    <div className='error-message'>
-                      {' '}
-                      {fieldError[value.name]}{' '}
-                    </div>
-                  )}
-                </div>
-              </Form.Field>
-            ))}
-            <p></p>
+                  <div className='error-message'>
+                    {fieldError[value.name] && (
+                      <div className='error-message'>
+                        {' '}
+                        {fieldError[value.name]}{' '}
+                      </div>
+                    )}
+                  </div>
+                </Form.Field>
+              );
+            })}
           </div>
-        )
+        );
       case 2:
         return (
           <RenderFormStep

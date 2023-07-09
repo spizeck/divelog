@@ -125,15 +125,13 @@ const diveFormData = {
     name: 'maxDepth',
     label: 'Max Depth',
     type: 'number',
-    defaultValue: 70,
+    defaultValue: 22, // This is in meters
+    min: 0,
     validate: value => {
-      if (value < 0) {
-        return 'Depth must be a positive number'
-      }
       if (value % 1 !== 0) {
         return 'Depth must be a whole number'
       }
-      if (value > 200 || value < 15) {
+      if (value > 60 || value < 4) {
         return 'Please verify your depth'
       }
       return null
@@ -142,17 +140,15 @@ const diveFormData = {
 
   waterTemperature: {
     name: 'waterTemperature',
-    label: 'Water Temperature (F)',
+    label: 'Water Temperature',
     type: 'number',
-    defaultValue: 80,
+    min: 0, 
+    defaultValue: 27,
     validate: value => {
-      if (value < 0) {
-        return 'Must be a positive number'
-      }
       if (value % 1 !== 0) {
         return 'Must be a whole number'
       }
-      if (value > 90 || value < 70) {
+      if (value > 32 || value < 21) {
         return 'Are you sure about that temperature?'
       }
       return null
