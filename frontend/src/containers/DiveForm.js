@@ -102,7 +102,8 @@ const DiveForm = ({ username, token }) => {
         totalSteps,
         setSubmitted,
         setConfirmationMessage,
-        setErrorMessage
+        setErrorMessage,
+        units
       )
     } catch (error) {
       if (error.response) {

@@ -1,4 +1,5 @@
 import api from '../utils/api'
+import unitConverter from './convertUnits'
 
 const handleSubmit = async (
   e,
@@ -8,11 +9,22 @@ const handleSubmit = async (
   totalSteps,
   setSubmitted,
   setConfirmationMessage,
-  setErrorMessage
+  setErrorMessage,
+  units
 ) => {
   e.preventDefault()
 
   if (step === totalSteps) {
+    // Convert depth and temperature to metric if units are imperial
+      formData.maxDepth = unitConverter.convertDepthToDatabase(
+        parseInt(formData.maxDepth, 10),
+        units.units
+      )
+      formData.waterTemperature = unitConverter.convertTempToDatabase(
+        parseInt(formData.waterTemperature, 10),
+        units.units
+      )
+      console.log('Form data:', formData)
     // Submit dive data to the /dives endpoint
     try {
       const diveResponse = await api.createDive(formData)
