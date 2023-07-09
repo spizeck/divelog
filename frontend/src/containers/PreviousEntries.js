@@ -8,9 +8,12 @@ import {
   Message,
   Modal,
   Form,
-  Input
+  Input,
+  Pagination,
 } from 'semantic-ui-react'
 import diveFormData from '../components/diveData'
+import unitConverter from '../utils/convertUnits'
+import '../styles/PreviousEntries.css'
 
 const PreviousEntries = ({ username, token }) => {
   const [entries, setEntries] = useState([])
@@ -19,9 +22,30 @@ const PreviousEntries = ({ username, token }) => {
   const [editOpen, setEditOpen] = useState(false)
   const [formState, setFormState] = useState({})
   const [units, setUnits] = useState({})
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+
+  const entriesPerPage = 10
+
+  const handlePageChange = (e, { activePage }) => {
+    if (activePage < 1 || activePage > totalPages) {
+      return
+    }
+    setPage(activePage)
+  }
 
   const handleEditOpen = entry => {
-    setFormState(entry)
+    const { diveId, date, diveNumber, boatName, diveSite, maxDepth, waterTemperature, diveGuide } = entry
+    setFormState({
+      diveId,
+      date,
+      diveNumber,
+      boatName,
+      diveSite,
+      maxDepth,
+      waterTemperature,
+      diveGuide,
+    })
     setEditOpen(true)
   }
 
@@ -33,100 +57,130 @@ const PreviousEntries = ({ username, token }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const divesResponse = await api.getDivesByGuide(username, 1);
-        console.log(divesResponse); // Need to update to pull page number from state
-
+        const divesResponse = await api.getDivesByGuide(username, page);
         if (Array.isArray(divesResponse.dives)) {
           const dives = divesResponse.dives.map(dive => ({
-            id: dive.id,
+            diveId: dive.id,
+            diveGuide: dive.diveGuide,
             date: dive.date,
-            diveNumber: dive.diveNumber, // Update property name according to the response
+            diveNumber: dive.diveNumber,
             boatName: dive.boat,
             diveSite: dive.diveSite,
-            maxDepth: dive.maxDepth,
-            waterTemperature: dive.waterTemperature,
+            maxDepth: unitConverter.convertDepthToForm(dive.maxDepth, units.units),
+            waterTemperature: unitConverter.convertTempToForm(dive.waterTemperature, units.units),
           }));
+          console.log(dives);
           setEntries(dives);
-          console.log(dives)
+        }
+      } catch (error) {
+        setErrorMessage(error.message);
+      }
+    };
 
-          const unitsResponse = await api.getPreferences(token);
-          if (unitsResponse.status === 200) {
-            if (unitsResponse.preferredUnits === 'metric') {
-              setUnits({
-                units: 'metric',
-                depth: 'm',
-                temp: '°C',
-              })
-            } else {
-              setUnits({
-                units: 'imperial',
-                depth: 'ft',
-                temp: '°F',
-              })
-            }
+    const fetchUnits = async () => {
+      try {
+        const unitsResponse = await api.getPreferences(token);
+        if (unitsResponse.status === 200) {
+          if (unitsResponse.preferredUnits === 'metric') {
+            setUnits({
+              units: 'metric',
+              depth: 'm',
+              temp: '°C',
+            });
+          } else {
+            setUnits({
+              units: 'imperial',
+              depth: 'ft',
+              temp: '°F',
+            });
           }
         }
-        } catch (error) {
-          setErrorMessage(error.message);
-        }
-      };
+      } catch (error) {
+        setErrorMessage(error.message);
+      }
+    };
 
-      fetchData();
-    }, [username, token]);
+    const fetchTotalPages = async () => {
+      try {
+        const totalPagesResponse = await api.getPages("diveGuide", username);
+        setTotalPages(Math.ceil(totalPagesResponse.count / entriesPerPage));
+      } catch (error) {
+        setErrorMessage(error.message);
+      }
+    };
 
+    fetchData();
+    fetchUnits();
+    fetchTotalPages();
+  }, [username, page, token, units.units]);
 
   const handleInputChange = (e, { name, value }) => {
-    setFormState({ ...formState, [name]: value })
+    setFormState(prevState => ({ ...prevState, [name]: value }))
   }
 
-  const handleEditSubmit = id => {
+  const handleEditSubmit = () => {
+    console.log(formState);
     api
-      .editDive(id, formState)
-      // check if response is successful
-      .then(response => {
-        // if successful, call the API again to get the updated list of entries
-        api
-          .getDivesByGuide(username)
-          .then(response => {
-            setEntries(response.data)
-            setSuccessMessage(response.message)
-            setErrorMessage('')
-          })
-          .catch(error => {
-            setSuccessMessage('')
-            setErrorMessage(error.message)
-          })
-      })
-      .catch(error => {
-        setSuccessMessage('')
-        setErrorMessage(error.message)
-      })
-  }
-
-  const handleDelete = id => {
-    api
-      .deleteDive(id)
-      // check if response is successful
+      .editDive(formState)
       .then(response => {
         if (response.status === 200) {
-          api
-            .getDivesByGuide(token)
-            .then(response => {
-              setEntries(response.data)
-              setSuccessMessage(response.message)
-              setErrorMessage('')
-            })
-            .catch(error => {
-              setSuccessMessage('')
-              setErrorMessage(error.message)
-            })
+          // update entries with the updated entry
+          const updatedEntries = entries.map(entry => {
+            if (entry.diveId === formState.diveId) {
+              return {
+                diveId: formState.diveId,
+                diveGuide: formState.diveGuide,
+                date: formState.date,
+                diveNumber: formState.diveNumber,
+                boatName: formState.boatName,
+                diveSite: formState.diveSite,
+                maxDepth: unitConverter.convertDepthToForm(formState.maxDepth, units.units),
+                waterTemperature: unitConverter.convertTempToForm(formState.waterTemperature, units.units),
+              }
+            } else {
+              return entry
+            }
+          })
+          setEntries(updatedEntries)
+          setSuccessMessage(response.message);
+          setErrorMessage('');
+          setEditOpen(false);
+        } else {
+          setSuccessMessage('');
+          setErrorMessage(response.message);
         }
       })
       .catch(error => {
-        setSuccessMessage('')
-        setErrorMessage(error.message)
-      })
-  }
+        setSuccessMessage('');
+        setErrorMessage(error.message);
+      });
+  };
+
+
+  // const handleDelete = diveId => {
+  //   api
+  //     .deleteDive(diveId)
+  //     // check if response is successful
+  //     .then(response => {
+  //       if (response.status === 200) {
+  //         api
+  //           .getDivesByGuide(token)
+  //           .then(response => {
+  //             setEntries(response.data)
+  //             setSuccessMessage(response.message)
+  //             setErrorMessage('')
+  //           })
+  //           .catch(error => {
+  //             setSuccessMessage('')
+  //             setErrorMessage(error.message)
+  //           })
+  //       }
+  //     })
+  //     .catch(error => {
+  //       setSuccessMessage('')
+  //       setErrorMessage(error.message)
+  //     })
+  // }
 
   // Main content
   return (
@@ -144,60 +198,80 @@ const PreviousEntries = ({ username, token }) => {
             <p>{successMessage}</p>
           </Message>
         )}
-        <Table celled>
+        <Table celled textAlign='center' className='responsive-table'>
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell>Date</Table.HeaderCell>
               <Table.HeaderCell>Dive Number</Table.HeaderCell>
               <Table.HeaderCell>Boat Name</Table.HeaderCell>
               <Table.HeaderCell>Dive Site</Table.HeaderCell>
-              <Table.HeaderCell>Max Depth</Table.HeaderCell>
-              <Table.HeaderCell>Water Temperature</Table.HeaderCell>
+              <Table.HeaderCell>Max Depth ({units.depth})</Table.HeaderCell>
+              <Table.HeaderCell>Water Temperature ({units.temp})</Table.HeaderCell>
+              <Table.HeaderCell>Edit/Delete</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
-          <Table.Body>
+          <Table.Body >
             {entries.map(entry => (
-              <Table.Row key={entry.id}>
+              <Table.Row key={entry.diveId}>
                 <Table.Cell>{entry.date}</Table.Cell>
-                <Table.Cell>{entry.diveNumber}</Table.Cell>
+                <Table.Cell>
+                  {entry.diveNumber === 1 && '9:00 am'}
+                  {entry.diveNumber === 2 && '11:00 am'}
+                  {entry.diveNumber === 3 && '1:00 pm'}
+                  {entry.diveNumber === 4 && '3:00 pm'}
+                  {entry.diveNumber === 5 && 'Night Dive'}
+                </Table.Cell>
                 <Table.Cell>{entry.boatName}</Table.Cell>
                 <Table.Cell>{entry.diveSite}</Table.Cell>
                 <Table.Cell>{entry.maxDepth}</Table.Cell>
                 <Table.Cell>{entry.waterTemperature}</Table.Cell>
-                <Table.Cell>
+                <Table.Cell >
                   <Button
+                    size='tiny'
                     icon
-                    labelPosition='left'
-                    onClick={() => handleEditOpen(entry.id)}
+                    onClick={() => handleEditOpen(entry)}
                   >
                     <Icon name='edit' />
-                    Edit
                   </Button>
                   <Button
+                    size='tiny'
                     icon
-                    labelPosition='left'
-                    onClick={() => handleDelete(entry.id)}
+                  // onClick={() => handleDelete(entry.diveId)}
                   >
                     <Icon name='trash' />
-                    Delete
                   </Button>
                 </Table.Cell>
               </Table.Row>
             )
             )}
           </Table.Body>
+          <Table.Footer>
+            <Table.Row>
+              <Table.HeaderCell colSpan='7'>
+                <Pagination
+                  activePage={page}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </Table.HeaderCell>
+            </Table.Row>
+
+          </Table.Footer>
         </Table>
       </Container>
 
       {/* Edit Modal */}
 
-      <Modal open={editOpen} onClose={handleEditClose} closeIcon>
-        <Modal.Header>Edit Entry</Modal.Header>
+      <Modal open={editOpen}>
+        <Modal.Header>Edit Dive --- ID: {formState.diveId}</Modal.Header>
         <Modal.Content>
           <Modal.Description>
-            <Form onSubmit={handleEditSubmit}>
+            <Form size='tiny' onSubmit={handleEditSubmit}>
               {/* Iterate through diveFormData */}
               {Object.entries(diveFormData).map(([key, value]) => {
+                if (key === 'diveGuide') {
+                  return null;
+                }
                 if (value.type === 'select') {
                   return (
                     <Form.Field key={key}>
@@ -252,11 +326,26 @@ const PreviousEntries = ({ username, token }) => {
                   );
                 }
               })}
-              <Button type='button' onClick={handleEditClose}>
-                Cancel
-              </Button>
-              <Button type='submit'>Submit</Button>
+              <Button.Group fluid>
+                <Button color='grey' type='button' onClick={handleEditClose}>
+                  Cancel
+                </Button>
+                <Button.Or className='or-button' />
+                <Button primary type='submit'>Submit</Button>
+              </Button.Group>
             </Form>
+            {errorMessage && (
+              <Message negative>
+                <Message.Header>Error</Message.Header>
+                <p>{errorMessage}</p>
+              </Message>
+            )}
+            {successMessage && (
+              <Message positive>
+                <Message.Header>Success</Message.Header>
+                <p>{successMessage}</p>
+              </Message>
+            )}
           </Modal.Description>
         </Modal.Content>
       </Modal>

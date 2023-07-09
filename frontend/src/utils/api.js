@@ -44,7 +44,8 @@ const API_ENDPOINTS = {
   createSighting: '/db/sightings/entries',
   getDivesByDate: '/db/dives/bydate',
   getDivesByGuide: '/db/dives/byguide',
-  editDive: '/db/dives/editDive'
+  editDive: '/db/dives/editDive',
+  getPages: '/db/dives/pages'
 }
 
 // Set the userId dynamically in the endpoint paths
@@ -158,6 +159,23 @@ const api = {
     }
   },
 
+  // Get number of pages by different sort methods endpoint
+  getPages: async (sortMethod, key) => {
+    try {
+      const response = await axios.get(
+        `${apiUrl}${API_ENDPOINTS.getPages}`, {
+        params: {
+          sortMethod,
+          key
+        }
+      }
+      )
+      return response.data
+    } catch (error) {
+      throw error.response.data
+    }
+  },
+  
   // Get dives by date endpoint
   getDivesByDate: async (startDate, endDate) => {
     try {
@@ -194,7 +212,7 @@ const api = {
   },
 
   // Edit dive endpoint
-  editDive: async diveData => {
+  editDive: async (diveData) => {
     try {
       const response = await axios.put(
         `${apiUrl}${API_ENDPOINTS.editDive}`,

@@ -35,7 +35,7 @@ def create_dive():
         dive = Dive(
             date=data['date'],
             dive_number=data['diveNumber'],
-            boat=data['boat'],
+            boat=data['boatName'],
             dive_guide=data['diveGuide'],
             dive_site=data['diveSite'],
             max_depth=data['maxDepth'],
@@ -126,9 +126,7 @@ def get_dives_by_date():
 
 @db_bp.route('/dives/byguide', methods=['GET'])
 def get_dives_by_guide():
-    print('get dives by guide')
     data = request.args
-    print(data)
     
     try:
         if 'diveGuide' not in data:
@@ -137,9 +135,9 @@ def get_dives_by_guide():
         page = int(data.get('page', 1))
         if page < 1:
             return jsonify({'status': 400, 'message': 'Invalid page number'}), 400
-        offset = (page - 1) * 20
+        offset = (page - 1) * 10
         
-        dives = Dive.query.filter(Dive.dive_guide == data['diveGuide']).offset(offset).limit(20).all()
+        dives = Dive.query.filter(Dive.dive_guide == data['diveGuide']).offset(offset).limit(10).all()
         
         result = [dive.serialize() for dive in dives]
         
@@ -149,7 +147,7 @@ def get_dives_by_guide():
         logging.error(e)
         return jsonify({'status': 500, 'message': 'Failed to get dives'}), 500
     
-@db_bp.route('/dives/edit', methods=['POST'])
+@db_bp.route('/dives/editDive', methods=['PUT'])
 def edit_dive():
     data = request.json
     
@@ -166,7 +164,7 @@ def edit_dive():
             return jsonify({'status': 404, 'message': 'Dive not found'}), 404
         
         # Update the dive with the new data
-        required_fields = ['date', 'diveNumber', 'boat', 'diveGuide', 'diveSite', 'maxDepth', 'waterTemperature']
+        required_fields = ['date', 'diveNumber', 'boatName', 'diveGuide', 'diveSite', 'maxDepth', 'waterTemperature']
         for field in required_fields:
             if field not in data:
                 return jsonify({'status': 400, 'message': 'Missing field: {}'.format(field)}), 400
@@ -177,11 +175,33 @@ def edit_dive():
         
         # Save the dive to the dive table in the database
         db.session.commit()
+        return jsonify({'message':'Dive edited successfully', 'status':200}), 200
         
     except Exception as e:
         logging.error(e)
         db.session.rollback()
         return jsonify({'status': 500, 'message': 'Failed to edit dive'}), 500
+    
+@db_bp.route('/dives/pages', methods=['GET'])
+def get_pages():
+    sort_method = request.args.get('sortMethod')
+    key = request.args.get('key')
+    
+    if sort_method is None or key is None:
+        return jsonify({'status': 400, 'message': 'Missing sort method or key'}), 400
+    
+    if sort_method == 'diveGuide':
+        # Return the number of entries for the given dive guide
+        count = Dive.query.filter(Dive.dive_guide == key).count()
+        return jsonify({'count': count, 'status': 200}), 200
+    
+    if sort_method == 'dateRange':
+        start_date = request.args.get('startDate')
+        end_date = request.args.get('endDate')
+        count = Dive.query.filter(Dive.date.between(start_date, end_date)).count()
+        return jsonify({'count': count, 'status': 200}), 200
+    
+    return jsonify({'status': 400, 'message': 'Invalid sort method'}), 400
         
 
 def register_routes(app):

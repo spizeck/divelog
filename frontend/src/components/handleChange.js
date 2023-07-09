@@ -2,7 +2,7 @@
 // handleChange.js is imported into DiveForm.js
 
 import sightingsData from './sightingsData'
-import unitConverter from './convertUnits';
+import unitConverter from '../utils/convertUnits';
 
 const handleChange =
   (

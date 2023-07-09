@@ -6,7 +6,7 @@ import diveFormData from '../components/diveData'
 import handleChange from '../components/handleChange'
 import handleSubmit from '../components/handleSubmit'
 import api from '../utils/api'
-import unitConverter from '../components/convertUnits'
+import unitConverter from '../utils/convertUnits'
 
 const DiveForm = ({ username, token }) => {
   const totalSteps = 7

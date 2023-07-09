@@ -37,13 +37,13 @@ const diveFormData = {
       return null
     }
   },
-  boatOptions: {
-    name: 'boat',
+  boatNameOptions: {
+    name: 'boatName',
     label: 'Boat Name',
     type: 'select',
     options: [
       { key: '1', text: 'Shark Bait', value: 'Shark Bait' },
-      { key: '2', text: 'Fin & Tonic', value: 'Fin and Tonic ' },
+      { key: '2', text: 'Fin & Tonic', value: 'Fin & Tonic' },
       { key: '3', text: 'Northern Sky', value: 'Northern Sky' },
       { key: '4', text: 'Private Boat', value: 'Private Boat' }
     ],
