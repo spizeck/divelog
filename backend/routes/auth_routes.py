@@ -20,9 +20,10 @@ def login():
     username = data['username'] if 'username' in data else None
     email = data['email'] if 'email' in data else None
     password = data['password']
-    
+
     try:
-        user = get_user_by_username(username) if username else get_user_by_email(email)
+        user = get_user_by_username(
+            username) if username else get_user_by_email(email)
     except Exception as e:
         logging.error(
             f'Error retrieving user {username} from the database: {e}')
@@ -47,6 +48,8 @@ def register():
     username = data['username']
     email = data['email']
     password = data['password']
+    first_name = data['first_name'] if 'first_name' in data else None
+    preferred_units = data['preferred_units'] if 'preferred_units' in data else None
 
     # Validate email format
     if not User.validate_email_format(email):
@@ -70,35 +73,13 @@ def register():
                         'message': 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'
                         }), 400
 
-    # Check if the user exists
-    user = get_user_by_username(username)
-
-    if user is not None:
-        logging.info(f'User {username} already exists')
-        return jsonify({'status': 409, 'message': 'Username already exists'}), 409
-
     # If the user doesn't exist, create a new user
-    user = create_user(username=username, email=email, password=password)
-
-    # Save the user to the database
     try:
-        db.session.add(user)
-        db.session.commit()
+        user = create_user(username=username, email=email, password=password,
+                       first_name=first_name, preferred_units=preferred_units)
+
     except Exception as e:
         logging.error(f'Error saving user {username} to the database: {e}')
-        return jsonify({'status': 500, 'message': 'Database Connection Error'}), 500
-
-    # Create a user preference record for the user
-    user_preferences = UserPreferences(
-        user_id=user.id, preferred_units='imperial')
-
-    # Save the user preferences to the database
-    try:
-        db.session.add(user_preferences)
-        db.session.commit()
-    except Exception as e:
-        logging.error(
-            f'Error saving user preferences for user {username} to the database: {e}')
         return jsonify({'status': 500, 'message': 'Database Connection Error'}), 500
 
     return jsonify({'status': 201, 'message': 'User created successfully'}), 201
@@ -122,23 +103,19 @@ def forgot_password():
     # check if the user exists
     user = get_user_by_email(email)
     if not user:
-        return jsonify({'status': 404, 'message': 'User does not exist'}), 404
+        return jsonify({'status': 404, 'message': 'Email not found'}), 404
 
     # Generate a new password for the user
-    new_password = 'Password123'
-
-    user.password = new_password
     try:
-        db.session.commit()
+        change_password(user, 'password123')
     except Exception as e:
-        logging.error(
-            f'Error saving new password for user {user.username} to the database: {e}')
-        return jsonify({'status': 500, 'message': 'Database Connection Error'}), 500
+        logging.error(f'Error saving new password to the database: {e}')
+        return jsonify({'status': 500, 'message': 'Database connection error'}), 500
 
     # Send the new password to the user's email
     # TODO: Implement email sending
     # TODO: Replace with a link to reset password
-    return jsonify({'status': 200, 'message': 'New password has been sent'}), 200
+    return jsonify({'status': 200, 'message': 'New password is password123 -- Please change ASAP'}), 200
 
 
 @auth_bp.route('/current_user', methods=['GET'])
@@ -156,6 +133,8 @@ def get_current_user():
     email = user.email if hasattr(user, 'email') else None
     is_approved = user.is_approved if hasattr(user, 'is_approved') else None
     admin = user.admin if hasattr(user, 'admin') else None
+    first_name = user.first_name if hasattr(user, 'first_name') else None
+    preferred_units = user.preferred_units if hasattr(user, 'preferred_units') else None
 
     return jsonify({
         'status': 200,
@@ -163,7 +142,9 @@ def get_current_user():
         'is_approved': is_approved,
         'admin': admin,
         'username': username,
-        'email': email
+        'email': email,
+        'firstName': first_name,
+        'preferredUnits': preferred_units
     }), 200
 
 
@@ -184,15 +165,17 @@ def update_user():
             update_username(user, data_to_update['newUsername'])
             return jsonify({'status': 200, 'message': 'Username updated successfully'}), 200
         except Exception as e:
-            logging.error(f'Error updating username for user {user.username}: {e}')
+            logging.error(
+                f'Error updating username for user {user.username}: {e}')
             return jsonify({'status': 409, 'message': 'Username already exists'}), 409
 
     if 'newEmail' in data_to_update:
-        try: 
+        try:
             update_email(user, data_to_update['newEmail'])
             return jsonify({'status': 200, 'message': 'Email updated successfully'}), 200
         except Exception as e:
-            logging.error(f'Error updating email for user {user.username}: {e}')
+            logging.error(
+                f'Error updating email for user {user.username}: {e}')
             return jsonify({'status': 409, 'message': 'Email already exists'}), 409
 
     if 'newPassword' in data_to_update:
@@ -200,11 +183,12 @@ def update_user():
             change_password(user, data_to_update['newPassword'])
             return jsonify({'status': 200, 'message': 'Password updated successfully'}), 200
         except Exception as e:
-            logging.error(f'Error updating password for user {user.username}: {e}')
+            logging.error(
+                f'Error updating password for user {user.username}: {e}')
             return jsonify({'status': 400,
-                        'message': 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'
-                        }), 400
-            
+                            'message': 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'
+                            }), 400
+
     if not data_to_update:
         return jsonify({'status': 400, 'message': 'No data to update'}), 400
 

@@ -13,16 +13,16 @@ def create_user(username, email, password, first_name=None, preferred_units='imp
         admin=admin
     )
     
-    db.session.add(user)
-    
     # Create a new user preferences
     user_preferences = UserPreferences(
         user_id=user.id,
         first_name=first_name,
         preferred_units=preferred_units
     )
+
+    user.user_preferences = user_preferences
     
-    db.session.add(user_preferences)
+    db.session.add(user)
     
     db.session.commit()
 
@@ -80,8 +80,17 @@ def change_password(user, new_password):
         user.password = new_password
         db.session.commit()
     
-def get_user_preferences(user):
+def get_user_preferences(user_id):
     # Retrieve the user's preferences from the database
+    user = get_user_by_id(user_id)
+    return user.user_preferences if user and user.user_preferences else None
+
+def change_user_preferences(user, **kwargs):
+    # Update the user's preferences
     if user is None:
         return
-    return user.user_preferences.get_user_preferences()
+    for key, value in kwargs.items():
+        if hasattr(user.user_preferences, key):
+            setattr(user.user_preferences, key, value)
+    
+    db.session.commit()

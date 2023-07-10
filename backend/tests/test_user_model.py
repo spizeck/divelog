@@ -12,7 +12,8 @@ from services.user_service import (create_user,
                                    get_all_users,
                                    update_username,
                                    update_email,
-                                   get_user_preferences
+                                   get_user_preferences,
+                                   change_user_preferences
                                    )
 
 
@@ -144,7 +145,7 @@ class UserModelTestCase(unittest.TestCase):
         self.assertTrue(user.verify_password('newPassword1!'))
         self.assertFalse(user.verify_password('password'))
 
-    def get_user_preferences(self):
+    def test_get_user_preferences(self):
         # Create a new User instance
         user = create_user(
             username='testuser',
@@ -207,6 +208,23 @@ class UserModelTestCase(unittest.TestCase):
         assert user2 in users
         assert len(users) == 2
 
+    def test_change_user_preferences(self):
+        # Create a new User instance
+        user = create_user(
+            username='testuser2',
+            email='test2@example.com',
+            password='password',
+            is_approved=True,
+            admin=False,
+            first_name='Test',
+            preferred_units='metric'
+        )
+        
+        # Change the user's preferences
+        change_user_preferences(user, first_name='Test2', preferred_units='imperial')
+        
+        assert user.user_preferences.first_name == 'Test2'
+        assert user.user_preferences.preferred_units == 'imperial'
 
 if __name__ == '__main__':
     unittest.main()
