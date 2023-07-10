@@ -134,6 +134,12 @@ const PreviousEntries = ({ username, token }) => {
   }
 
   const handleEditSubmit = () => {
+    setFormState(prevState => ({
+      ...prevState,
+      maxDepth: unitConverter.convertDepthToDatabase(formState.maxDepth, units.units),
+      waterTemperature: unitConverter.convertTempToDatabase(formState.waterTemperature, units.units),
+    }))
+    console.log(formState)
     api
       .editDive(formState)
       .then(response => {

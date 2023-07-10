@@ -164,17 +164,25 @@ def edit_dive():
             return jsonify({'status': 404, 'message': 'Dive not found'}), 404
         
         # Update the dive with the new data
-        required_fields = ['date', 'diveNumber', 'boatName', 'diveGuide', 'diveSite', 'maxDepth', 'waterTemperature']
-        for field in required_fields:
-            if field not in data:
-                return jsonify({'status': 400, 'message': 'Missing field: {}'.format(field)}), 400
-            setattr(dive, field, data[field])
-        
-        # Validate that the dive
-        dive.validate()
-        
-        # Save the dive to the dive table in the database
-        db.session.commit()
+        try:
+            attribute_mapping = {
+                'date': 'date',
+                'diveNumber': 'dive_number',
+                'boatName': 'boat',
+                'diveGuide': 'dive_guide',
+                'diveSite': 'dive_site',
+                'maxDepth': 'max_depth',
+                'waterTemperature': 'water_temperature'
+            }
+            
+            for json_key, attr_name in attribute_mapping.items():
+                if json_key in data:
+                    setattr(dive, attr_name, data[json_key])
+            
+            dive.update()
+        except DiveIntegrityError:
+            return jsonify({'status': 409, 'message': 'Duplicate dive detected'}), 409
+    
         return jsonify({'message':'Dive edited successfully', 'status':200}), 200
         
     except Exception as e:
@@ -223,8 +231,7 @@ def delete_dive():
             db.session.rollback()
             return jsonify({'status': 404, 'message': 'Dive not found'}), 404
         
-        db.session.delete(dive)
-        db.session.commit()
+        dive.delete() 
         return jsonify({'message':'Dive deleted successfully', 'status':200}), 200
     
     except Exception as e:

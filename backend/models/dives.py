@@ -17,20 +17,37 @@ class Dive(db.Model):
     sightings = db.relationship('Sightings', back_populates='dive', cascade='all, delete-orphan')
 
     def save(self):
+        self.validate()
         self.validate_unique()
         db.session.add(self)
         db.session.commit()
 
     def validate_unique(self):
-        if existing_dive := Dive.query.filter_by(
+        existing_dive = Dive.query.filter_by(
             date=self.date,
             dive_number=self.dive_number,
             boat=self.boat,
             dive_guide=self.dive_guide,
-        ).first():
+        ).first()
+        
+        if existing_dive and existing_dive.id != self.id:
             # Rollback the session to prevent the duplicate dive from being saved
             db.session.rollback()
             raise DiveIntegrityError()
+        
+    # Update dive
+    def update(self, **kwargs):
+        for attr, value in kwargs.items():
+            setattr(self, attr, value)
+            
+        self.validate()
+        self.validate_unique()
+        db.session.commit()
+        
+    # Delete dive
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
     # check that all fields are present
     def validate(self):

@@ -11,13 +11,12 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(255), unique=True, nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
     is_approved = db.Column(db.Boolean, default=False)
     admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    password_hash = db.Column(db.String(255), nullable=False)
     
-    user_preferences = db.relationship('UserPreferences', back_populates='user', uselist=False)
+    user_preferences = db.relationship('UserPreferences', back_populates='user', uselist=False, cascade="all, delete-orphan")
       
 
     def __init__(self, username, email, password, is_approved=False, admin=False):
@@ -26,18 +25,17 @@ class User(UserMixin, db.Model):
         self.password = password
         self.is_approved = is_approved
         self.admin = admin
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
         
     def update(self, **kwargs):
+        if 'user_preferences' in kwargs and self.user_preferences:
+            self.user_preferences.update(**kwargs.get('user_preferences'))
+            
         for key, value in kwargs.items():
-            print(f"Updating {key} to {value}")
-            setattr(self, key, value)
-        print("I am updating the user now...")        
-        db.session.commit()
-        
+            if key != 'user_preferences':
+                setattr(self, key, value)
+                
+        db.session.commit()            
+            
     @staticmethod
     def validate_email_format(email):
         return validate_email_format(email)
@@ -64,7 +62,8 @@ class User(UserMixin, db.Model):
     
     @password.setter
     def password(self, password):
-        self.password_hash = generate_password_hash(password).decode("utf-8")
+        # Hash password only if it is not hashed already
+        self.password_hash = generate_password_hash(password).decode('utf-8')
         
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)

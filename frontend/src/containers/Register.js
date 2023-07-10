@@ -5,6 +5,7 @@ import { Form, Button, Message } from 'semantic-ui-react';
 import '../styles/Login.css';
 
 const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
+    const [firstName, setFirstName] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -52,6 +53,12 @@ const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
                     placeholder="Username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                />
+                <Form.Input
+                    type="text"
+                    placeholder="First Name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                 />
                 <Form.Input
                     type="email"
