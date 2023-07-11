@@ -76,4 +76,39 @@ class DiveInfoMissingError(Exception):
         self.message = message
         super().__init__(self.message)
         
-    
+class DiveNotFound(Exception):
+    # This exception is raised when a dive is not found in the database
+    def __init__(self, message="Dive not found"):
+        logging.error(message)
+        self.message = message
+        super().__init__(self.message)
+        
+class MissingDateError(Exception):
+    # This exception is raised when the date is missing
+    def __init__(self, message="Date is missing"):
+        logging.error(message)
+        self.message = message
+        super().__init__(self.message)
+        
+class InvalidDateFormatError(Exception):
+    # This exception is raised when the date is in an invalid format
+    def __init__(self, message="Date is in an invalid format"):
+        logging.error(message)
+        self.message = message
+        super().__init__(self.message)
+        
+class MissingDiveGuideError(Exception):
+    # This exception is raised with the Dive Guide is missing in the request
+    def __init__(self, message="Dive Guide is missing"):
+        logging.error(message)
+        self.message = message
+        super().__init__(self.message)
+        
+class InvalidPageNumber(Exception):
+    # This exception is raised when the page number is invalid
+    def __init__(self, message="Page number is invalid"):
+        logging.error(message)
+        self.message = message
+        super().__init__(self.message)
+        
+        
