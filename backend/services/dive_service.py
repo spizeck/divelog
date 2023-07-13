@@ -1,13 +1,14 @@
 import logging
 
 from dateutil.parser import parse
-from errors import (DiveInfoMissingError, DiveIntegrityError,
-                    InvalidDateFormatError, MissingDateError,
-                    MissingDiveGuideError, DiveNotFound, InvalidPageNumber)
+from errors import (DiveInfoMissingError, DiveIntegrityError, DiveNotFound,
+                    InvalidDateFormatError, InvalidPageNumber,
+                    MissingDateError, MissingDiveGuideError, MissingDiveId)
 from extensions import db
 from models.dives import Dive
 from models.sightings import Sightings
 from sqlalchemy import text
+
 
 def _log_and_rollback(e):
     logging.error(e)
@@ -42,6 +43,7 @@ def test_database_connection():
         # If there's an exception, there is an issue with the database connection
         logging.error(e)
         return {'message': 'Error connecting to database'}, 500
+
 
 def create_dive(data):
     try:
@@ -134,29 +136,81 @@ def get_dives_by_date_range(data):
 
 
 def get_dives_by_guide(data):  # sourcery skip: extract-method
-    
+
     entries_per_page = 10
-    
+
     try:
         if 'diveGuide' not in data:
             raise MissingDiveGuideError()
-        
+
         page = int(data.get('page', 1))
-        
+
         if page < 1:
             raise InvalidPageNumber()
-        
+
         offset = (page - 1) * entries_per_page
-        dives = Dive.query.filter(Dive.dive_guide == data['diveGuide']).order_by(Dive.date.desc()).limit(entries_per_page).offset(offset).all()
+        dives = Dive.query.filter(Dive.dive_guide == data['diveGuide']).order_by(
+            Dive.date.desc()).limit(entries_per_page).offset(offset).all()
 
         return {'dives': [dive.serialize() for dive in dives], 'status': 200}, 200
 
     except MissingDiveGuideError as e:
         return {'message': str(e), 'status': 400}, 400
-    
+
     except InvalidPageNumber as e:
         return {'message': str(e), 'status': 400}, 400
 
     except Exception as e:
         logging.error(e)
         return {'message': 'Failed to get dives', 'status': 500}, 500
+
+
+def edit_dive(data):  # sourcery skip: extract-method
+
+    try:
+        if 'diveId' not in data:
+            raise MissingDiveId()
+
+        dive_id = data['diveId']
+        dive = Dive.query.filter(Dive.id == dive_id).first()
+
+        if dive is None:
+            raise DiveNotFound()
+
+        attribute_mapping = {
+            'date': 'date',
+            'diveNumber': 'dive_number',
+            'boatName': 'boat',
+            'diveGuide': 'dive_guide',
+            'diveSite': 'dive_site',
+            'maxDepth': 'max_depth',
+            'waterTemperature': 'water_temperature'
+        }
+
+        for json_key, attr_name in attribute_mapping.items():
+            if json_key in data:
+                setattr(dive, attr_name, data[json_key])
+
+        dive.update()
+
+        return {'message': 'Dive updated successfully', 'status': 200}, 200
+
+    except MissingDiveId as e:
+        return {'message': str(e), 'status': 400}, 400
+
+    except DiveNotFound as e:
+        _log_and_rollback(e)
+        return {'message': str(e), 'status': 404}, 404
+
+    except DiveIntegrityError as e:
+        _log_and_rollback(e)
+        return {'message': str(e), 'status': 409}, 409
+
+    except DiveInfoMissingError as e:
+        _log_and_rollback(e)
+        return {'message': str(e), 'status': 400}, 400
+
+    except Exception as e:
+        _log_and_rollback(e)
+        return {'message': 'Failed to update dive', 'status': 500}, 500
+

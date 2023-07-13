@@ -111,4 +111,14 @@ class InvalidPageNumber(Exception):
         self.message = message
         super().__init__(self.message)
         
+class MissingDiveId(Exception):
+    def __init__(self, message="Dive Id is missing"):
+        logging.error(message)
+        self.message = message
+        super().__init__(self.message)
         
+class DiveUpdateError(Exception):
+    def __init__(self, message="Dive update failed"):
+        logging.error(message)
+        self.message = message
+        super().__init__(self.message)

@@ -1,5 +1,5 @@
 from extensions import db
-from errors import DiveIntegrityError, DiveInfoMissingError
+from errors import DiveIntegrityError, DiveInfoMissingError, DiveUpdateError
 
 
 class Dive(db.Model):
@@ -20,7 +20,11 @@ class Dive(db.Model):
         self.validate()
         self.validate_unique()
         db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            raise DiveUpdateError()
 
     def validate_unique(self):
         existing_dive = Dive.query.filter_by(
@@ -42,7 +46,11 @@ class Dive(db.Model):
             
         self.validate()
         self.validate_unique()
-        db.session.commit()
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            raise DiveUpdateError()
         
     # Delete dive
     def delete(self):

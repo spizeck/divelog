@@ -1,10 +1,9 @@
 import logging
 
 from app import db
-from errors import DiveIntegrityError
 from flask import Blueprint, jsonify, request
 from models.dives import Dive
-from services.dive_service import (create_dive, create_sighting,
+from services.dive_service import (create_dive, create_sighting, edit_dive,
                                    get_dives_by_date_range, get_dives_by_guide,
                                    test_database_connection)
 
@@ -47,45 +46,8 @@ def get_dives_by_guide_route():
 @db_bp.route('/dives/editDive', methods=['PUT'])
 def edit_dive():
     data = request.json
-
-    try:
-        if 'diveId' not in data:
-            return jsonify({'status': 400, 'message': 'Missing dive ID'}), 400
-
-        dive_id = data['diveId'],
-
-        # Fetch the existing dive
-        dive = Dive.query.filter(Dive.id == dive_id).first()
-
-        if dive is None:
-            return jsonify({'status': 404, 'message': 'Dive not found'}), 404
-
-        # Update the dive with the new data
-        try:
-            attribute_mapping = {
-                'date': 'date',
-                'diveNumber': 'dive_number',
-                'boatName': 'boat',
-                'diveGuide': 'dive_guide',
-                'diveSite': 'dive_site',
-                'maxDepth': 'max_depth',
-                'waterTemperature': 'water_temperature'
-            }
-
-            for json_key, attr_name in attribute_mapping.items():
-                if json_key in data:
-                    setattr(dive, attr_name, data[json_key])
-
-            dive.update()
-        except DiveIntegrityError:
-            return jsonify({'status': 409, 'message': 'Duplicate dive detected'}), 409
-
-        return jsonify({'message': 'Dive edited successfully', 'status': 200}), 200
-
-    except Exception as e:
-        logging.error(e)
-        db.session.rollback()
-        return jsonify({'status': 500, 'message': 'Failed to edit dive'}), 500
+    response, status = edit_dive(data)
+    return jsonify(response), status
 
 
 @db_bp.route('/dives/pages', methods=['GET'])
