@@ -3,7 +3,9 @@ import logging
 from dateutil.parser import parse
 from errors import (DiveInfoMissingError, DiveIntegrityError, DiveNotFound,
                     InvalidDateFormatError, InvalidPageNumber,
-                    MissingDateError, MissingDiveGuideError, MissingDiveId)
+                    InvalidSortMethodError, MissingDateError,
+                    MissingDiveGuideError, MissingDiveId,
+                    MissingSortMethodOrKeyError)
 from extensions import db
 from models.dives import Dive
 from models.sightings import Sightings
@@ -32,7 +34,7 @@ def _create_dive_instance(data):
     return dive
 
 
-def test_database_connection():
+def verify_database_connection():
     try:
         # Perform a simple query to test the database connection
         db.session.execute(text('SELECT 1'))
@@ -214,3 +216,70 @@ def edit_dive(data):  # sourcery skip: extract-method
         _log_and_rollback(e)
         return {'message': 'Failed to update dive', 'status': 500}, 500
 
+
+def get_count_for_pages(data):
+    try:
+        sort_method = data.get('sortMethod')
+        key = data.get('key')
+
+        if sort_method is None or key is None:
+            raise MissingSortMethodOrKeyError()
+
+        if sort_method == 'diveGuide':
+            try:
+                count = Dive.query.filter(Dive.dive_guide == key).count()
+                return {'count': count, 'status': 200}, 200
+            except Exception as e:
+                _log_and_rollback(e)
+                return {'message': 'Failed to get count', 'status': 500}, 500
+
+        elif sort_method == 'dateRange':
+            try:
+                start_date = parse(key['startDate']).date()
+                end_date = parse(key['endDate']).date()
+                count = Dive.query.filter(
+                    Dive.date.between(start_date, end_date)).count()
+                return {'count': count, 'status': 200}, 200
+            except ValueError as e:
+                raise InvalidDateFormatError() from e
+            except Exception as e:
+                _log_and_rollback(e)
+                return {'message': 'Failed to get count', 'status': 500}, 500
+
+        else:
+            raise InvalidSortMethodError()
+
+    except MissingSortMethodOrKeyError as e:
+        return {'message': str(e), 'status': 400}, 400
+
+    except InvalidDateFormatError as e:
+        return {'message': str(e), 'status': 400}, 400
+
+    except Exception as e:
+        logging.error(e)
+        return {'message': 'Failed to get count', 'status': 500}, 500
+
+def delete_dive(data):  # sourcery skip: extract-method
+    try:
+        if 'diveId' not in data:
+            raise MissingDiveId()
+
+        dive_id = data['diveId']
+        dive = Dive.query.filter(Dive.id == dive_id).first()
+
+        if dive is None:
+            raise DiveNotFound()
+
+        dive.delete()
+        return {'message': 'Dive deleted successfully', 'status': 200}, 200
+
+    except MissingDiveId as e:
+        return {'message': str(e), 'status': 400}, 400
+
+    except DiveNotFound as e:
+        _log_and_rollback(e)
+        return {'message': str(e), 'status': 404}, 404
+
+    except Exception as e:
+        _log_and_rollback(e)
+        return {'message': 'Failed to delete dive', 'status': 500}, 500

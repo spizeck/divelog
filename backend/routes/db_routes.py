@@ -3,16 +3,16 @@ import logging
 from app import db
 from flask import Blueprint, jsonify, request
 from models.dives import Dive
-from services.dive_service import (create_dive, create_sighting, edit_dive,
+from services.dive_service import (create_dive, create_sighting, edit_dive, get_count_for_pages,
                                    get_dives_by_date_range, get_dives_by_guide,
-                                   test_database_connection)
+                                   verify_database_connection, delete_dive)
 
 db_bp = Blueprint('db_bp', __name__, url_prefix='/db')
 
 
 @db_bp.route('/test', methods=['GET'])
-def test_database_connection():
-    result, status = test_database_connection()
+def database_connection_verification():
+    result, status = verify_database_connection()
     return jsonify(result), status
 
 
@@ -44,63 +44,23 @@ def get_dives_by_guide_route():
 
 
 @db_bp.route('/dives/editDive', methods=['PUT'])
-def edit_dive():
+def edit_dive_route():
     data = request.json
     response, status = edit_dive(data)
     return jsonify(response), status
 
 
 @db_bp.route('/dives/pages', methods=['GET'])
-def get_pages():
-    sort_method = request.args.get('sortMethod')
-    key = request.args.get('key')
-
-    if sort_method is None or key is None:
-        return jsonify({'status': 400, 'message': 'Missing sort method or key'}), 400
-
-    if sort_method == 'diveGuide':
-        try:
-            # Return the number of entries for the given dive guide
-            count = Dive.query.filter(Dive.dive_guide == key).count()
-            return jsonify({'count': count, 'status': 200}), 200
-        except Exception as e:
-            logging.error(e)
-            db.session.rollback()
-            return jsonify({'status': 500, 'message': 'Failed to get dive count'}), 500
-
-    if sort_method == 'dateRange':
-        start_date = request.args.get('startDate')
-        end_date = request.args.get('endDate')
-        count = Dive.query.filter(
-            Dive.date.between(start_date, end_date)).count()
-        return jsonify({'count': count, 'status': 200}), 200
-
-    return jsonify({'status': 400, 'message': 'Invalid sort method'}), 400
-
+def get_count_for_pages_route():
+    data = request.args
+    response, status = get_count_for_pages(data)
+    return jsonify(response), status
 
 @db_bp.route('/dives/deleteDive', methods=['DELETE'])
 def delete_dive():
     data = request.args
-
-    if 'diveId' not in data:
-        return jsonify({'status': 400, 'message': 'Missing dive ID'}), 400
-
-    try:
-        dive_id = data['diveId']
-        dive = Dive.query.filter(Dive.id == dive_id).first()
-
-        if dive is None:
-            db.session.rollback()
-            return jsonify({'status': 404, 'message': 'Dive not found'}), 404
-
-        dive.delete()
-        return jsonify({'message': 'Dive deleted successfully', 'status': 200}), 200
-
-    except Exception as e:
-        logging.error(e)
-        db.session.rollback()
-        return jsonify({'status': 500, 'message': 'Failed to delete dive'}), 500
-
+    response, status = delete_dive(data)
+    return jsonify(response), status
 
 def register_routes(app):
     app.register_blueprint(db_bp)

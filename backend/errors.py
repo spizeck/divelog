@@ -122,3 +122,15 @@ class DiveUpdateError(Exception):
         logging.error(message)
         self.message = message
         super().__init__(self.message)
+        
+class MissingSortMethodOrKeyError(Exception):
+    def __init__(self, message="Sort method or sort key is missing"):
+        logging.error(message)
+        self.message = message
+        super().__init__(self.message)
+
+class InvalidSortMethodError(Exception):
+    def __init__(self, message="Sort method is invalid"):
+        logging.error(message)
+        self.message = message
+        super().__init__(self.message)
