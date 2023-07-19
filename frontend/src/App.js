@@ -28,13 +28,14 @@ const AppRoutes = observer(() => {
 
 const App = observer(() => {
   const rootStore = useMemo(() => new RootStore(),[])
+  const { token, loading, checkLogin } = rootStore
 
   useEffect(() => {
     // Check if the user is logged in based on the token presence and validity
-    rootStore.checkLogin()
-  }, [rootStore])
+    checkLogin()
+  }, [token, checkLogin])
 
-  if (rootStore.loading) {
+  if (loading) {
     return (
       <Dimmer active>
         <Loader>Loading...</Loader>

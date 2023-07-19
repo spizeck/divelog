@@ -14,6 +14,15 @@ class RootStore {
     makeAutoObservable(this)
   }
 
+  resetState() {
+    this.setLoggedIn(false)
+    this.setUsername('')
+    this.setFirstName('')
+    this.setPreferedUnits('')
+    this.setToken(null)
+    localStorage.removeItem('token')
+  }
+
   checkLogin = flow(function * () {
     if (this.token) {
       // check if the token is valid by attempting to retrieve the user's data
@@ -24,18 +33,10 @@ class RootStore {
           this.setUsername(response.data.username)
           this.setFirstName(response.data.first_name)
         } else {
-          this.setLoggedIn(false)
-          this.setUsername('')
-          this.setFirstName('')
-          this.setPreferedUnits('')
-          localStorage.removeItem('token')
+          this.resetState()
         }
       } catch (error) {
-        this.setLoggedIn(false)
-        this.setUsername('')
-        this.setFirstName('')
-        this.setPreferedUnits('')
-        localStorage.removeItem('token')
+        this.resetState()
       }
     } else {
       this.setLoggedIn(false)
@@ -54,43 +55,25 @@ class RootStore {
         this.setToken(response.data.token)
         localStorage.setItem('token', response.data.token)
       } else {
-        this.setLoggedIn(false)
-        this.setUsername('')
-        this.setFirstName('')
-        this.setPreferedUnits('')
-        this.setToken(null)
-        localStorage.removeItem('token')
+        this.resetState()
       }
     } catch (error) {
-      this.setLoggedIn(false)
-      this.setUsername('')
-      this.setFirstName('')
-      this.setPreferedUnits('')
-      this.setToken(null)
-      localStorage.removeItem('token')
+      this.resetState()
     }
   })
 
-  logout () {
+  logout = flow(function* () {
     try {
       const response = yield api.logout(this.token)
       if (response.data.status === 200) {
-        this.setLoggedIn(false)
-        this.setUsername('')
-        this.setFirstName('')
-        this.setPreferedUnits('')
-        this.token = null
-        localStorage.removeItem('token')
+        this.resetState()
+      } else {
+        this.resetState()
       }
     } catch (error) {
-      this.setLoggedIn(false)
-      this.setUsername('')
-      this.setFirstName('')
-      this.setPreferedUnits('')
-      this.token = null
-      localStorage.removeItem('token')
+      this.resetState()
     }
-  }
+  })
 
   setLoading (value) {
     this.loading = value
