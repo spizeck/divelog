@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { observer } from 'mobx-react';
+import { observable, action } from 'mobx';
 import { Sidebar, Menu, Message, Icon } from 'semantic-ui-react'
 import api from '../utils/api'
 import '../styles/Navigation.css'
@@ -7,56 +9,48 @@ import DiveForm from './DiveForm'
 import Preferences from './Preferences'
 import PreviousEntries from './PreviousEntries'
 
-const Navigation = ({
-  loggedIn,
-  username,
-  setUsername,
-  handleLogout,
-  handleLoginSuccess,
-  token
-}) => {
-  const [activeItem, setActiveItem] = useState('home')
-  const [logoutMessage, setLogoutMessage] = useState('')
-  const [sidebarOpened, setSidebarOpened] = useState(false)
-
-  const handleSidebarToggle = () => setSidebarOpened(!sidebarOpened)
-
-  const handleItemClick = (e, { name }) => {
-    setSidebarOpened(false)
+@observer
+class Navigation extends React.Component {
+  @observable activeItem = 'home'
+  @observable logoutMessage = ''
+  @observable sidebarOpened = false
+  
+  // click handler for menu items, login and logout
+  @action.bound
+  handleItemClick (e, { name }) {
     if (name === 'logout') {
-      api
-        .logout()
-        .then(response => {
-          setLogoutMessage(response.message)
-          handleLogout()
-          setTimeout(() => {
-            setLogoutMessage('')
-          }, 3000)
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    } else {
-      setActiveItem(name)
+      this.logout()
+    } else if (name === 'login') {
+      this.props.history.push('/login')
+      this.activeItem = name
     }
   }
 
-  let content
-  if (activeItem === 'home') {
-    content = <Home username={username} loggedIn={loggedIn} />
-  } else if (activeItem === 'Dive Log Entry') {
-    content = <DiveForm username={username} token={token} />
-  } else if (activeItem === 'Previous Entries') {
-    content = <PreviousEntries username={username} token={token} />
-  } else if (activeItem === 'Preferences') {
-    content = (
-      <Preferences
-        token={token}
-        setUsername={setUsername}
-        handleLoginSuccess={handleLoginSuccess}
-      />
-    )
+
+
+  // click handler for sidebar toggle
+  @action.bound
+  handleSidebarToggle () {
+    this.sidebarOpened = !this.sidebarOpened
   }
+
+  let content;
+if (this.activeItem === 'home') {
+  content = <Home username={this.props.username} loggedIn={this.props.loggedIn} />;
+} else if (this.activeItem === 'Dive Log Entry') {
+  content = <DiveForm username={this.props.username} token={this.props.token} />;
+} else if (this.activeItem === 'Previous Entries') {
+  content = <PreviousEntries username={this.props.username} token={this.props.token} />;
+} else if (this.activeItem === 'Preferences') {
+  content = (
+    <Preferences
+      token={this.props.token}
+      setUsername={this.props.setUsername}
+      handleLoginSuccess={this.props.handleLoginSuccess}
+    />
+  );
+}
+
 
   return (
     <div>

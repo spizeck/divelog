@@ -72,12 +72,24 @@ class RootStore {
   })
 
   logout () {
-    this.setLoggedIn(false)
-    this.setUsername('')
-    this.setFirstName('')
-    this.setPreferedUnits('')
-    this.token = null
-    localStorage.removeItem('token')
+    try {
+      const response = yield api.logout(this.token)
+      if (response.data.status === 200) {
+        this.setLoggedIn(false)
+        this.setUsername('')
+        this.setFirstName('')
+        this.setPreferedUnits('')
+        this.token = null
+        localStorage.removeItem('token')
+      }
+    } catch (error) {
+      this.setLoggedIn(false)
+      this.setUsername('')
+      this.setFirstName('')
+      this.setPreferedUnits('')
+      this.token = null
+      localStorage.removeItem('token')
+    }
   }
 
   setLoading (value) {
