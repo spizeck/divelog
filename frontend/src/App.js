@@ -28,12 +28,12 @@ const AppRoutes = observer(() => {
 
 const App = observer(() => {
   const rootStore = useMemo(() => new RootStore(),[])
-  const { token, loading, checkLogin } = rootStore
+  const { loading, checkLogin } = rootStore
 
   useEffect(() => {
     // Check if the user is logged in based on the token presence and validity
     checkLogin()
-  }, [token, checkLogin])
+  }, [rootStore.token])
 
   if (loading) {
     return (

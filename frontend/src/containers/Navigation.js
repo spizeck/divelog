@@ -7,9 +7,12 @@ import DiveForm from './DiveForm'
 import Preferences from './Preferences'
 import PreviousEntries from './PreviousEntries'
 
-@inject('rootStore')
-@observer
 class Navigation extends Component {
+  constructor (props) {
+    super(props)
+    this.handleItemClick = this.handleItemClick.bind(this)
+    this.handleSidebarToggle = this.handleSidebarToggle.bind(this)
+  }
   // click handler for menu items, login and logout
   handleItemClick (e, { name }) {
     if (name === 'logout') {
@@ -63,8 +66,7 @@ class Navigation extends Component {
           <Menu.Item
             name='home'
             active={activeItem === 'home'}
-            onClick={loggedIn ? this.handleItemClick : null}
-            disabled={!loggedIn}
+            onClick={this.handleItemClick}
           />
           <Menu.Item
             name='Dive Log Entry'
@@ -88,10 +90,9 @@ class Navigation extends Component {
             />
             <Menu.Item
               className='desktop-item'
-              name='logout'
-              active={activeItem === 'logout'}
-              onClick={loggedIn ? this.handleItemClick : null}
-              disabled={!loggedIn}
+              name={loggedIn ? 'logout' : 'login'}
+              active={activeItem === (loggedIn ? 'logout' : 'login')}
+              onClick={this.handleItemClick}
             />
           </Menu.Menu>
         </Menu>
@@ -103,8 +104,8 @@ class Navigation extends Component {
               onClick={this.handleItemClick}
             />
             <Menu.Item
-              name='logout'
-              active={activeItem === 'logout'}
+              name={loggedIn ? 'logout' : 'login'}
+              active={activeItem === (loggedIn ? 'logout' : 'login')}
               onClick={this.handleItemClick}
             />
           </Sidebar>
@@ -118,4 +119,4 @@ class Navigation extends Component {
   }
 }
 
-export default Navigation
+export default inject('rootStore')(observer(Navigation))

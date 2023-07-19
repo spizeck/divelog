@@ -1,23 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import { observer, inject } from 'mobx-react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Form, Message } from 'semantic-ui-react'
 import '../styles/Login.css'
 import api from '../utils/api'
 
-const Login = ({ handleLoginSuccess, loggedIn }) => {
+const Login = inject('authStore')(observer(({ authStore }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
 
   const navigate = useNavigate()
-
-  useEffect(() => {
-    // Check if the user is already logged in
-    if (loggedIn) {
-      navigate('/home')
-    }
-  }, [loggedIn, navigate])
 
   const handleLogin = async e => {
     e.preventDefault()
@@ -34,7 +28,16 @@ const Login = ({ handleLoginSuccess, loggedIn }) => {
       if (loginResponse.status === 200) {
         // Login successful, display message and execute handleLoginSuccess
         setSuccessMessage(loginResponse.message)
-        handleLoginSuccess(loginResponse.token, loginResponse.username)
+        authStore.handleLoginSuccess(
+          loginResponse.token,
+          loginResponse.username,
+          loginResponse.preferred_units,
+          loginResponse.first_name
+        )
+        navigate('/home')
+      } else {
+        // Login failed, display error message
+        setErrorMessage(loginResponse.message)
       }
     } catch (error) {
       setErrorMessage(error.message)
@@ -87,10 +90,6 @@ const Login = ({ handleLoginSuccess, loggedIn }) => {
       </div>
     </div>
   )
-}
-
-// TODO: Make the login accept either username
-// OR email in a single box. Perhaps the logic can look for
-// an @ symbol and then decide which to use.
+}))
 
 export default Login
