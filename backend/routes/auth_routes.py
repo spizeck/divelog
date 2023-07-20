@@ -139,7 +139,7 @@ def get_current_user():
     return jsonify({
         'status': 200,
         'message': 'User found',
-        'is_approved': is_approved,
+        'approved': is_approved,
         'admin': admin,
         'username': username,
         'email': email,

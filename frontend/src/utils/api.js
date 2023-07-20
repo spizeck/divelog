@@ -92,12 +92,14 @@ const api = {
   },
 
   // Register endpoint
-  register: async (username, email, password) => {
+  register: async (username, email, password, firstName, preferredUnits) => {
     try {
       const response = await axios.post(`${apiUrl}${API_ENDPOINTS.register}`, {
         username,
         email,
-        password
+        password,
+        firstName,
+        preferredUnits
       })
       return response.data
     } catch (error) {

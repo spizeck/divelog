@@ -1,6 +1,6 @@
 // Used for: Main app component
 import React, { useEffect, useMemo } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Provider, observer } from 'mobx-react'
 import RootStore from './stores/RootStore'
 import { Container, Loader, Dimmer } from 'semantic-ui-react'
@@ -17,10 +17,10 @@ import NotFound from './containers/NotFound.js'
 const AppRoutes = observer(() => {
   return (
     <Routes>
-      <Route path='home' element={<BasePage />} />
-      <Route path='register' element={<Register />} />
-      <Route path='forgot-password' element={<ForgotPassword />} />
-      <Route path='login' element={<Login />} />
+      <Route path='/home' element={<BasePage />} />
+      <Route path='/register' element={<Register />} />
+      <Route path='/forgotPassword' element={<ForgotPassword />} />
+      <Route path='/login' element={<Login />} />
       <Route path='*' element={<NotFound />} />
     </Routes>
   )
@@ -28,14 +28,16 @@ const AppRoutes = observer(() => {
 
 const App = observer(() => {
   const rootStore = useMemo(() => new RootStore(),[])
-  const { loading, checkLogin } = rootStore
+  const { userStore, authStore } = rootStore
+  const { fetchUserData, userStatus } = userStore
+  const { authStatus } = authStore
 
   useEffect(() => {
     // Check if the user is logged in based on the token presence and validity
-    checkLogin()
-  }, [rootStore.token])
+    fetchUserData()
+  }, [fetchUserData])
 
-  if (loading) {
+  if (userStatus === 'pending' || authStatus === 'pending') {
     return (
       <Dimmer active>
         <Loader>Loading...</Loader>
@@ -44,7 +46,7 @@ const App = observer(() => {
   }
 
   return (
-    <Router>
+    <BrowserRouter>
       <Container>
         <Provider rootStore={rootStore}>
           <AppHeader />
@@ -52,7 +54,7 @@ const App = observer(() => {
           <AppRoutes />
         </Provider>
       </Container>
-    </Router>
+    </BrowserRouter>
   )
 })
 
