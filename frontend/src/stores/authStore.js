@@ -19,7 +19,7 @@ class AuthStore {
 
   // private login helper function
   _loginHelper = response => {
-    this.token = response.data.token
+    this.token = response.token
     this.loggedIn = true
     this.loginMessage = 'You have been successfully logged in'
     localStorage.setItem('token', this.token)
@@ -52,23 +52,29 @@ class AuthStore {
   // login function that accepts either a username or email
   login = flow(
     function* (username, password) {
-      console.log("Starting login")
+      console.log('Starting login')
       this._startStatus()
       try {
         // Check if the username has an @ in it
         if (username.includes('@')) {
           const response = yield api.loginWithEmail(username, password)
-          if (response.data.status === 200) {
+          if (response.status === 200) {
             this._loginHelper(response)
+            return response
           }
-        } else {
+        } else if (!username.includes('@')) {
           const response = yield api.loginWithUsername(username, password)
-          if (response.data.status === 200) {
-            this._loginHelper(response)
+          if (response.status !== 200) {
+            this._errorHelper(response)
+            throw new Error(response.message)
           }
+          this._loginHelper(response)
         }
       } catch (error) {
         this._errorHelper(error)
+        throw new Error(error.message)
+      } finally {
+        this.authStatus = 'idle'
       }
     }.bind(this)
   )
@@ -79,11 +85,18 @@ class AuthStore {
       this._startStatus()
       try {
         const response = yield api.logout()
-        if (response.data.status === 200) {
+        if (response.status === 200) {
           this._logoutHelper()
+          return response
+        } else {
+          this._errorHelper(response)
+          return response
         }
       } catch (error) {
         this._errorHelper(error)
+        throw new Error(error.message)
+      } finally {
+        this.authStatus = 'idle'
       }
     }.bind(this)
   )
@@ -100,11 +113,16 @@ class AuthStore {
           firstName,
           preferredUnits
         )
-        if (response.data.status === 200) {
-          this.authStatus = 'idle'
+        if (response.status !== 201) {
+          this._errorHelper(response)
+          throw new Error(response.message)
         }
+        return response
       } catch (error) {
         this._errorHelper(error)
+        throw new Error(error.message)
+      } finally {
+        this.authStatus = 'idle'
       }
     }.bind(this)
   )

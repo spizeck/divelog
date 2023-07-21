@@ -6,12 +6,13 @@ import '../styles/Login.css'
 
 const Login = inject('rootStore')(
   observer(({ rootStore }) => {
+    const { authStore } = rootStore
+
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [errorMessage, setErrorMessage] = useState('')
     const [successMessage, setSuccessMessage] = useState('')
-    const { authStore } = rootStore
-
+    
     const navigate = useNavigate()
 
     // handle login function using the login function in the authStore

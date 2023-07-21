@@ -48,8 +48,8 @@ def register():
     username = data['username']
     email = data['email']
     password = data['password']
-    first_name = data['first_name'] if 'first_name' in data else None
-    preferred_units = data['preferred_units'] if 'preferred_units' in data else None
+    first_name = data['firstName'] if 'firstName' in data else None
+    preferred_units = data['preferredUnits'] if 'preferredUnits' in data else None
 
     # Validate email format
     if not User.validate_email_format(email):

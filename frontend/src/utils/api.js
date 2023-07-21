@@ -1,3 +1,33 @@
+/**
+ * This file exports an api object that contains methods for interacting
+ * with the backend server. Each method corresponds to a specific API endpoint
+ * and returns the data from the server response. If an error occurs, it throws
+ * the error data.
+ * 
+ * All methods use the axios library to send HTTP requests. For GET and DELETE 
+ * requests, you can pass parameters directly. For POST and PUT requests, you should 
+ * pass an object containing the request body data.
+ * 
+ * Usage:
+ * 1. Import the api object into your file:
+ *    import api from './api'
+ * 2. Use the methods in the api object to make requests to the server:
+ *    const response = await api.loginWithUsername(username, password)
+ *    const user = await api.getCurrentUser(token)
+ * 
+ * Here are some examples of how to use the api object methods:
+ * 
+ * - To log in with a username and password:
+ *   const response = await api.loginWithUsername('username', 'password')
+ *   If successful, this returns the server's response data, which includes the user's token.
+ * 
+ * - To get the current user's information:
+ *   const user = await api.getCurrentUser('your-token-here')
+ *   This returns the user's information.
+ * 
+ * Remember to use try/catch to handle errors when you use these methods, as they throw errors.
+ */
+
 import axios from 'axios'
 
 // Define the base URL for your API
@@ -104,7 +134,7 @@ const api = {
       return response.data
     } catch (error) {
       if (error.response) {
-        return error.response
+        return error.response.data
       } else {
         throw error
       }
@@ -165,20 +195,18 @@ const api = {
   // Get number of pages by different sort methods endpoint
   getPages: async (sortMethod, key) => {
     try {
-      const response = await axios.get(
-        `${apiUrl}${API_ENDPOINTS.getPages}`, {
+      const response = await axios.get(`${apiUrl}${API_ENDPOINTS.getPages}`, {
         params: {
           sortMethod,
           key
         }
-      }
-      )
+      })
       return response.data
     } catch (error) {
       throw error.response.data
     }
   },
-  
+
   // Get dives by date endpoint
   getDivesByDate: async (startDate, endDate) => {
     try {
@@ -201,12 +229,13 @@ const api = {
   getDivesByGuide: async (diveGuide, page) => {
     try {
       const response = await axios.get(
-        `${apiUrl}${API_ENDPOINTS.getDivesByGuide}`, {
-        params: {
-          diveGuide,
-          page
+        `${apiUrl}${API_ENDPOINTS.getDivesByGuide}`,
+        {
+          params: {
+            diveGuide,
+            page
+          }
         }
-      }
       )
       return response.data
     } catch (error) {
@@ -215,7 +244,7 @@ const api = {
   },
 
   // Edit dive endpoint
-  editDive: async (diveData) => {
+  editDive: async diveData => {
     try {
       const response = await axios.put(
         `${apiUrl}${API_ENDPOINTS.editDive}`,
@@ -228,14 +257,15 @@ const api = {
   },
 
   // Delete dive endpoint
-  deleteDive: async (diveId) => {
+  deleteDive: async diveId => {
     try {
       const response = await axios.delete(
-        `${apiUrl}${API_ENDPOINTS.deleteDive}`, {
-        params: {
-          diveId
+        `${apiUrl}${API_ENDPOINTS.deleteDive}`,
+        {
+          params: {
+            diveId
+          }
         }
-      }
       )
       return response.data
     } catch (error) {

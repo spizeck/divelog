@@ -1,91 +1,135 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../utils/api';
-import { Form, Button, Message } from 'semantic-ui-react';
-import '../styles/Login.css';
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Form, Button, Message } from 'semantic-ui-react'
+import '../styles/Login.css'
+import { inject, observer } from 'mobx-react'
 
-const Register = ({ setShowRegisterForm, setShowLoginForm }) => {
-    const [firstName, setFirstName] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [email, setEmail] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
-    const [successMessage, setSuccessMessage] = useState('');
+const FormInput = ({ type, placeholder, value, setValue }) => (
+  <Form.Input
+    type={type}
+    placeholder={placeholder}
+    value={value}
+    onChange={e => setValue(e.target.value)}
+  />
+)
 
-    const navigate = useNavigate();
+const Register = inject('rootStore')(
+  observer(({ rootStore }) => {
+    const { authStore } = rootStore
+    const { register } = authStore
+    const navigate = useNavigate()
 
-    const handleRegister = async (e) => {
-        e.preventDefault();
+    const [formData, setFormData] = useState({
+      firstName: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
+      email: '',
+      preferredUnits: 'imperial', // 'imperial', 'metric'
+      successMessage: '',
+      errorMessage: ''
+    })
 
-        if (password !== confirmPassword) {
-            setErrorMessage("Passwords do not match");
-            return;
+    const handleRegister = async e => {
+      e.preventDefault()
+
+      if (formData.password !== formData.confirmPassword) {
+        setFormData({ ...formData, errorMessage: 'Passwords do not match' })
+        return
+      }
+      // Send the registration request to the authStore
+      try {
+        const registerResponse = await register(
+          formData.username,
+          formData.email,
+          formData.password,
+          formData.firstName,
+          formData.preferredUnits
+        )
+        if (registerResponse.status === 201) {
+          setFormData({
+            ...formData,
+            successMessage: registerResponse.message,
+            errorMessage: ''
+          })
+          setTimeout(() => {
+            navigate('/login')
+          }, 3000)
+        } else {
+          setFormData({
+            ...formData,
+            errorMessage: registerResponse.message,
+            successMessage: ''
+          })
         }
-
-        try {
-            // Send register request to the backend
-            const registerResponse = await api.register(username, email, password);
-
-            if (registerResponse.status === 201) {
-                // Registration successful, show login form
-                setSuccessMessage(registerResponse.message)
-                setTimeout(() => {
-                    navigate('/login');
-                }, 3000);
-            } else {
-                // Server error or Validation error
-                setErrorMessage(registerResponse.data.message);
-            }
-        } catch (error) {
-            setErrorMessage(error.response.data.message);
-        }
-
-    };
+      } catch (error) {
+        setFormData({ ...formData, errorMessage: error.message })
+      }
+    }
 
     return (
-        <div className="login-container">
+      <div className='login-container'>
+        <Form onSubmit={handleRegister} className='login-form'>
+          <h1>Please Register</h1>
+          <FormInput
+            type='text'
+            placeholder='Username'
+            value={formData.username}
+            setValue={value => setFormData({ ...formData, username: value })}
+          />
+          <FormInput
+            type='text'
+            placeholder='First Name'
+            value={formData.firstName}
+            setValue={value => setFormData({ ...formData, firstName: value })}
+          />
+          <FormInput
+            type='text'
+            placeholder='Email'
+            value={formData.email}
+            setValue={value => setFormData({ ...formData, email: value })}
+          />
+          <FormInput
+            type='password'
+            placeholder='Password'
+            value={formData.password}
+            setValue={value => setFormData({ ...formData, password: value })}
+          />
+          <FormInput
+            type='password'
+            placeholder='Confirm Password'
+            value={formData.confirmPassword}
+            setValue={value =>
+              setFormData({ ...formData, confirmPassword: value })
+            }
+          />
+          <Form.Select
+            fluid
+            label='Preferred Units'
+            options={[
+              { key: 'imperial', text: 'Imperial', value: 'imperial' },
+              { key: 'metric', text: 'Metric', value: 'metric' }
+            ]}
+            value={formData.preferredUnits}
+            onChange={(e, { value }) =>
+              setFormData({ ...formData, preferredUnits: value })
+            }
+          />
+          <Button fluid type='submit' primary>
+            Register
+          </Button>
+          <p></p>
+          <Button fluid type='button' onClick={() => navigate('/login')}>
+            Back
+          </Button>
+          {formData.successMessage && (
+            <Message positive>{formData.successMessage}</Message>
+          )}
+          {formData.errorMessage && <Message negative>{formData.errorMessage}</Message>}
+        </Form>
+      </div>
+    )
+  })
+)
 
-            <Form onSubmit={handleRegister} className='login-form'>
-                <h1>Please Register</h1>
-                <Form.Input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <Form.Input
-                    type="text"
-                    placeholder="First Name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                />
-                <Form.Input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-                <Form.Input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <Form.Input
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-                <Button fluid type="submit" primary>Register</Button>
-                <p></p>
-                <Button fluid type="button" onClick={() => navigate('/login')}>Back</Button>
-                {successMessage && <Message positive>{successMessage}</Message>}
-                {errorMessage && <Message negative>{errorMessage}</Message>}
-            </Form>
-        </div>
-    );
-};
-
-export default Register;
+export default Register

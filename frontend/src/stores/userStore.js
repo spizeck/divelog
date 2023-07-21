@@ -60,19 +60,23 @@ class UserStore {
     try {
       const response = yield api.getUserData(this.rootStore.authStore.token)
       if (response.data.status === 200) {
-        this.setUsername(response.data.username)
-        this.setFirstName(response.data.firstName)
-        this.setApproved(response.data.approved)
-        this.setAdmin(response.data.admin)
-        this.setPreferedUnits(response.data.preferredUnits)
-      } else if (response.data.status === 401) {
+        this.setUsername(response.username)
+        this.setFirstName(response.firstName)
+        this.setApproved(response.approved)
+        this.setAdmin(response.admin)
+        this.setPreferedUnits(response.preferredUnits)
+        return response
+      } else if (response.status === 401) {
         this._errorHelper(new Error("Your session has expired. Please log in again."))
         this.rootStore.authStore.logout()
+        return response
       } else {
-        this._errorHelper(new Error(response.data.message))
+        this._errorHelper(new Error(response.message))
+        return response
       }
     } catch (error) {
       this._errorHelper(error)
+      return error
     }
   }.bind(this))
 }

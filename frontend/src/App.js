@@ -1,6 +1,6 @@
 // Used for: Main app component
 import React, { useEffect, useMemo } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Provider, observer } from 'mobx-react'
 import RootStore from './stores/RootStore'
 import { Container, Loader, Dimmer } from 'semantic-ui-react'
@@ -17,6 +17,7 @@ import NotFound from './containers/NotFound.js'
 const AppRoutes = observer(() => {
   return (
     <Routes>
+      <Route path='/' element={<Navigate to='/home' />} />
       <Route path='/home' element={<BasePage />} />
       <Route path='/register' element={<Register />} />
       <Route path='/forgotPassword' element={<ForgotPassword />} />
