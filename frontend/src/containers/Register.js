@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Form, Button, Message } from 'semantic-ui-react'
 import '../styles/Login.css'
@@ -125,7 +125,9 @@ const Register = inject('rootStore')(
           {formData.successMessage && (
             <Message positive>{formData.successMessage}</Message>
           )}
-          {formData.errorMessage && <Message negative>{formData.errorMessage}</Message>}
+          {formData.errorMessage && (
+            <Message negative>{formData.errorMessage}</Message>
+          )}
         </Form>
       </div>
     )

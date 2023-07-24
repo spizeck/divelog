@@ -24,7 +24,7 @@ const Login = inject('rootStore')(
           setSuccessMessage(authStore.loginMessage)
           setTimeout(() => {
             navigate('/home')
-          }, 1000)
+          }, 3000)
         } else {
           setErrorMessage(authStore.errorMessage)
         }
@@ -54,8 +54,7 @@ const Login = inject('rootStore')(
             <Button fluid className='login-button' type='submit' primary>
               Log In
             </Button>
-            {successMessage && <Message positive>{successMessage}</Message>}
-            {errorMessage && <Message negative>{errorMessage}</Message>}
+
           </Form>
           <div className='login-footer'>
             <Button.Group fluid>
@@ -70,11 +69,13 @@ const Login = inject('rootStore')(
               <Button
                 className='small-buttons'
                 negative
-                onClick={() => navigate('/forgot-password')}
+                onClick={() => navigate('/forgot_password')}
               >
                 Forgot Password
               </Button>
             </Button.Group>
+            {successMessage && <Message positive>{successMessage}</Message>}
+            {errorMessage && <Message negative>{errorMessage}</Message>}
           </div>
         </div>
       </div>

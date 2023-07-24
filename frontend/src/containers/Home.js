@@ -1,19 +1,27 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { observer, inject } from 'mobx-react'
-import { Container, Header } from 'semantic-ui-react'
+import { Container, Header, Message } from 'semantic-ui-react'
 
 // Home class that takes firstName from the userStore
 const Home = inject('rootStore')(observer(({ rootStore }) => {
     const { userStore, authStore } = rootStore
     const { firstName } = userStore
     const { loggedIn } = authStore
+    const [errorMessage, setErrorMessage] = useState(null)
 
     return (
       <div>
         <Container>
           <p></p>
+          {errorMessage && 
+          <div className="error-popup">
+            <h2>Error</h2>
+            <Message negative>{errorMessage}</Message>
+            <button onClick={() => setErrorMessage(null)}>Close</button>
+          </div>
+          }
           <Header as='h1'>
-            Welcome to the Dive Log App{loggedIn && <p>, {firstName}!</p>}!
+            Welcome to the Dive Log App{loggedIn && `, ${firstName}`}!
           </Header>
           <p></p>
           <p>

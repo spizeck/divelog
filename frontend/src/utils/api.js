@@ -3,28 +3,28 @@
  * with the backend server. Each method corresponds to a specific API endpoint
  * and returns the data from the server response. If an error occurs, it throws
  * the error data.
- * 
- * All methods use the axios library to send HTTP requests. For GET and DELETE 
- * requests, you can pass parameters directly. For POST and PUT requests, you should 
+ *
+ * All methods use the axios library to send HTTP requests. For GET and DELETE
+ * requests, you can pass parameters directly. For POST and PUT requests, you should
  * pass an object containing the request body data.
- * 
+ *
  * Usage:
  * 1. Import the api object into your file:
  *    import api from './api'
  * 2. Use the methods in the api object to make requests to the server:
  *    const response = await api.loginWithUsername(username, password)
  *    const user = await api.getCurrentUser(token)
- * 
+ *
  * Here are some examples of how to use the api object methods:
- * 
+ *
  * - To log in with a username and password:
  *   const response = await api.loginWithUsername('username', 'password')
  *   If successful, this returns the server's response data, which includes the user's token.
- * 
+ *
  * - To get the current user's information:
  *   const user = await api.getCurrentUser('your-token-here')
  *   This returns the user's information.
- * 
+ *
  * Remember to use try/catch to handle errors when you use these methods, as they throw errors.
  */
 
@@ -286,7 +286,9 @@ const api = {
       )
       return response.data
     } catch (error) {
-      if (error.response && error.response.data.message) {
+      if (error.response && error.response.status === 401) {
+        throw new Error('401')
+      } else if (error.response && error.response.data.message) {
         throw new Error(error.response.data.message)
       } else {
         throw new Error('An error occurred while fetching the current user')

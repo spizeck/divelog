@@ -6,9 +6,7 @@ class AuthStore {
   loggedIn = false
   token = null
   authStatus = 'idle' // 'idle' | 'pending' | 'error'
-  errorMessage = null
-  logoutMessage = null
-  loginMessage = null
+  errorMessage = ''
 
   constructor (rootStore) {
     this.rootStore = rootStore
@@ -17,94 +15,49 @@ class AuthStore {
     this.loggedIn = localStorage.getItem('loggedIn') === 'true' || false
   }
 
-  // private login helper function
-  _loginHelper = response => {
-    this.token = response.token
-    this.loggedIn = true
-    this.loginMessage = 'You have been successfully logged in'
-    localStorage.setItem('token', this.token)
-    localStorage.setItem('loggedIn', true)
-    this.authStatus = 'idle'
-  }
-
-  // private logout helper function
-  _logoutHelper = () => {
-    this.token = null
-    this.loggedIn = false
-    this.logoutMessage = 'You have been successfully logged out'
-    localStorage.removeItem('token')
-    localStorage.removeItem('loggedIn')
-    this.authStatus = 'idle'
-  }
-
-  // private error helper function
-  _errorHelper = error => {
-    this.authStatus = 'error'
-    this.errorMessage = error.message
-  }
-
-  // private status helper function
-  _startStatus () {
-    this.authStatus = 'pending'
-    this.errorMessage = null
-  }
-
-  // login function that accepts either a username or email
   login = flow(
     function* (username, password) {
-      console.log('Starting login')
-      this._startStatus()
+      this.startAuthProcess()
       try {
-        // Check if the username has an @ in it
-        if (username.includes('@')) {
-          const response = yield api.loginWithEmail(username, password)
-          if (response.status === 200) {
-            this._loginHelper(response)
-            return response
-          }
-        } else if (!username.includes('@')) {
-          const response = yield api.loginWithUsername(username, password)
-          if (response.status !== 200) {
-            this._errorHelper(response)
-            throw new Error(response.message)
-          }
-          this._loginHelper(response)
+        const response = username.includes('@')
+          ? yield api.loginWithEmail(username, password)
+          : yield api.loginWithUsername(username, password)
+
+        if (response.status !== 200) {
+          throw new Error(response.message)
         }
+
+        this.handleSuccessfulLogin(response)
+        yield this.fetchUserData()
       } catch (error) {
-        this._errorHelper(error)
-        throw new Error(error.message)
+        this.handleAuthError(error)
       } finally {
-        this.authStatus = 'idle'
+        this.endAuthProcess()
       }
     }.bind(this)
   )
 
-  // logout function
   logout = flow(
     function* () {
-      this._startStatus()
+      this.startAuthProcess()
       try {
         const response = yield api.logout()
         if (response.status === 200) {
-          this._logoutHelper()
-          return response
+          this.handleSuccessfulLogout()
         } else {
-          this._errorHelper(response)
-          return response
+          throw new Error(response.message)
         }
       } catch (error) {
-        this._errorHelper(error)
-        throw new Error(error.message)
+        this.handleAuthError(error)
       } finally {
-        this.authStatus = 'idle'
+        this.endAuthProcess()
       }
     }.bind(this)
   )
 
-  // register function that does not login the user after registering
   register = flow(
     function* (username, email, password, firstName, preferredUnits) {
-      this._startStatus()
+      this.startAuthProcess()
       try {
         const response = yield api.register(
           username,
@@ -114,18 +67,69 @@ class AuthStore {
           preferredUnits
         )
         if (response.status !== 201) {
-          this._errorHelper(response)
           throw new Error(response.message)
         }
-        return response
       } catch (error) {
-        this._errorHelper(error)
-        throw new Error(error.message)
+        this.handleAuthError(error)
       } finally {
-        this.authStatus = 'idle'
+        this.endAuthProcess()
       }
     }.bind(this)
   )
+
+  resetPassword = flow(
+    function* (email) {
+      this.startAuthProcess()
+      try {
+        const response = yield api.forgotPassword(email)
+        if (response.status !== 200) {
+          throw new Error(response.message)
+        }
+      } catch (error) {
+        this.handleAuthError(error)
+      } finally {
+        this.endAuthProcess()
+      }
+    }.bind(this)
+  )
+
+  startAuthProcess () {
+    this.authStatus = 'pending'
+  }
+
+  endAuthProcess () {
+    this.authStatus = 'idle'
+  }
+
+  handleSuccessfulLogin (response) {
+    this.token = response.token
+    this.loggedIn = true
+    localStorage.setItem('token', this.token)
+    localStorage.setItem('loggedIn', true)
+  }
+
+  handleSuccessfulLogout () {
+    this.token = null
+    this.loggedIn = false
+    localStorage.clear()
+  }
+
+  async fetchUserData () {
+    try {
+      await this.rootStore.userStore.fetchUserData()
+    } catch (error) {
+      console.error('Failed to fetch user data after login', error)
+    }
+  }
+
+  handleAuthError (error) {
+    this.authStatus = 'error'
+    console.error('Auth error: ', error)
+  }
+
+  setErrorMessage (value) {
+    this.errorMessage = value
+  }
 }
 
 export default AuthStore

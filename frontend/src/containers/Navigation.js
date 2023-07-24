@@ -20,10 +20,10 @@ const Navigation = inject('rootStore')(observer(({ rootStore }) => {
   }
 
   const handleItemClick = name => {
-    if (name === '/logout') {
-      console.log('Im goin to logout')
+    if (name === 'logout') {
+      console.log('Im going to logout')
       logout()
-    } else {
+    } else if (name === 'login') {
       navigate('/login')
     }
   }
@@ -86,7 +86,7 @@ const Navigation = inject('rootStore')(observer(({ rootStore }) => {
             className='desktop-item'
             name={loggedIn ? 'logout' : 'login'}
             active={isActive(loggedIn ? '/logout' : '/login')}
-            onClick={handleItemClick}
+            onClick={loggedIn ? logout : () => navigate('/login')}
           />
         </Menu.Menu>
       </Menu>
@@ -100,7 +100,7 @@ const Navigation = inject('rootStore')(observer(({ rootStore }) => {
           <Menu.Item
             name={loggedIn ? 'logout' : 'login'}
             active={isActive(loggedIn ? '/logout' : '/login')}
-            onClick={handleItemClick}
+            onClick={loggedIn ? logout : () => navigate('/login')}
           />
         </Sidebar>
         <Sidebar.Pusher dimmed={sidebarOpened}>

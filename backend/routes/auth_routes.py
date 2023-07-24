@@ -133,8 +133,8 @@ def get_current_user():
     email = user.email if hasattr(user, 'email') else None
     is_approved = user.is_approved if hasattr(user, 'is_approved') else None
     admin = user.admin if hasattr(user, 'admin') else None
-    first_name = user.first_name if hasattr(user, 'first_name') else None
-    preferred_units = user.preferred_units if hasattr(user, 'preferred_units') else None
+    first_name = user.user_preferences.first_name if hasattr(user.user_preferences, 'first_name') else None
+    preferred_units = user.user_preferences.preferred_units if hasattr(user.user_preferences, 'preferred_units') else None
 
     return jsonify({
         'status': 200,
