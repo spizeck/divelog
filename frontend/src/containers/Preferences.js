@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
+import { observer, inject } from 'mobx-react'
 import {
   Button,
   Container,
@@ -11,52 +12,42 @@ import {
 
 import '../styles/Preferences.css'
 
-import api from '../utils/api'
-
-const Preferences = ({ token, setUsername }) => {
-  const [originalUsername, setOriginalUsername] = useState('')
-  const [originalEmail, setOriginalEmail] = useState('')
-  const [originalUnit, setOriginalUnit] = useState('')
-  const [newUsername, setNewUsername] = useState('')
-  const [newEmail, setNewEmail] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [verifyPassword, setVerifyPassword] = useState('')
-  const [newUnit, setNewUnit] = useState('')
-  const [isEditing, setIsEditing] = useState(false)
-  const [editingField, setEditingField] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
-  const [isApproved, setIsApproved] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
+const Preferences = inject('rootStore')(observer(({ rootStore }) => {
+  const { authStore, userStore } = rootStore
 
   useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const userResponse = await api.getCurrentUser(token)
-        setOriginalUsername(userResponse.username)
-        setNewUsername(userResponse.username)
-        setOriginalEmail(userResponse.email)
-        setNewEmail(userResponse.email)
-        setIsApproved(userResponse.isApproved)
-        setIsAdmin(userResponse.isAdmin)
-        setUsername(capitalizeFirstLetter(userResponse.username))
+    if (userStore.userStatus === 'idle' && authStore.authStatus === 'idle') {
+      userStore.fetchUserData()
+    }
+  }, [userStore, authStore])
 
-        const preferencesResponse = await api.getPreferences(token)
-        setOriginalUnit(preferencesResponse.preferredUnits)
-        setNewUnit(preferencesResponse.preferredUnits)
-      } catch (error) {
-        setTimeout(() => {
-          setErrorMessage(error.message)
-        }, 1000)
-        window.location.reload()
+  // handle submit function that calls the updateUser function in the authStore
+  const handleSubmit = async e => {
+    e.preventDefault()
+
+    // check what field is being updated to perform the correct validation
+    if (editingField === 'username') {
+      // validate that the username is not empty
+      if (newUsername === '') {
+        setErrorMessage('Username cannot be empty')
+        return
       }
+      // START EDITING HERE. I'm going to bed...
+
+    // validate that the new password and verify password fields match if editing password
+    if (newPassword !== verifyPassword) {
+      setErrorMessage('Passwords do not match')
+      return
     }
 
-    fetchCurrentUser()
-  }, [token, setUsername])
 
-  const handleUpdate = async e => {
-    e.preventDefault()
+    await authStore.updateUser(authStore.token, {
+      newUsername: userStore.newUsername,
+      newEmail: userStore.newEmail,
+      newPreferredUnits: userStore.newPreferredUnits
+    })
+  }
+
 
     if (newPassword !== verifyPassword) {
       setErrorMessage('Passwords do not match')

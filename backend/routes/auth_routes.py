@@ -4,7 +4,6 @@ from extensions import db
 from flask import Blueprint, jsonify, request, session
 from flask_jwt_extended import (create_access_token, get_jwt_identity,
                                 jwt_required)
-from models.user_preferences import UserPreferences
 from models.users import User
 from services.user_service import (create_user, get_user_by_email,
                                    get_user_by_id, get_user_by_username,

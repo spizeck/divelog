@@ -24,7 +24,7 @@ const Login = inject('rootStore')(
           setSuccessMessage(authStore.loginMessage)
           setTimeout(() => {
             navigate('/home')
-          }, 3000)
+          }, 1500)
         } else {
           setErrorMessage(authStore.errorMessage)
         }

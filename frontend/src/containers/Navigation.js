@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { observer, inject } from 'mobx-react'
 import { Sidebar, Menu, Message, Icon } from 'semantic-ui-react'
@@ -28,10 +28,15 @@ const Navigation = inject('rootStore')(observer(({ rootStore }) => {
     }
   }
 
-  // click handler for sidebar toggle
   const handleSidebarToggle = () => {
     setSidebarOpened(!sidebarOpened)
   }
+
+  // Close the sidebar after logging in or out
+  useEffect(() => {
+    setSidebarOpened(false)
+  }, [loggedIn])
+
 
   let content
   if (isActive('/home')) {

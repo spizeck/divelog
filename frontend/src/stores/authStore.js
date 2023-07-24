@@ -93,6 +93,22 @@ class AuthStore {
     }.bind(this)
   )
 
+  updateUser = flow(
+    function* (token, userData) {
+      this.startAuthProcess()
+      try {
+        const response = yield api.updateUser(token, userData)
+        if (response.status !== 200) {
+          throw new Error(response.message)
+        }
+      } catch (error) {
+        this.handleAuthError(error)
+      } finally {
+        this.endAuthProcess()
+      }
+    }.bind(this)
+  )
+
   startAuthProcess () {
     this.authStatus = 'pending'
   }
