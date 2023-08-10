@@ -65,7 +65,7 @@ const API_ENDPOINTS = {
   // Admin endpoints
   getUsers: 'admin/users',
   approveUser: `admin/users/:userId/approve`,
-  dissaproveUser: `admin/users/:userId/dissaprove`,
+  disapproveUser: `admin/users/:userId/disapprove`,
   promoteUser: `admin/users/:userId/promote`,
   demoteUser: `admin/users/:userId/demote`,
   deleteUser: `admin/users/:userId/delete`,

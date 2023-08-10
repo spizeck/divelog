@@ -9,6 +9,7 @@ import {
   Modal,
   Form
 } from 'semantic-ui-react'
+import {validateEmailFormat, validatePasswordStrength, validateUsername} from '../utils/validators'
 
 import '../styles/Preferences.css'
 
@@ -24,82 +25,8 @@ const Preferences = inject('rootStore')(observer(({ rootStore }) => {
   // handle submit function that calls the updateUser function in the authStore
   const handleSubmit = async e => {
     e.preventDefault()
-
-    // check what field is being updated to perform the correct validation
-    if (editingField === 'username') {
-      // validate that the username is not empty
-      if (newUsername === '') {
-        setErrorMessage('Username cannot be empty')
-        return
-      }
-      // START EDITING HERE. I'm going to bed...
-
-    // validate that the new password and verify password fields match if editing password
-    if (newPassword !== verifyPassword) {
-      setErrorMessage('Passwords do not match')
-      return
-    }
-
-
-    await authStore.updateUser(authStore.token, {
-      newUsername: userStore.newUsername,
-      newEmail: userStore.newEmail,
-      newPreferredUnits: userStore.newPreferredUnits
-    })
   }
 
-
-    if (newPassword !== verifyPassword) {
-      setErrorMessage('Passwords do not match')
-      return
-    }
-    // Check what field is being updated and call the appropriate API endpoint
-    try {
-      if (editingField === 'username') {
-        const updateUsername = await api.updateUser(token, {
-          newUsername: newUsername
-        })
-        if (updateUsername.status === 200) {
-          setSuccessMessage(updateUsername.message)
-          setUsername(capitalizeFirstLetter(newUsername))
-          setOriginalUsername(newUsername)
-          setErrorMessage('')
-          setIsEditing(false)
-        }
-      } else if (editingField === 'email') {
-        const updateEmail = await api.updateUser(token, {
-          newEmail: newEmail
-        })
-        if (updateEmail.status === 200) {
-          setSuccessMessage(updateEmail.message)
-          setOriginalEmail(newEmail)
-          setErrorMessage('')
-          setIsEditing(false)
-        }
-      } else if (editingField === 'password') {
-        const updatePassword = await api.updateUser(token, {
-          newPassword: newPassword
-        })
-        if (updatePassword.status === 200) {
-          setSuccessMessage(updatePassword.message)
-          setErrorMessage('')
-          setIsEditing(false)
-        }
-      } else if (editingField === 'preferredUnit') {
-        const updateUnit = await api.updatePreferences(token, {
-          newPreferredUnits: newUnit
-        })
-        if (updateUnit.status === 200) {
-          setSuccessMessage(updateUnit.message)
-          setOriginalUnit(newUnit)
-          setErrorMessage('')
-          setIsEditing(false)
-        }
-      }
-    } catch (error) {
-      setErrorMessage(error.message)
-    }
-  }
 
   const handleEdit = field => {
     setEditingField(field)
@@ -244,7 +171,7 @@ const Preferences = inject('rootStore')(observer(({ rootStore }) => {
             </Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.Cell>User Privledges</Table.Cell>
+            <Table.Cell>User Privileges</Table.Cell>
             <Table.Cell colSpan='2'>
               {isApproved ? (isAdmin ? 'Admin' : 'Basic') : 'Read-Only'}
             </Table.Cell>
@@ -257,8 +184,9 @@ const Preferences = inject('rootStore')(observer(({ rootStore }) => {
       </div>
     </Container>
   )
-
+  
   return isEditing ? renderPreferencesForm() : renderPreferencesView()
-}
+
+}))
 
 export default Preferences
