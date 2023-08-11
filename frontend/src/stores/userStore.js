@@ -7,7 +7,7 @@ class UserStore {
     this.rootStore = rootStore
     this.username = this.retrieveFromLocalStorage('username')
     this.firstName = this.retrieveFromLocalStorage('firstName')
-    this.preferedUnits = this.retrieveFromLocalStorage('preferedUnits')
+    this.preferredUnits = this.retrieveFromLocalStorage('preferredUnits')
     this.approved = this.retrieveFromLocalStorage('approved') === 'true'
     this.admin = this.retrieveFromLocalStorage('admin') === 'true'
     this.userStatus = 'idle' // 'idle' | 'pending' | 'error'
@@ -62,7 +62,7 @@ class UserStore {
             'firstName',
             'approved',
             'admin',
-            'preferedUnits'
+            'preferredUnits'
           ].forEach(key => {
             this.updateValue(key, response[key])
           })
