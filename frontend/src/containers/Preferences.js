@@ -66,6 +66,17 @@ const Preferences = inject('rootStore')(
         case 'preferredUnits':
           userData.preferredUnits = newPreferredUnits
           break
+        case 'password':
+          if (!validatePasswordStrength(newPassword)) {
+            setErrorMessage('Please enter a valid password.')
+            return
+          }
+          if (newPassword !== verifyPassword) {
+            setErrorMessage('Passwords do not match.')
+            return
+          }
+          userData.password = newPassword
+          break
         default:
           break
       }
@@ -154,7 +165,7 @@ const Preferences = inject('rootStore')(
                   { key: 'metric', text: 'Metric', value: 'metric' }
                 ]}
                 value={newPreferredUnits}
-                onChange={handleUnitChange}
+                onChange={handleUpdate}
               />
             </>
           )}
@@ -162,7 +173,7 @@ const Preferences = inject('rootStore')(
           {successMessage && <Message positive>{successMessage}</Message>}
         </Modal.Content>
         <Modal.Actions>
-          <Button color='grey' onClick={handleCancel}>
+          <Button color='grey' onClick={handleCloseModal}>
             Cancel
           </Button>
           <Button primary onClick={handleUpdate}>
@@ -185,7 +196,7 @@ const Preferences = inject('rootStore')(
           <Table.Body>
             <Table.Row>
               <Table.Cell>Username:</Table.Cell>
-              <Table.Cell>{capitalizeFirstLetter(username)}</Table.Cell>
+              <Table.Cell>{username}</Table.Cell>
               <Table.Cell>
                 <Button fluid onClick={() => handleEdit('username')}>
                   Change
@@ -193,8 +204,17 @@ const Preferences = inject('rootStore')(
               </Table.Cell>
             </Table.Row>
             <Table.Row>
+              <Table.Cell>First Name:</Table.Cell>
+              <Table.Cell>{capitalizeFirstLetter(firstName)}</Table.Cell>
+              <Table.Cell>
+                <Button fluid onClick={() => handleEdit('firstName')}>
+                  Change
+                </Button>
+              </Table.Cell>
+            </Table.Row>
+            <Table.Row>
               <Table.Cell>Email:</Table.Cell>
-              <Table.Cell>{originalEmail}</Table.Cell>
+              <Table.Cell>{email}</Table.Cell>
               <Table.Cell>
                 <Button fluid onClick={() => handleEdit('email')}>
                   Change
@@ -202,7 +222,7 @@ const Preferences = inject('rootStore')(
               </Table.Cell>
             </Table.Row>
             <Table.Row>
-              <Table.Cell>Preferred Unit:</Table.Cell>
+              <Table.Cell>Preferred Units:</Table.Cell>
               <Table.Cell>{capitalizeFirstLetter(preferredUnits)}</Table.Cell>
               <Table.Cell>
                 <Button fluid onClick={() => handleEdit('preferredUnit')}>
@@ -212,9 +232,7 @@ const Preferences = inject('rootStore')(
             </Table.Row>
             <Table.Row>
               <Table.Cell>User Privileges</Table.Cell>
-              <Table.Cell colSpan='2'>
-                {isApproved ? (isAdmin ? 'Admin' : 'Basic') : 'Read-Only'}
-              </Table.Cell>
+              <Table.Cell colSpan='2'>{privileges}</Table.Cell>
             </Table.Row>
           </Table.Body>
         </Table>

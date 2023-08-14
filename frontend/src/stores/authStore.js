@@ -59,16 +59,13 @@ class AuthStore {
     function* (username, email, password, firstName, preferredUnits) {
       this.startAuthProcess()
       try {
-        const response = yield api.register(
+        yield api.register(
           username,
           email,
           password,
           firstName,
           preferredUnits
         )
-        if (response.status !== 201) {
-          throw new Error(response.message)
-        }
       } catch (error) {
         this.handleAuthError(error)
       } finally {

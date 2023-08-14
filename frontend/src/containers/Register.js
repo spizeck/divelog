@@ -39,29 +39,21 @@ const Register = inject('rootStore')(
       }
       // Send the registration request to the authStore
       try {
-        const registerResponse = await register(
+        await register(
           formData.username,
           formData.email,
           formData.password,
           formData.firstName,
           formData.preferredUnits
         )
-        if (registerResponse.status === 201) {
           setFormData({
             ...formData,
-            successMessage: registerResponse.message,
+            successMessage: 'Registration successful',
             errorMessage: ''
           })
           setTimeout(() => {
             navigate('/login')
           }, 3000)
-        } else {
-          setFormData({
-            ...formData,
-            errorMessage: registerResponse.message,
-            successMessage: ''
-          })
-        }
       } catch (error) {
         setFormData({ ...formData, errorMessage: error.message })
       }

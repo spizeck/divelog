@@ -131,12 +131,23 @@ const api = {
         firstName,
         preferredUnits
       })
+
+      if (response.status !== 201) {
+        throw new Error(response.data.message || 'Failed to register')
+      }
+
       return response.data
     } catch (error) {
-      if (error.response) {
-        return error.response.data
+      // If there's an error response and it has a message, throw that.
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        throw new Error(error.response.data.message)
       } else {
-        throw error
+        // Otherwise, throw a general error or the original error.
+        throw new Error('Registration failed.')
       }
     }
   },
