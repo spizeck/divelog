@@ -7,7 +7,7 @@ from extensions import db, jwt
 
 def create_app(config_class=app_config):
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*", "allow_headers": ["Content-Type", "Authorization"]}})
 
     # Configure Flask app
     app.config.from_object(config_class)

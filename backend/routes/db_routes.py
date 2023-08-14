@@ -30,20 +30,20 @@ def create_sighting_route():
     return jsonify(result), status
 
 
-@db_bp.route('/dives/bydate', methods=['GET'])
+@db_bp.route('/dives/by_date', methods=['GET'])
 def get_dives_by_date_range_route():
     data = request.json
     return get_dives_by_date_range(data)
 
 
-@db_bp.route('/dives/byguide', methods=['GET'])
+@db_bp.route('/dives/by_guide', methods=['GET'])
 def get_dives_by_guide_route():
     data = request.args
     response, status = get_dives_by_guide(data)
     return jsonify(response), status
 
 
-@db_bp.route('/dives/editDive', methods=['PUT'])
+@db_bp.route('/dives/edit_dive', methods=['PUT'])
 def edit_dive_route():
     data = request.json
     response, status = edit_dive(data)
@@ -56,7 +56,7 @@ def get_count_for_pages_route():
     response, status = get_count_for_pages(data)
     return jsonify(response), status
 
-@db_bp.route('/dives/deleteDive', methods=['DELETE'])
+@db_bp.route('/dives/delete_dive', methods=['DELETE'])
 def delete_dive():
     data = request.args
     response, status = delete_dive(data)
