@@ -30,11 +30,36 @@
 
 import axios from 'axios'
 
+type Method = 'get' | 'post' | 'put' | 'delete'
+
+interface UserCredentials {
+  username?: string
+  email?: string
+  password: string
+  firstName?: string
+  preferredUnits?: string
+}
+
+interface DiveData {
+  date: string
+  diveNumber: number
+  diveGuide: string
+  diveSite: string
+  maxDepth: number
+  waterTemp: number
+}
+
+interface SightingsData {
+  sightings: {
+    [key: string]: number
+  }
+}
+
 // Define the base URL for your API
 const apiUrl: string = process.env.REACT_APP_LIVE_API
 
 // Use the apiUrl variable to make API calls
-let userId = null // Set userId to null to avoid error
+let userId: number | null = null 
 
 // Create an axios instance with the base URL and headers
 const axiosInstance = axios.create({
@@ -126,14 +151,25 @@ const handleApiError = error => {
   }
 }
 
-async function makeApiRequest (method, endpoint, data = null, params = null) {
+async function makeApiRequest<T>(
+  method: Method,
+  endpoint: string,
+  data?: T,
+  params?: Record<string, any>
+): Promise<any> {
   try {
-    const response = await axiosInstance[method](endpoint, data)
+    const response = await axiosInstance({
+      method,
+      url: params ? `${endpoint}?${new URLSearchParams(params)}` : endpoint,
+      data
+    })
     return response.data
   } catch (error) {
     handleApiError(error)
+    throw error
   }
 }
+
 
 const api = {
   loginWithUsername: (username, password) =>
