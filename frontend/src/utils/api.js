@@ -1,65 +1,28 @@
 /**
- * This file exports an api object that contains methods for interacting
- * with the backend server. Each method corresponds to a specific API endpoint
- * and returns the data from the server response. If an error occurs, it throws
- * the error data.
+ * This module provides an 'api' interface for interacting with the backend server.
+ * Each method within this interface maps to a specific server endpoint, returning
+ * the respective response data. Should any issues arise, an error will be thrown.
  *
- * All methods use the axios library to send HTTP requests. For GET and DELETE
- * requests, you can pass parameters directly. For POST and PUT requests, you should
- * pass an object containing the request body data.
+ * The methods rely on the axios library for making HTTP requests.
+ * - For GET and DELETE requests: Pass parameters directly.
+ * - For POST and PUT requests: Provide an object with the request body.
  *
- * Usage:
- * 1. Import the api object into your file:
+ * Usage Example:
+ *
+ * 1. Incorporate the 'api' interface:
  *    import api from './api'
- * 2. Use the methods in the api object to make requests to the server:
- *    const response = await api.loginWithUsername(username, password)
- *    const user = await api.getCurrentUser(token)
  *
- * Here are some examples of how to use the api object methods:
+ * 2. Employ the provided methods for server interactions:
+ *    const userToken = await api.loginWithUsername('username', 'password');
+ *    const userInfo = await api.getCurrentUser('your-token-here');
  *
- * - To log in with a username and password:
- *   const response = await api.loginWithUsername('username', 'password')
- *   If successful, this returns the server's response data, which includes the user's token.
- *
- * - To get the current user's information:
- *   const user = await api.getCurrentUser('your-token-here')
- *   This returns the user's information.
- *
- * Remember to use try/catch to handle errors when you use these methods, as they throw errors.
+ * Ensure to encompass these methods within try/catch blocks to manage potential errors.
  */
 
 import axios from 'axios'
 
-type Method = 'get' | 'post' | 'put' | 'delete'
-
-interface UserCredentials {
-  username?: string
-  email?: string
-  password: string
-  firstName?: string
-  preferredUnits?: string
-}
-
-interface DiveData {
-  date: string
-  diveNumber: number
-  diveGuide: string
-  diveSite: string
-  maxDepth: number
-  waterTemp: number
-}
-
-interface SightingsData {
-  sightings: {
-    [key: string]: number
-  }
-}
-
 // Define the base URL for your API
-const apiUrl: string = process.env.REACT_APP_LIVE_API
-
-// Use the apiUrl variable to make API calls
-let userId: number | null = null 
+const apiUrl = process.env.REACT_APP_LIVE_API
 
 // Create an axios instance with the base URL and headers
 const axiosInstance = axios.create({
@@ -92,11 +55,6 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error)
   }
 )
-
-// Function to update the token in the Axios instance
-const updateToken = token => {
-  axiosInstance.defaults.headers.common.Authorization = `Bearer ${token}`
-}
 
 // API endpoints
 const API_ENDPOINTS = {
@@ -132,44 +90,46 @@ const setUserId = id => {
 }
 
 // Replace the userId placeholder in the endpoint paths with the actual userId
-const replaceUserId = path => {
+const replaceUserId = (path, userId) => {
   return path.replace(':userId', userId)
 }
 
 const handleApiError = error => {
   if (error.response) {
-    // If the server responded with a status other than 2xx range
-    // Use error message from server if available or default to statusText
-    const message = error.response.data.message || error.response.statusText
-    throw new Error(message)
+    const { status, data } = error.response;
+    
+    switch (status) {
+      case 400:
+        throw new Error(data.message || 'Bad request');
+      case 401:
+        throw new Error(data.message || 'Unauthorized');
+      case 403:
+        throw new Error(data.message || 'Forbidden');
+      case 404:
+        throw new Error(data.message || 'Not found');
+      case 409:
+        throw new Error(data.message || 'Conflict');
+      case 500:
+        throw new Error(data.message || 'Internal server error');
+      default:
+        throw new Error(data.message || 'Unknown error');
+    }
   } else if (error.request) {
-    // The request was made but no response was received
-    throw new Error('The request was made but no response was received.')
+    throw new Error('The request was made but no response was received.');
   } else {
-    // If there was an error setting up the request.
-    throw new Error(error.message)
+    throw new Error(error.message);
   }
 }
 
-async function makeApiRequest<T>(
-  method: Method,
-  endpoint: string,
-  data?: T,
-  params?: Record<string, any>
-): Promise<any> {
+
+async function makeApiRequest (method, endpoint, data = null, params = null) {
   try {
-    const response = await axiosInstance({
-      method,
-      url: params ? `${endpoint}?${new URLSearchParams(params)}` : endpoint,
-      data
-    })
+    const response = await axiosInstance[method](endpoint, data)
     return response.data
   } catch (error) {
     handleApiError(error)
-    throw error
   }
 }
-
 
 const api = {
   loginWithUsername: (username, password) =>
@@ -232,6 +192,21 @@ const api = {
 
   updatePreferences: preferencesData =>
     makeApiRequest('put', API_ENDPOINTS.preferences, preferencesData),
+
+  approveUser: userId =>
+    makeApiRequest('put', replaceUserId(API_ENDPOINTS.approveUser, userId)),
+
+  disapproveUser: userId =>
+    makeApiRequest('put', replaceUserId(API_ENDPOINTS.disapproveUser, userId)),
+
+  promoteUser: userId =>
+    makeApiRequest('put', replaceUserId(API_ENDPOINTS.promoteUser, userId)),
+
+  demoteUser: userId =>
+    makeApiRequest('put', replaceUserId(API_ENDPOINTS.demoteUser, userId)),
+
+  deleteUser: userId =>
+    makeApiRequest('delete', replaceUserId(API_ENDPOINTS.deleteUser, userId)),
 
   setUserId
 }

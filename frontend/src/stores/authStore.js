@@ -23,10 +23,6 @@ class AuthStore {
           ? yield api.loginWithEmail(username, password)
           : yield api.loginWithUsername(username, password)
 
-        if (response.status !== 200) {
-          throw new Error(response.message)
-        }
-
         this.handleSuccessfulLogin(response)
         yield this.fetchUserData()
       } catch (error) {
