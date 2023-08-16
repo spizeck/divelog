@@ -84,6 +84,8 @@ const API_ENDPOINTS = {
   getPages: '/db/dives/pages'
 }
 
+let userId = null
+
 // Set the userId dynamically in the endpoint paths
 const setUserId = id => {
   userId = id
@@ -193,20 +195,35 @@ const api = {
   updatePreferences: preferencesData =>
     makeApiRequest('put', API_ENDPOINTS.preferences, preferencesData),
 
-  approveUser: userId =>
-    makeApiRequest('put', replaceUserId(API_ENDPOINTS.approveUser, userId)),
+  approveUser: (userId) => {
+    if (!userId) throw new Error('User ID is required')
+    const endpoint = API_ENDPOINTS.approveUser.replace(':userId', userId)
+    return makeApiRequest('put', endpoint)
+  },
 
-  disapproveUser: userId =>
-    makeApiRequest('put', replaceUserId(API_ENDPOINTS.disapproveUser, userId)),
+  disapproveUser: (userId) => {
+    if (!userId) throw new Error('User ID is required')
+    const endpoint = API_ENDPOINTS.disapproveUser.replace(':userId', userId)
+    return makeApiRequest('put', endpoint)
+  },
 
-  promoteUser: userId =>
-    makeApiRequest('put', replaceUserId(API_ENDPOINTS.promoteUser, userId)),
+  promoteUser: (userId) => {
+    if (!userId) throw new Error('User ID is required')
+    const endpoint = replaceUserId(API_ENDPOINTS.promoteUser, userId)
+    return makeApiRequest('put', endpoint)
+  },
 
-  demoteUser: userId =>
-    makeApiRequest('put', replaceUserId(API_ENDPOINTS.demoteUser, userId)),
+  demoteUser: (userId) => {
+    if (!userId) throw new Error('User ID is required')
+    const endpoint = replaceUserId(API_ENDPOINTS.demoteUser, userId)
+    return makeApiRequest('put', endpoint)
+  },
 
-  deleteUser: userId =>
-    makeApiRequest('delete', replaceUserId(API_ENDPOINTS.deleteUser, userId)),
+  deleteUser: (userId) => {
+    if (!userId) throw new Error('User ID is required')
+    const endpoint = replaceUserId(API_ENDPOINTS.deleteUser, userId)
+    return makeApiRequest('delete', endpoint)
+  },
 
   setUserId
 }
