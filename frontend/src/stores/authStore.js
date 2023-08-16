@@ -22,7 +22,6 @@ class AuthStore {
         const response = username.includes('@')
           ? yield api.loginWithEmail(username, password)
           : yield api.loginWithUsername(username, password)
-
         this.handleSuccessfulLogin(response)
         yield this.fetchUserData()
       } catch (error) {
@@ -55,13 +54,7 @@ class AuthStore {
     function* (username, email, password, firstName, preferredUnits) {
       this.startAuthProcess()
       try {
-        yield api.register(
-          username,
-          email,
-          password,
-          firstName,
-          preferredUnits
-        )
+        yield api.register(username, email, password, firstName, preferredUnits)
       } catch (error) {
         this.handleAuthError(error)
       } finally {
@@ -74,10 +67,7 @@ class AuthStore {
     function* (email) {
       this.startAuthProcess()
       try {
-        const response = yield api.forgotPassword(email)
-        if (response.status !== 200) {
-          throw new Error(response.message)
-        }
+        yield api.forgotPassword(email)
       } catch (error) {
         this.handleAuthError(error)
       } finally {
@@ -90,10 +80,7 @@ class AuthStore {
     function* (token, userData) {
       this.startAuthProcess()
       try {
-        const response = yield api.updateUser(token, userData)
-        if (response.status !== 200) {
-          throw new Error(response.message)
-        }
+        yield api.updateUser(token, userData)
       } catch (error) {
         this.handleAuthError(error)
       } finally {
@@ -133,7 +120,7 @@ class AuthStore {
 
   handleAuthError (error) {
     this.authStatus = 'error'
-    console.error('Auth error: ', error)
+    this.errorMessage = error.message
   }
 
   setErrorMessage (value) {

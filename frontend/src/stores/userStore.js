@@ -32,7 +32,7 @@ class UserStore {
 
   _errorHelper (error) {
     this.userStatus = 'error'
-    console.log(error)
+    console.error('User error:', error)
   }
 
   updateValue (key, value) {
@@ -48,7 +48,7 @@ class UserStore {
     function* () {
       this._startStatus()
       if (!this.rootStore.authStore.token) {
-        this.status = 'idle'
+        this.userStatus = 'idle'
         return
       }
 
@@ -56,37 +56,29 @@ class UserStore {
         const response = yield api.getCurrentUser(
           this.rootStore.authStore.token
         )
-        if (response.status === 200) {
-          ;[
-            'username',
-            'firstName',
-            'approved',
-            'admin',
-            'preferredUnits'
-          ].forEach(key => {
-            this.updateValue(key, response[key])
-          })
-
-          return response
-        } else if (response.status === 401) {
-          this.errorMessage = 'Unauthorized access. Please log in again.' // You can customize this message
-          this.rootStore.authStore.logout()
-          return response
-        } else {
-          this._errorHelper(new Error(response.message))
-          return response
-        }
+        ;[
+          'username',
+          'firstName',
+          'approved',
+          'admin',
+          'preferredUnits'
+        ].forEach(key => {
+          this.updateValue(key, response[key])
+        })
       } catch (error) {
-        if (error.message === '401') {
+        if (
+          error.message.includes('401') ||
+          error.message.includes('Unauthorized')
+        ) {
           this._errorHelper(
             new Error('Your session has expired. Please log in again.')
           )
           this.rootStore.authStore.logout()
-          return
         } else {
           this._errorHelper(error)
-          return error
         }
+      } finally {
+        this.userStatus = 'idle'
       }
     }.bind(this)
   )
