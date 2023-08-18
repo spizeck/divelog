@@ -81,7 +81,8 @@ const API_ENDPOINTS = {
   getDivesByGuide: '/db/dives/by_guide',
   editDive: '/db/dives/edit_dive',
   deleteDive: '/db/dives/delete_dive',
-  getPages: '/db/dives/pages'
+  getPages: '/db/dives/pages',
+  getSightingsForDive: '/db/sightings/for_dive'
 }
 
 let userId = null
@@ -98,31 +99,30 @@ const replaceUserId = (path, userId) => {
 
 const handleApiError = error => {
   if (error.response) {
-    const { status, data } = error.response;
-    
+    const { status, data } = error.response
+
     switch (status) {
       case 400:
-        throw new Error(data.message || 'Bad request');
+        throw new Error(data.message || 'Bad request')
       case 401:
-        throw new Error(data.message || 'Unauthorized');
+        throw new Error(data.message || 'Unauthorized')
       case 403:
-        throw new Error(data.message || 'Forbidden');
+        throw new Error(data.message || 'Forbidden')
       case 404:
-        throw new Error(data.message || 'Not found');
+        throw new Error(data.message || 'Not found')
       case 409:
-        throw new Error(data.message || 'Conflict');
+        throw new Error(data.message || 'Conflict')
       case 500:
-        throw new Error(data.message || 'Internal server error');
+        throw new Error(data.message || 'Internal server error')
       default:
-        throw new Error(data.message || 'Unknown error');
+        throw new Error(data.message || 'Unknown error')
     }
   } else if (error.request) {
-    throw new Error('The request was made but no response was received.');
+    throw new Error('The request was made but no response was received.')
   } else {
-    throw new Error(error.message);
+    throw new Error(error.message)
   }
 }
-
 
 async function makeApiRequest (method, endpoint, data = null, params = null) {
   try {
@@ -185,6 +185,11 @@ const api = {
       diveId
     }),
 
+  getSightingsForDive: diveId =>
+    makeApiRequest('get', API_ENDPOINTS.getSightingsForDive, null, {
+      diveId
+    }),
+
   getCurrentUser: () => makeApiRequest('get', API_ENDPOINTS.getCurrentUser),
 
   updateUser: userData =>
@@ -195,31 +200,31 @@ const api = {
   updatePreferences: preferencesData =>
     makeApiRequest('put', API_ENDPOINTS.preferences, preferencesData),
 
-  approveUser: (userId) => {
+  approveUser: userId => {
     if (!userId) throw new Error('User ID is required')
     const endpoint = API_ENDPOINTS.approveUser.replace(':userId', userId)
     return makeApiRequest('put', endpoint)
   },
 
-  disapproveUser: (userId) => {
+  disapproveUser: userId => {
     if (!userId) throw new Error('User ID is required')
     const endpoint = API_ENDPOINTS.disapproveUser.replace(':userId', userId)
     return makeApiRequest('put', endpoint)
   },
 
-  promoteUser: (userId) => {
+  promoteUser: userId => {
     if (!userId) throw new Error('User ID is required')
     const endpoint = replaceUserId(API_ENDPOINTS.promoteUser, userId)
     return makeApiRequest('put', endpoint)
   },
 
-  demoteUser: (userId) => {
+  demoteUser: userId => {
     if (!userId) throw new Error('User ID is required')
     const endpoint = replaceUserId(API_ENDPOINTS.demoteUser, userId)
     return makeApiRequest('put', endpoint)
   },
 
-  deleteUser: (userId) => {
+  deleteUser: userId => {
     if (!userId) throw new Error('User ID is required')
     const endpoint = replaceUserId(API_ENDPOINTS.deleteUser, userId)
     return makeApiRequest('delete', endpoint)

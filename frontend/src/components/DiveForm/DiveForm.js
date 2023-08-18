@@ -1,27 +1,23 @@
 import React, { useState, useEffect } from 'react'
+import { inject, observer } from'mobx-react'
 import { Button, Form, Input } from 'semantic-ui-react'
 import '../styles/DiveForm.css'
-import RenderFormStep from '../components/RenderFormStep'
-import DiveFormField from '../components/DiveFormField'
-import sightingsData from '../components/sightingsData'
-import diveFormData from '../components/diveData'
-import handleChange from '../components/handleChange'
-import handleSubmit from '../components/handleSubmit'
-import api from '../utils/api'
-import unitConverter from '../utils/convertUnits'
+import {DiveFormField, RenderFormStep, SightingsFormData, DiveFormData, handleChange, handleSubmit} from './'
+import unitConverter from '../../utils/convertUnits'
 
-const DiveForm = ({ rootStore }) => {
-  const { preferredUnits, firstName, token } = rootStore
+const DiveForm = inject('userStore')(observer(({ userStore }) => {
+  const { preferredUnits, firstName } = userStore
   const totalSteps = 7
   const [step, setStep] = useState(1)
   const [sightingData, setSightingData] = useState(sightingsData)
+  const [diveFormData, setDiveFormData] = useState({})
   // todo: Add otherSightings options
   const [submitted, setSubmitted] = useState(false)
   const [confirmationMessage, setConfirmationMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [fieldError, setFieldError] = useState({})
   const [formError, setFormError] = useState(false)
-  const [formData, setFormData] = useState({})
+  
   const [units, setUnits] = useState({})
   const [defaultData, setDefaultData] = useState({})
 
@@ -38,25 +34,6 @@ const DiveForm = ({ rootStore }) => {
         depth: 'ft',
         temp: '°F'
       })
-    // } else {
-    //   // Call API to get user's preferences
-    //   api.getPreferences(token).then(response => {
-    //     if (response.data.status === 200) {
-    //       if (response.data.preferred_units === 'metric') {
-    //         setUnits({
-    //           units: 'metric',
-    //           depth: 'm',
-    //           temp: '°C'
-    //         })
-    //       } else if (response.data.preferred_units === 'imperial') {
-    //         setUnits({
-    //           units: 'imperial',
-    //           depth: 'ft',
-    //           temp: '°F'
-    //         })
-    //       }
-    //     }
-    //   })
     }
 
     Object.entries(diveFormData).forEach(([key, value]) => {

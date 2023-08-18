@@ -56,11 +56,16 @@ def get_count_for_pages_route():
     response, status = get_count_for_pages(data)
     return jsonify(response), status
 
+
 @db_bp.route('/dives/delete_dive', methods=['DELETE'])
 def delete_dive():
     data = request.args
     response, status = delete_dive(data)
     return jsonify(response), status
+
+# todo: make a route to get sightings for a given dive
+# The frontend is calling the route /db/sightings/for_dive and passing the dive id as a parameter
+
 
 def register_routes(app):
     app.register_blueprint(db_bp)

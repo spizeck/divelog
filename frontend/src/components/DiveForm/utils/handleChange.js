@@ -1,8 +1,8 @@
 // handleChange.js is a function that handles the change of the form data and sighting data
 // handleChange.js is imported into DiveForm.js
 
-import sightingsData from './sightingsData'
-import unitConverter from '../utils/convertUnits';
+import sightingsData from '../SightingsFormData'
+import unitConverter from '../../../utils/convertUnits';
 
 const handleChange =
   (

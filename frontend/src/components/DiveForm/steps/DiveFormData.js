@@ -1,4 +1,4 @@
-const diveFormData = {
+const DiveFormData = {
   date: {
     name: 'date',
     label: 'Date',
@@ -142,7 +142,7 @@ const diveFormData = {
     name: 'waterTemperature',
     label: 'Water Temperature',
     type: 'number',
-    min: 0, 
+    min: 0,
     defaultValue: 27,
     validate: value => {
       if (value % 1 !== 0) {
@@ -156,4 +156,4 @@ const diveFormData = {
   }
 }
 
-export default diveFormData
+export default DiveFormData

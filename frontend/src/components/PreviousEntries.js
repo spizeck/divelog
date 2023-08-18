@@ -11,7 +11,7 @@ import {
   Input,
   Pagination,
 } from 'semantic-ui-react'
-import diveFormData from '../components/diveData'
+import diveFormData from './DiveForm/steps/DiveFormData'
 import unitConverter from '../utils/convertUnits'
 import '../styles/PreviousEntries.css'
 
