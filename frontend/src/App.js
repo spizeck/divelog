@@ -12,7 +12,7 @@ import Navigation from './components/Navigation'
 import Login from './components/Login'
 import Register from './components/Register'
 import ForgotPassword from './components/ForgotPassword'
-import NotFound from './components/NotFound.js'
+// import NotFound from './components/NotFound.js'
 
 const AppRoutes = observer(() => {
   return (
@@ -22,7 +22,7 @@ const AppRoutes = observer(() => {
       <Route path='/register' element={<Register />} />
       <Route path='/forgot_password' element={<ForgotPassword />} />
       <Route path='/login' element={<Login />} />
-      <Route path='*' element={<NotFound />} />
+      {/* <Route path='*' element={<NotFound />} /> */}
     </Routes>
   )
 })

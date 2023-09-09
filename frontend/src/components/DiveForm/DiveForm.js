@@ -26,7 +26,7 @@ const DiveForm = inject('rootStore')(
     const [fieldError, setFieldError] = useState('')
     const [formError, setFormError] = useState(false)
     const [formData, setFormData] = useState({})
-
+    const [defaultData, setDefaultData] = useState({})
     const [units, setUnits] = useState({})
 
     useEffect(() => {
@@ -43,7 +43,9 @@ const DiveForm = inject('rootStore')(
           temp: '°F'
         })
       }
+    }, [preferredUnits])
 
+    useEffect(() => {
       let defaultData = {}
       Object.entries(DiveFormData).forEach(([key, value]) => {
         if (value.defaultValue) {
@@ -68,7 +70,8 @@ const DiveForm = inject('rootStore')(
         defaultData.diveGuide = firstName
       }
       setFormData(defaultData)
-    }, [units, firstName, preferredUnits])
+      setDefaultData(defaultData)
+    }, [units, firstName])
 
     const handleNext = e => {
       e.preventDefault()
@@ -113,40 +116,16 @@ const DiveForm = inject('rootStore')(
       setFieldError,
       setFormError,
       DiveFormData,
+      SightingsFormData,
       step,
       totalSteps,
       units
     )
 
     const handleResetForm = () => {
+      console.log('Resetting form')
       setStep(1)
-      setFormData(() => {
-        const defaultData = {}
-
-        Object.entries(DiveFormData).forEach(([key, value]) => {
-          if (value.defaultValue) {
-            if (key === 'maxDepth') {
-              defaultData[key] = unitConverter.convertDepthToForm(
-                value.defaultValue,
-                units.units
-              )
-            } else if (key === 'waterTemperature') {
-              defaultData[key] = unitConverter.convertTempToForm(
-                value.defaultValue,
-                units.units
-              )
-            } else {
-              defaultData[key] = value.defaultValue
-            }
-          } else {
-            defaultData[key] = ''
-          }
-        })
-        if (firstName) {
-          defaultData.diveGuide = firstName
-        }
-        return defaultData
-      })
+      setFormData(defaultData)
       setSightingData(SightingsFormData)
       setSubmitted(false)
       setErrorMessage('')
@@ -167,6 +146,7 @@ const DiveForm = inject('rootStore')(
                     handleChangeFn={handleChangeFn}
                     fieldError={fieldError}
                     units={units}
+                    formData={formData}
                   />
                 )
               })}
