@@ -6,13 +6,13 @@ import RootStore from './stores/RootStore'
 import { Container} from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
 
-import AppHeader from './containers/Header'
-import BasePage from './containers/BasePage'
-import Navigation from './containers/Navigation'
-import Login from './containers/Login'
-import Register from './containers/Register'
-import ForgotPassword from './containers/ForgotPassword'
-import NotFound from './containers/NotFound.js'
+import AppHeader from './components/Header'
+import BasePage from './components/BasePage'
+import Navigation from './components/Navigation'
+import Login from './components/Login'
+import Register from './components/Register'
+import ForgotPassword from './components/ForgotPassword'
+import NotFound from './components/NotFound.js'
 
 const AppRoutes = observer(() => {
   return (

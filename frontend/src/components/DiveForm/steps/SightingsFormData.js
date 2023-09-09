@@ -6,7 +6,7 @@ const _validateCount = value => {
 }
 
 const SightingsFormData = [
-  { name: 'Green Turtle', defaultValue: 0, step: 2, validate: validateCount }, // step = the rendering step
+  { name: 'Green Turtle', defaultValue: 0, step: 2, validate: _validateCount }, // step = the rendering step
   {
     name: 'Hawksbill Turtle',
     defaultValue: 0,
@@ -25,7 +25,7 @@ const SightingsFormData = [
     step: 2,
     validate: _validateCount
   },
-  { name: 'Nurse Shark', defaultValue: 0, step: 2, validate: validateCount },
+  { name: 'Nurse Shark', defaultValue: 0, step: 2, validate: _validateCount },
   {
     name: 'Roughtail Stingray',
     defaultValue: 0,
@@ -44,29 +44,34 @@ const SightingsFormData = [
     step: 3,
     validate: _validateCount
   },
-  { name: 'Nassau Grouper', defaultValue: 0, step: 3, validate: validateCount },
+  {
+    name: 'Nassau Grouper',
+    defaultValue: 0,
+    step: 3,
+    validate: _validateCount
+  },
   {
     name: 'Yellowfin Grouper',
     defaultValue: 0,
     step: 3,
     validate: _validateCount
   },
-  { name: 'Tiger Grouper', defaultValue: 0, step: 3, validate: validateCount },
+  { name: 'Tiger Grouper', defaultValue: 0, step: 3, validate: _validateCount },
   {
     name: 'Longspine Sea Urchin',
     defaultValue: 0,
     step: 4,
     validate: _validateCount
   },
-  { name: 'Sea Egg', defaultValue: 0, step: 4, validate: validateCount },
-  { name: 'Pencil Urchin', defaultValue: 0, step: 4, validate: validateCount },
+  { name: 'Sea Egg', defaultValue: 0, step: 4, validate: _validateCount },
+  { name: 'Pencil Urchin', defaultValue: 0, step: 4, validate: _validateCount },
   {
     name: 'Magnificent Urchin',
     defaultValue: 0,
     step: 4,
     validate: _validateCount
   },
-  { name: 'Reef Urchin', defaultValue: 0, step: 4, validate: validateCount },
+  { name: 'Reef Urchin', defaultValue: 0, step: 4, validate: _validateCount },
   {
     name: 'Variegated Urchin',
     defaultValue: 0,
@@ -127,8 +132,13 @@ const SightingsFormData = [
     step: 6,
     validate: _validateCount
   },
-  { name: 'Lionfish Alive', defaultValue: 0, step: 6, validate: validateCount },
-  { name: 'Lionfish Dead', defaultValue: 0, step: 6, validate: validateCount }
+  {
+    name: 'Lionfish Alive',
+    defaultValue: 0,
+    step: 6,
+    validate: _validateCount
+  },
+  { name: 'Lionfish Dead', defaultValue: 0, step: 6, validate: _validateCount }
 ]
 
-export default SightingsFormDataData
+export default SightingsFormData
