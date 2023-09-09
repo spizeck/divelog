@@ -1,5 +1,4 @@
 // frontend/src/components/DiveForm/index.js
-export { default as DiveForm } from './DiveForm'
 export { default as DiveFormField } from './DiveFormField'
 export { default as RenderFormStep } from './steps/RenderFormStep'
 export { default as SightingsFormData } from './steps/SightingsFormData'

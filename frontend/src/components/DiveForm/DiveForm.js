@@ -10,24 +10,24 @@ import {
   SightingsFormData,
   DiveFormData
 } from './'
-import { unitConverter } from '../../utils/convertUnits'
+import unitConverter from '../../utils/convertUnits'
 
-const DiveForm = inject('userStore')(
-  observer(({ userStore }) => {
+const DiveForm = inject('rootStore')(
+  observer(({ rootStore }) => {
+    const { userStore } = rootStore
     const { preferredUnits, firstName } = userStore
     const totalSteps = 7
     const [step, setStep] = useState(1)
     const [sightingData, setSightingData] = useState(SightingsFormData)
-    const [diveFormData, setDiveFormData] = useState({})
     // todo: Add otherSightings options
     const [submitted, setSubmitted] = useState(false)
     const [confirmationMessage, setConfirmationMessage] = useState('')
     const [errorMessage, setErrorMessage] = useState('')
     const [fieldError, setFieldError] = useState('')
     const [formError, setFormError] = useState(false)
+    const [formData, setFormData] = useState({})
 
     const [units, setUnits] = useState({})
-    const [defaultData, setDefaultData] = useState({})
 
     useEffect(() => {
       if (preferredUnits === 'metric') {
@@ -45,7 +45,7 @@ const DiveForm = inject('userStore')(
       }
 
       let defaultData = {}
-      Object.entries(diveFormData).forEach(([key, value]) => {
+      Object.entries(DiveFormData).forEach(([key, value]) => {
         if (value.defaultValue) {
           if (key === 'maxDepth') {
             defaultData[key] = unitConverter.convertDepthToForm(
@@ -68,7 +68,7 @@ const DiveForm = inject('userStore')(
         defaultData.diveGuide = firstName
       }
       setFormData(defaultData)
-    }, [units, firstName])
+    }, [units, firstName, preferredUnits])
 
     const handleNext = e => {
       e.preventDefault()
@@ -123,7 +123,7 @@ const DiveForm = inject('userStore')(
       setFormData(() => {
         const defaultData = {}
 
-        Object.entries(diveFormData).forEach(([key, value]) => {
+        Object.entries(DiveFormData).forEach(([key, value]) => {
           if (value.defaultValue) {
             if (key === 'maxDepth') {
               defaultData[key] = unitConverter.convertDepthToForm(
@@ -159,7 +159,7 @@ const DiveForm = inject('userStore')(
           return (
             <div>
               <h2 className='dive-form-heading'>Dive Information</h2>
-              {Object.entries(diveFormData).map(([key, value]) => {
+              {Object.entries(DiveFormData).map(([key, value]) => {
                 return (
                   <DiveFormField
                     key={key}
@@ -235,7 +235,7 @@ const DiveForm = inject('userStore')(
                 <div className='confirmation__item'>
                   <h3>Dive Information</h3>
                   <ul>
-                    {Object.entries(diveFormData).map(([key, value]) => (
+                    {Object.entries(DiveFormData).map(([key, value]) => (
                       <li key={key}>
                         <strong>{value.label}:</strong> {formData[value.name]}
                       </li>
