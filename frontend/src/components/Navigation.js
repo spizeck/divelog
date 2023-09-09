@@ -36,20 +36,34 @@ const Navigation = inject('rootStore')(
       '/home': <Home />,
       '/diveLogEntry': <DiveForm />,
       '/previousEntries': <PreviousEntries />,
-      '/preferences': <Preferences />,
+      '/preferences': <Preferences />
     }
 
     const content = contentMapping[location.pathname]
 
-    const renderMenuItem = (name, path, disabled = false) => (
-      <Menu.Item
-        name={name}
-        active={isActive(path)}
-        as={NavLink}
-        to={path}
-        disabled={disabled && !loggedIn}
-      />
-    )
+    const renderMenuItem = (name, path, disabled = false) => {
+      if (disabled && !loggedIn) {
+        return (
+          <Menu.Item name={name} disabled>
+            {name}
+          </Menu.Item>
+        );
+      }
+      return (
+        <Menu.Item
+          name={name}
+          active={isActive(path)}
+          as={NavLink}
+          to={path}
+          onClick={e => {
+            if (disabled && !loggedIn) {
+              e.preventDefault();
+            }
+          }}
+        />
+      );
+    };
+    
 
     // Close the sidebar after logging in or out
     useEffect(() => {
