@@ -4,10 +4,10 @@ import {
   Button,
   Container,
   Message,
-  Select,
   Table,
   Modal,
-  Form
+  Form,
+  Dropdown
 } from 'semantic-ui-react'
 import {
   validateEmailFormat,
@@ -22,6 +22,7 @@ const Preferences = inject('rootStore')(
     const { authStore, userStore } = rootStore
     const { firstName, username, email, preferredUnits, approved, admin } =
       userStore
+    const { updateUser } = authStore
 
     const [isEditing, setIsEditing] = useState(false)
     const [editingField, setEditingField] = useState('')
@@ -45,7 +46,7 @@ const Preferences = inject('rootStore')(
 
       switch (editingField) {
         case 'firstName':
-          userData.firstName = newFirstName
+          userData.newFirstName = newFirstName
           break
         case 'username':
           if (!validateUsername(newUsername)) {
@@ -54,17 +55,17 @@ const Preferences = inject('rootStore')(
             )
             return
           }
-          userData.username = newUsername
+          userData.newUsername = newUsername
           break
         case 'email':
           if (!validateEmailFormat(newEmail)) {
             setErrorMessage('Please enter a valid email address.')
             return
           }
-          userData.email = newEmail
+          userData.newEmail = newEmail
           break
         case 'preferredUnits':
-          userData.preferredUnits = newPreferredUnits
+          userData.newPreferredUnits = newPreferredUnits
           break
         case 'password':
           if (!validatePasswordStrength(newPassword)) {
@@ -75,15 +76,21 @@ const Preferences = inject('rootStore')(
             setErrorMessage('Passwords do not match.')
             return
           }
-          userData.password = newPassword
+          userData.newPassword = newPassword
           break
         default:
           break
       }
-      setIsEditing(false)
+      // setIsEditing(false)
       try {
-        await authStore.updateUser(authStore.token, userData)
+        console.log("calling updateUser",userData)
+        updateUser(userData)
+        console.log("called it")
         setSuccessMessage('Success!')
+        userStore.fetchUserData()
+        setTimeout(function () {
+          handleCloseModal()
+        }, 1500)
       } catch (error) {
         setErrorMessage(error.message || 'Failed to update user.')
       }
@@ -136,6 +143,18 @@ const Preferences = inject('rootStore')(
               />
             </>
           )}
+          {editingField === 'firstName' && (
+            <>
+              <label>First Name</label>
+              <p></p>
+              <Form.Input
+                type='text'
+                value={newFirstName}
+                onChange={e => setNewFirstName(e.target.value)}
+              />
+            </>
+          )}
+
           {editingField === 'password' && (
             <>
               <label>New Password</label>
@@ -154,18 +173,21 @@ const Preferences = inject('rootStore')(
               />
             </>
           )}
-          {editingField === 'preferredUnit' && (
+          {editingField === 'preferredUnits' && (
             <>
               <label>Preferred Unit</label>
               <p></p>
-              <Select
+              <Dropdown
                 placeholder='Select your preferred unit'
                 options={[
                   { key: 'imperial', text: 'Imperial', value: 'imperial' },
                   { key: 'metric', text: 'Metric', value: 'metric' }
                 ]}
                 value={newPreferredUnits}
-                onChange={handleUpdate}
+                onChange={(e, { value }) =>{
+                console.log("new preferred units", value);
+                  setNewPreferredUnits(value)
+                }}
               />
             </>
           )}
@@ -225,7 +247,7 @@ const Preferences = inject('rootStore')(
               <Table.Cell>Preferred Units:</Table.Cell>
               <Table.Cell>{capitalizeFirstLetter(preferredUnits)}</Table.Cell>
               <Table.Cell>
-                <Button fluid onClick={() => handleEdit('preferredUnit')}>
+                <Button fluid onClick={() => handleEdit('preferredUnits')}>
                   Change
                 </Button>
               </Table.Cell>

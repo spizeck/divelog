@@ -7,7 +7,7 @@ from flask_jwt_extended import (create_access_token, get_jwt_identity,
 from models.users import User
 from services.user_service import (create_user, get_user_by_email,
                                    get_user_by_id, get_user_by_username,
-                                   update_username, update_email, change_password)
+                                   update_username, update_email, change_password, change_user_preferences)
 
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
@@ -75,7 +75,7 @@ def register():
     # If the user doesn't exist, create a new user
     try:
         user = create_user(username=username, email=email, password=password,
-                       first_name=first_name, preferred_units=preferred_units)
+                           first_name=first_name, preferred_units=preferred_units)
 
     except Exception as e:
         logging.error(f'Error saving user {username} to the database: {e}')
@@ -132,8 +132,10 @@ def get_current_user():
     email = user.email if hasattr(user, 'email') else None
     is_approved = user.is_approved if hasattr(user, 'is_approved') else None
     admin = user.admin if hasattr(user, 'admin') else None
-    first_name = user.user_preferences.first_name if hasattr(user.user_preferences, 'first_name') else None
-    preferred_units = user.user_preferences.preferred_units if hasattr(user.user_preferences, 'preferred_units') else None
+    first_name = user.user_preferences.first_name if hasattr(
+        user.user_preferences, 'first_name') else None
+    preferred_units = user.user_preferences.preferred_units if hasattr(
+        user.user_preferences, 'preferred_units') else None
 
     return jsonify({
         'status': 200,
@@ -156,9 +158,13 @@ def update_user():
         return jsonify({'status': 404, 'message': 'User not found'}), 404
 
     data = request.json
-    allowed_keys = ['newUsername', 'newEmail', 'newPassword']
-    data_to_update = {k: v for k, v in data.items() if k in allowed_keys}
+    print("Data type:", type(data))
+    print("Data content:", data)
 
+    allowed_keys = ['newUsername', 'newEmail',
+                    'newPassword', 'newFirstName', 'newPreferredUnits']
+    data_to_update = {k: v for k, v in data.items() if k in allowed_keys}
+    print('data_to_update: ', data_to_update)
     if 'newUsername' in data_to_update:
         try:
             update_username(user, data_to_update['newUsername'])
@@ -188,6 +194,28 @@ def update_user():
                             'message': 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'
                             }), 400
 
+    if 'newFirstName' in data_to_update or 'newPreferredUnits' in data_to_update:
+        print('data_to_update: ', data_to_update)
+        mapped_data_to_update = {}
+
+        if 'newFirstName' in data_to_update and data_to_update['newFirstName']:
+            mapped_data_to_update['first_name'] = data_to_update['newFirstName']
+
+        if 'newPreferredUnits' in data_to_update and data_to_update['newPreferredUnits']:
+            mapped_data_to_update['preferred_units'] = data_to_update['newPreferredUnits']
+
+        if mapped_data_to_update:
+            try:
+                change_user_preferences(user, **mapped_data_to_update)
+                return jsonify({'status': 200, 'message': 'User preferences updated successfully'}), 200
+            except Exception as e:
+                logging.error(
+                    f'Error updating user preferences for user {user.username}: {e}'
+                )
+                return jsonify({'status': 400, 'message': 'Invalid input'}), 400
+        else:
+            return jsonify({'status': 400, 'message': 'No valid data to update'}), 400
+
     if not data_to_update:
         return jsonify({'status': 400, 'message': 'No data to update'}), 400
 
@@ -203,24 +231,10 @@ def user_preferences():
     if not (user := get_user_by_id(current_identity)):
         return jsonify({'status': 404, 'message': 'User not found'}), 404
 
-    if request.method == 'GET':
-        # Get the user's current preferences
-        preferred_units = user.user_preferences.get_user_preferences()
-        return jsonify({'status': 200, 'preferredUnits': preferred_units}), 200
-
-    if request.method == 'PUT':
-        data = request.json
-        new_preferred_units = data.get('newPreferredUnits')
-
-        if not new_preferred_units:
-            return jsonify({'status': 400, 'message': 'Preferred units not provided'}), 400
-
-        # Update the user's preferences
-        user.user_preferences.update(preferred_units=new_preferred_units)
-        return jsonify({'status': 200, 'message': 'User preferences updated'}), 200
+    # Get the user's current preferences
+    preferred_units = user.user_preferences.get_user_preferences()
+    return jsonify({'status': 200, 'preferredUnits': preferred_units}), 200
 
 
 def register_routes(app):
     app.register_blueprint(auth_bp)
-    app.add_url_rule('/auth/preferences',
-                     view_func=user_preferences, methods=['GET', 'PUT'])

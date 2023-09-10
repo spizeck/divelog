@@ -77,10 +77,10 @@ class AuthStore {
   )
 
   updateUser = flow(
-    function* (token, userData) {
+    function* (userData) {
       this.startAuthProcess()
       try {
-        yield api.updateUser(token, userData)
+        yield api.updateUser(userData)
       } catch (error) {
         this.handleAuthError(error)
       } finally {
