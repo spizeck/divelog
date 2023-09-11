@@ -2,31 +2,42 @@ import { flow, makeAutoObservable } from 'mobx'
 import api from '../utils/api'
 
 class DiveStore {
-  dives = []
-  dive = {}
-  loading = false
-  error = null
-
   constructor (rootStore) {
     makeAutoObservable(this)
     this.rootStore = rootStore
+    this.dives = []
+    this.dive = {}
+    this.error = null
+    this.currentPage = 1
+    this.totalPages = 0
+    this.perPage = 10
   }
 
+  fetchDivesByGuide = flow(function* (diveGuide, page=1) {
+    console.log('fetchDivesByGuide', diveGuide, page)
+    try {
+      const response = yield api.getDivesByGuide(diveGuide, page)
+      const { dives, totalCount, perPage, currentPage } = response.data
+      this.dives = dives
+      this.totalPages = Math.ceil(totalCount / perPage)
+      this.currentPage = currentPage
+      this.perPage = perPage
+    } catch (error) {
+      this.error = error
+    }
+  })
+
   fetchDivesByDate = flow(function* (startDate, endDate) {
-    this.loading = true
     this.error = null
     try {
       const response = yield api.getDivesByDate(startDate, endDate)
       this.dives = response.data
     } catch (error) {
       this.error = error
-    } finally {
-      this.loading = false
     }
   })
 
   fetchSightingsForDive = flow(function* (diveId) {
-    this.loading = true
     this.error = null
     try {
       const response = yield api.getSightingsForDive(diveId)
@@ -36,13 +47,10 @@ class DiveStore {
       }
     } catch (error) {
       this.error = error
-    } finally {
-      this.loading = false
     }
   })
 
   saveDive = flow(function* (diveData) {
-    this.loading = true
     this.error = null
     try {
       const response = yield api.createDive(diveData)
@@ -52,13 +60,10 @@ class DiveStore {
     } catch (error) {
       this.error = error
       throw error // Propagate the error so it can be caught in the component.
-    } finally {
-      this.loading = false
     }
   })
 
   saveSightings = flow(function* (sightingsData) {
-    this.loading = true
     this.error = null
     try {
       const response = yield api.createSighting(sightingsData)
@@ -68,8 +73,6 @@ class DiveStore {
     } catch (error) {
       this.error = error
       throw error
-    } finally {
-      this.loading = false
     }
   })
 

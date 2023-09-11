@@ -153,8 +153,18 @@ def get_dives_by_guide(data):  # sourcery skip: extract-method
         offset = (page - 1) * entries_per_page
         dives = Dive.query.filter(Dive.dive_guide == data['diveGuide']).order_by(
             Dive.date.desc()).limit(entries_per_page).offset(offset).all()
+        
+        total_count = Dive.query.filter(Dive.dive_guide == data['diveGuide']).count()
+        
+        response = {
+            'dives': [dive.serialize() for dive in dives],
+            'totalCount': total_count,
+            'perPage': entries_per_page,
+            'currentPage': page,
+            'status': 200
+        }
 
-        return {'dives': [dive.serialize() for dive in dives], 'status': 200}, 200
+        return response, 200
 
     except MissingDiveGuideError as e:
         return {'message': str(e), 'status': 400}, 400
