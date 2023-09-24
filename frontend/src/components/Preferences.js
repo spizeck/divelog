@@ -7,7 +7,7 @@ import {
   Table,
   Modal,
   Form,
-  Dropdown
+  Select
 } from 'semantic-ui-react'
 import {
   validateEmailFormat,
@@ -20,8 +20,8 @@ import '../styles/Preferences.css'
 const Preferences = inject('rootStore')(
   observer(({ rootStore }) => {
     const { authStore, userStore } = rootStore
-    const { firstName, username, email, preferredUnits, approved, admin } =
-      userStore
+    // const { firstName, username, email, preferredUnits, approved, admin } =
+    //   userStore
     const { updateUser } = authStore
 
     const [isEditing, setIsEditing] = useState(false)
@@ -39,7 +39,7 @@ const Preferences = inject('rootStore')(
       userStore.fetchUserData()
     }, [userStore, authStore])
 
-    const privileges = approved ? (admin ? 'Admin' : 'Basic') : 'Read-Only'
+    const privileges = userStore.approved ? (userStore.admin ? 'Admin' : 'Basic') : 'Read-Only'
 
     const handleUpdate = async () => {
       let userData = {}
@@ -83,11 +83,8 @@ const Preferences = inject('rootStore')(
       }
       // setIsEditing(false)
       try {
-        console.log("calling updateUser",userData)
-        updateUser(userData)
-        console.log("called it")
-        setSuccessMessage('Success!')
-        userStore.fetchUserData()
+        updateUser(userData).then(
+        setSuccessMessage('Success!'))
         setTimeout(function () {
           handleCloseModal()
         }, 1500)
@@ -115,6 +112,7 @@ const Preferences = inject('rootStore')(
       setNewPassword('')
       setVerifyPassword('')
       setIsEditing(false)
+      userStore.fetchUserData()
     }
 
     const renderPreferencesForm = () => (
@@ -177,7 +175,7 @@ const Preferences = inject('rootStore')(
             <>
               <label>Preferred Unit</label>
               <p></p>
-              <Dropdown
+              <Select
                 placeholder='Select your preferred unit'
                 options={[
                   { key: 'imperial', text: 'Imperial', value: 'imperial' },
@@ -185,7 +183,6 @@ const Preferences = inject('rootStore')(
                 ]}
                 value={newPreferredUnits}
                 onChange={(e, { value }) =>{
-                console.log("new preferred units", value);
                   setNewPreferredUnits(value)
                 }}
               />
@@ -218,7 +215,7 @@ const Preferences = inject('rootStore')(
           <Table.Body>
             <Table.Row>
               <Table.Cell>Username:</Table.Cell>
-              <Table.Cell>{username}</Table.Cell>
+              <Table.Cell>{userStore.username}</Table.Cell>
               <Table.Cell>
                 <Button fluid onClick={() => handleEdit('username')}>
                   Change
@@ -227,7 +224,7 @@ const Preferences = inject('rootStore')(
             </Table.Row>
             <Table.Row>
               <Table.Cell>First Name:</Table.Cell>
-              <Table.Cell>{capitalizeFirstLetter(firstName)}</Table.Cell>
+              <Table.Cell>{capitalizeFirstLetter(userStore.firstName)}</Table.Cell>
               <Table.Cell>
                 <Button fluid onClick={() => handleEdit('firstName')}>
                   Change
@@ -236,7 +233,7 @@ const Preferences = inject('rootStore')(
             </Table.Row>
             <Table.Row>
               <Table.Cell>Email:</Table.Cell>
-              <Table.Cell>{email}</Table.Cell>
+              <Table.Cell>{userStore.email}</Table.Cell>
               <Table.Cell>
                 <Button fluid onClick={() => handleEdit('email')}>
                   Change
@@ -245,7 +242,7 @@ const Preferences = inject('rootStore')(
             </Table.Row>
             <Table.Row>
               <Table.Cell>Preferred Units:</Table.Cell>
-              <Table.Cell>{capitalizeFirstLetter(preferredUnits)}</Table.Cell>
+              <Table.Cell>{capitalizeFirstLetter(userStore.preferredUnits)}</Table.Cell>
               <Table.Cell>
                 <Button fluid onClick={() => handleEdit('preferredUnits')}>
                   Change

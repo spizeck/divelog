@@ -11,7 +11,7 @@ import {
   Form,
   Input,
   Pagination,
-  Dropdown
+  Select
 } from 'semantic-ui-react'
 import diveFormData from './DiveForm/steps/DiveFormData'
 import unitConverter from '../utils/convertUnits'
@@ -25,7 +25,6 @@ const PreviousEntries = inject('rootStore')(
       dives,
       currentPage,
       totalPages,
-      error,
       editDive
     } = diveStore
     const { firstName, preferredUnits } = userStore
@@ -36,9 +35,8 @@ const PreviousEntries = inject('rootStore')(
     const [activePage, setActivePage] = useState(1)
 
     useEffect(() => {
-      fetchDivesByGuide(firstName).then(() => {
-        console.log(toJS(dives))
-      })
+      fetchDivesByGuide(firstName).then(
+      console.log(toJS(dives)))
     }, [firstName])
 
     const timeMap = {
@@ -55,7 +53,21 @@ const PreviousEntries = inject('rootStore')(
         : { depth: 'M', temperature: 'C' }
 
     const handleEditOpen = dive => {
-      setFormState(dive.diveId)
+      const convertedDepth = unitConverter.convertDepthToForm(
+        dive.maxDepth,
+        preferredUnits
+      )
+      const convertedTemp = unitConverter.convertTempToForm(
+        dive.waterTemperature,
+        preferredUnits
+      )
+
+      setFormState({
+        ...dive,
+        maxDepth: convertedDepth,
+        waterTemperature: convertedTemp
+      })
+
       setEditOpen(true)
     }
 
@@ -69,12 +81,25 @@ const PreviousEntries = inject('rootStore')(
     }
 
     const handleEditSubmit = async () => {
+      const metricDepth = unitConverter.convertDepthToDatabase(
+        formState.maxDepth,
+        preferredUnits
+      )
+      const metricTemp = unitConverter.convertTempToDatabase(
+        formState.waterTemperature,
+        preferredUnits
+      )
+      const updatedDive = {
+        ...formState,
+        maxDepth: metricDepth,
+        waterTemperature: metricTemp
+      }
       try {
-        await editDive(formState.diveId, formState)
+        await editDive(updatedDive)
         setSuccessMessage(diveStore.successMessage)
         setErrorMessage('')
         handleEditClose()
-        fetchDivesByGuide({ diveGuide: firstName })
+        fetchDivesByGuide(firstName)
       } catch (error) {
         setErrorMessage(diveStore.errorMessage)
       }
@@ -102,11 +127,21 @@ const PreviousEntries = inject('rootStore')(
             {dives.map((dive, index) => (
               <Table.Row key={index}>
                 <Table.Cell>{dive.date}</Table.Cell>
-                <Table.Cell>{dive.diveNumber}</Table.Cell>
+                <Table.Cell>{timeMap[dive.diveNumber]}</Table.Cell>
                 <Table.Cell>{dive.boat}</Table.Cell>
                 <Table.Cell>{dive.diveSite}</Table.Cell>
-                <Table.Cell>{dive.maxDepth}</Table.Cell>
-                <Table.Cell>{dive.waterTemperature}</Table.Cell>
+                <Table.Cell>
+                  {unitConverter.convertDepthToForm(
+                    dive.maxDepth,
+                    preferredUnits
+                  )}
+                </Table.Cell>
+                <Table.Cell>
+                  {unitConverter.convertTempToForm(
+                    dive.waterTemperature,
+                    preferredUnits
+                  )}
+                </Table.Cell>
                 <Table.Cell>
                   <Button
                     icon
@@ -123,7 +158,7 @@ const PreviousEntries = inject('rootStore')(
         </Table>
 
         <Modal open={editOpen} onClose={handleEditClose}>
-          <Modal.Header>Edit Dive</Modal.Header>
+          <Modal.Header>Edit Dive #{formState.id}</Modal.Header>
           <Modal.Content>
             <Form onSubmit={handleEditSubmit}>
               <Form.Field>
@@ -137,12 +172,50 @@ const PreviousEntries = inject('rootStore')(
               </Form.Field>
               <Form.Field>
                 <label>Dive Number</label>
-                <Dropdown
+                <Select
                   placeholder='Select Dive Number'
                   name='diveNumber'
                   value={formState.diveNumber}
                   onChange={handleInputChange}
                   options={diveFormData.diveNumberOptions.options}
+                />
+              </Form.Field>
+              <Form.Field>
+                <label>Boat</label>
+                <Select
+                  placeholder='Select Boat'
+                  name='boat'
+                  value={formState.boat}
+                  onChange={handleInputChange}
+                  options={diveFormData.boatNameOptions.options}
+                />
+              </Form.Field>
+              <Form.Field>
+                <label>Dive Site</label>
+                <Select
+                  placeholder='Select Dive Site'
+                  name='diveSite'
+                  value={formState.diveSite}
+                  onChange={handleInputChange}
+                  options={diveFormData.diveSiteOptions.options}
+                />
+              </Form.Field>
+              <Form.Field>
+                <label>Max Depth ({units.depth})</label>
+                <Input
+                  type='number'
+                  name='maxDepth'
+                  value={formState.maxDepth}
+                  onChange={handleInputChange}
+                />
+              </Form.Field>
+              <Form.Field>
+                <label>Water Temp ({units.temperature})</label>
+                <Input
+                  type='number'
+                  name='waterTemperature'
+                  value={formState.waterTemperature}
+                  onChange={handleInputChange}
                 />
               </Form.Field>
               <Button type='submit'>Update</Button>

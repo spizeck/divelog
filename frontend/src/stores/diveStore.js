@@ -107,10 +107,10 @@ class DiveStore {
     }
   }.bind(this))
 
-  editDive = flow(function* (diveId, diveData) {
+  editDive = flow(function* (diveData) {
     this._startDiveProcess()
     try {
-      const response = yield api.updateDive(diveId, diveData)
+      const response = yield api.editDive(diveData)
       if (response.status === 200) {
         this.successMessage =
           response.data.message || 'Dive updated successfully'

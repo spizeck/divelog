@@ -180,10 +180,10 @@ def get_dives_by_guide(data):  # sourcery skip: extract-method
 def edit_dive(data):  # sourcery skip: extract-method
 
     try:
-        if 'diveId' not in data:
+        if 'id' not in data:
             raise MissingDiveId()
 
-        dive_id = data['diveId']
+        dive_id = data['id']
         dive = Dive.query.filter(Dive.id == dive_id).first()
 
         if dive is None:
@@ -192,18 +192,19 @@ def edit_dive(data):  # sourcery skip: extract-method
         attribute_mapping = {
             'date': 'date',
             'diveNumber': 'dive_number',
-            'boatName': 'boat',
+            'boat': 'boat',
             'diveGuide': 'dive_guide',
             'diveSite': 'dive_site',
             'maxDepth': 'max_depth',
             'waterTemperature': 'water_temperature'
         }
 
-        for json_key, attr_name in attribute_mapping.items():
-            if json_key in data:
-                setattr(dive, attr_name, data[json_key])
-
-        dive.update()
+        attributes_to_update = {
+            attr_name: data[json_key]
+            for json_key, attr_name in attribute_mapping.items()
+            if json_key in data
+        }
+        dive.update(**attributes_to_update)
 
         return {'message': 'Dive updated successfully', 'status': 200}, 200
 
