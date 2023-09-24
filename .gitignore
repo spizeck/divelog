@@ -45,3 +45,6 @@ backend/tests/__pycache__/
 backend/tests/__pycache__/
 
 frontend/.env
+
+package-lock.json
+package.json

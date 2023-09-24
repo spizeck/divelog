@@ -1,8 +1,7 @@
 // handleChange.js is a function that handles the change of the form data and sighting data
 // handleChange.js is imported into DiveForm.js
 
-import sightingsData from './sightingsData'
-import unitConverter from '../utils/convertUnits';
+import unitConverter from '../../../utils/convertUnits';
 
 const handleChange =
   (
@@ -10,7 +9,8 @@ const handleChange =
     setSightingData,
     setFieldError,
     setFormError,
-    diveFormData,
+    DiveFormData,
+    SightingsFormData,
     step,
     totalSteps,
     units
@@ -24,7 +24,7 @@ const handleChange =
         [name]: value
       }))
       // After updating the state, run validation for this specific input field
-      const fieldDefinition = diveFormData[name]
+      const fieldDefinition = DiveFormData[name]
       if (fieldDefinition) {
         let convertedValue = value;
         if (units.units === 'imperial') {
@@ -62,7 +62,7 @@ const handleChange =
         )
       )
       // Validate the data
-      const sightingFieldDefinition = sightingsData.find(
+      const sightingFieldDefinition = SightingsFormData.find(
         item => item.name === name
       )
       if (sightingFieldDefinition) {

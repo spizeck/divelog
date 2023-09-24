@@ -1,9 +1,10 @@
 import unittest
-from datetime import date
+from datetime import date, timedelta
 
 from app import create_app, db
 from config import TestingConfig
 from models.dives import Dive, DiveIntegrityError
+from models.sightings import Sightings
 
 
 class DivesModelTestCase(unittest.TestCase):
@@ -19,11 +20,11 @@ class DivesModelTestCase(unittest.TestCase):
             db.create_all()
 
     def tearDown(self):
-         # Clean up after each test
+        # Clean up after each test
         with self.app.app_context():
             db.session.query(Dive).delete()
             db.session.commit()
-            
+
         # Remove the session
         db.session.remove()
 
@@ -85,7 +86,81 @@ class DivesModelTestCase(unittest.TestCase):
         with self.assertRaises(DiveIntegrityError):
             dive2.save()
 
-    # Add more test cases as needed
+    def test_update_dive(self):
+        # Create a new Dive instance
+        initial_dive = {
+            'date': date.today(),
+            'dive_number': 3,
+            'boat': 'Boat 1',
+            'dive_guide': 'John Doe',
+            'dive_site': 'Site 1',
+            'max_depth': 30,
+            'water_temperature': 25
+        }
+        dive = Dive(**initial_dive)
+
+        # Save the dive to the database
+        dive.save()
+        
+        # Get the dive id from the database
+        dive_id = dive.id
+
+        # Update the dive attributes
+        updated_data = {
+            'date': date.today() - timedelta(days=1),
+            'dive_number': 2,
+            'boat': 'Boat 2',
+            'dive_guide': 'Jane Doe',
+            'dive_site': 'Site 2',
+            'max_depth': 20,
+            'water_temperature': 30    
+        }
+        
+        # Update the dive in the database
+        dive.update(**updated_data)
+
+        # Query the dive from the database
+        queried_dive = Dive.query.filter_by(id=dive_id).first()
+
+        # Assert that the updated dive attributes match the updated values
+        self.assertEqual(queried_dive.date, date.today() - timedelta(days=1))
+
+        # Assert that the old dive attributes no longer exist
+        self.assertFalse(queried_dive.date == date.today())
+
+    def test_sightings_delete_with_dive(self):
+        # Create a new Dive instance
+        dive = Dive(
+            date=date.today(),
+            dive_number=1,
+            boat='Boat 1',
+            dive_guide='John Doe',
+            dive_site='Site 1',
+            max_depth=30,
+            water_temperature=25
+        )
+
+        # Save the dive to the database
+        dive.save()
+
+        # Create a new Sightings instance
+        sightings = Sightings(
+            dive_id=dive.id,
+            species='Shark',
+            count=2
+        )
+
+        # Save the sightings to the database
+        sightings.save()
+
+        # Delete the dive from the database
+        dive.delete()
+
+        # Query the sightings from the database
+        saved_sightings = Sightings.query.filter_by(dive_id=dive.id).first()
+
+        # Assert that the sightings are None
+        self.assertIsNone(saved_sightings)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-const diveFormData = {
+const DiveFormData = {
   date: {
     name: 'date',
     label: 'Date',
@@ -22,7 +22,7 @@ const diveFormData = {
   diveNumberOptions: {
     name: 'diveNumber',
     label: 'Dive Number',
-    type: 'select',
+    type: 'dropdown',
     options: [
       { key: '1', text: '9:00 am', value: 1 },
       { key: '2', text: '11:00 am', value: 2 },
@@ -40,7 +40,7 @@ const diveFormData = {
   boatNameOptions: {
     name: 'boatName',
     label: 'Boat Name',
-    type: 'select',
+    type: 'dropdown',
     options: [
       { key: '1', text: 'Shark Bait', value: 'Shark Bait' },
       { key: '2', text: 'Fin & Tonic', value: 'Fin & Tonic' },
@@ -71,7 +71,7 @@ const diveFormData = {
   diveSiteOptions: {
     name: 'diveSite',
     label: 'Dive Site',
-    type: 'select',
+    type: 'dropdown',
     options: [
       { key: '1', text: 'Mt. Michel', value: 'Mt Michel' },
       { key: '2', text: 'Third Encounter', value: 'Third Encounter' },
@@ -142,7 +142,7 @@ const diveFormData = {
     name: 'waterTemperature',
     label: 'Water Temperature',
     type: 'number',
-    min: 0, 
+    min: 0,
     defaultValue: 27,
     validate: value => {
       if (value % 1 !== 0) {
@@ -156,4 +156,4 @@ const diveFormData = {
   }
 }
 
-export default diveFormData
+export default DiveFormData

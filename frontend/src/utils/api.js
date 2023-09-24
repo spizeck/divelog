@@ -1,25 +1,60 @@
+/**
+ * This module provides an 'api' interface for interacting with the backend server.
+ * Each method within this interface maps to a specific server endpoint, returning
+ * the respective response data. Should any issues arise, an error will be thrown.
+ *
+ * The methods rely on the axios library for making HTTP requests.
+ * - For GET and DELETE requests: Pass parameters directly.
+ * - For POST and PUT requests: Provide an object with the request body.
+ *
+ * Usage Example:
+ *
+ * 1. Incorporate the 'api' interface:
+ *    import api from './api'
+ *
+ * 2. Employ the provided methods for server interactions:
+ *    const userToken = await api.loginWithUsername('username', 'password');
+ *    const userInfo = await api.getCurrentUser('your-token-here');
+ *
+ * Ensure to encompass these methods within try/catch blocks to manage potential errors.
+ */
+
 import axios from 'axios'
 
 // Define the base URL for your API
 const apiUrl = process.env.REACT_APP_LIVE_API
 
-// Use the apiUrl variable to make API calls
-
-let userId = null // Set userId to null to avoid error
-
 // Create an axios instance with the base URL and headers
 const axiosInstance = axios.create({
   baseURL: apiUrl,
+  timeout: 10000, // Set timeout to 10 seconds
   headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${localStorage.getItem('token')}`
+    'Content-Type': 'application/json'
   }
 })
 
-// Function to update the token in the Axios instance
-const updateToken = token => {
-  axiosInstance.defaults.headers.common.Authorization = `Bearer ${token}`
-}
+axiosInstance.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  error => {
+    return Promise.reject(error)
+  }
+)
+
+axiosInstance.interceptors.response.use(
+  response => {
+    return response
+  },
+  error => {
+    handleApiError(error)
+    return Promise.reject(error)
+  }
+)
 
 // API endpoints
 const API_ENDPOINTS = {
@@ -35,19 +70,22 @@ const API_ENDPOINTS = {
   // Admin endpoints
   getUsers: 'admin/users',
   approveUser: `admin/users/:userId/approve`,
-  dissaproveUser: `admin/users/:userId/dissaprove`,
+  disapproveUser: `admin/users/:userId/disapprove`,
   promoteUser: `admin/users/:userId/promote`,
   demoteUser: `admin/users/:userId/demote`,
   deleteUser: `admin/users/:userId/delete`,
   // db endpoints
   createDive: '/db/dives/entries',
   createSighting: '/db/sightings/entries',
-  getDivesByDate: '/db/dives/bydate',
-  getDivesByGuide: '/db/dives/byguide',
-  editDive: '/db/dives/editDive',
-  deleteDive: '/db/dives/deleteDive',
-  getPages: '/db/dives/pages'
+  getDivesByDate: '/db/dives/by_date',
+  getDivesByGuide: '/db/dives/by_guide',
+  editDive: '/db/dives/edit_dive',
+  deleteDive: '/db/dives/delete_dive',
+  getPages: '/db/dives/pages',
+  getSightingsForDive: '/db/sightings/for_dive'
 }
+
+let userId = null
 
 // Set the userId dynamically in the endpoint paths
 const setUserId = id => {
@@ -55,271 +93,153 @@ const setUserId = id => {
 }
 
 // Replace the userId placeholder in the endpoint paths with the actual userId
-const replaceUserId = path => {
+const replaceUserId = (path, userId) => {
   return path.replace(':userId', userId)
 }
 
-const api = {
-  // Login endpoint
-  loginWithUsername: async (username, password) => {
-    try {
-      const response = await axios.post(`${apiUrl}${API_ENDPOINTS.login}`, {
-        username,
-        password
-      })
+const handleApiError = error => {
+  if (error.response) {
+    const { status, data } = error.response
 
-      updateToken(response.data.token)
-
-      return response.data
-    } catch (error) {
-      throw error.response.data
+    switch (status) {
+      case 400:
+        throw new Error(data.message || 'Bad request')
+      case 401:
+        throw new Error(data.message || 'Unauthorized')
+      case 403:
+        throw new Error(data.message || 'Forbidden')
+      case 404:
+        throw new Error(data.message || 'Not found')
+      case 409:
+        throw new Error(data.message || 'Conflict')
+      case 500:
+        throw new Error(data.message || 'Internal server error')
+      default:
+        throw new Error(data.message || 'Unknown error')
     }
-  },
-
-  loginWithEmail: async (username, password) => {
-    try {
-      const response = await axios.post(`${apiUrl}${API_ENDPOINTS.login}`, {
-        email: username,
-        password
-      })
-
-      updateToken(response.data.token)
-
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-
-  // Register endpoint
-  register: async (username, email, password) => {
-    try {
-      const response = await axios.post(`${apiUrl}${API_ENDPOINTS.register}`, {
-        username,
-        email,
-        password
-      })
-      return response.data
-    } catch (error) {
-      if (error.response) {
-        return error.response
-      } else {
-        throw error
-      }
-    }
-  },
-
-  // Logout endpoint
-  logout: async () => {
-    try {
-      const response = await axios.post(`${apiUrl}${API_ENDPOINTS.logout}`)
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-
-  // Forgot password endpoint
-  forgotPassword: async email => {
-    try {
-      const response = await axios.post(
-        `${apiUrl}${API_ENDPOINTS.forgotPassword}`,
-        {
-          email
-        }
-      )
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-
-  // Create dive endpoint
-  createDive: async diveData => {
-    try {
-      const response = await axios.post(
-        `${apiUrl}${API_ENDPOINTS.createDive}`,
-        diveData
-      )
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-
-  // Create sighting endpoint
-  createSighting: async sightingData => {
-    try {
-      const response = await axios.post(
-        `${apiUrl}${API_ENDPOINTS.createSighting}`,
-        sightingData
-      )
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-
-  // Get number of pages by different sort methods endpoint
-  getPages: async (sortMethod, key) => {
-    try {
-      const response = await axios.get(
-        `${apiUrl}${API_ENDPOINTS.getPages}`, {
-        params: {
-          sortMethod,
-          key
-        }
-      }
-      )
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-  
-  // Get dives by date endpoint
-  getDivesByDate: async (startDate, endDate) => {
-    try {
-      const response = await axios.get(
-        `${apiUrl}${API_ENDPOINTS.getDivesByDate}`,
-        {
-          params: {
-            startDate,
-            endDate
-          }
-        }
-      )
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-
-  // Get dives by guide endpoint
-  getDivesByGuide: async (diveGuide, page) => {
-    try {
-      const response = await axios.get(
-        `${apiUrl}${API_ENDPOINTS.getDivesByGuide}`, {
-        params: {
-          diveGuide,
-          page
-        }
-      }
-      )
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-
-  // Edit dive endpoint
-  editDive: async (diveData) => {
-    try {
-      const response = await axios.put(
-        `${apiUrl}${API_ENDPOINTS.editDive}`,
-        diveData
-      )
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-
-  // Delete dive endpoint
-  deleteDive: async (diveId) => {
-    try {
-      const response = await axios.delete(
-        `${apiUrl}${API_ENDPOINTS.deleteDive}`, {
-        params: {
-          diveId
-        }
-      }
-      )
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-
-  // Get current user endpoint
-  getCurrentUser: async token => {
-    try {
-      const response = await axiosInstance.get(
-        `${API_ENDPOINTS.getCurrentUser}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      )
-      return response.data
-    } catch (error) {
-      if (error.response && error.response.data.message) {
-        throw new Error(error.response.data.message)
-      } else {
-        throw new Error('An error occurred while fetching the current user')
-      }
-    }
-  },
-
-  // Update user endpoint
-  updateUser: async (token, userData) => {
-    try {
-      const response = await axiosInstance.put(
-        `${API_ENDPOINTS.updateUser}`,
-        userData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      )
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-
-  // Get user preferences endpoint
-  getPreferences: async token => {
-    try {
-      const response = await axiosInstance.get(`${API_ENDPOINTS.preferences}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-
-  // Update user preferences endpoint
-  updatePreferences: async (token, preferencesData) => {
-    try {
-      const response = await axiosInstance.put(
-        `${API_ENDPOINTS.preferences}`,
-        preferencesData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      )
-      return response.data
-    } catch (error) {
-      throw error.response.data
-    }
-  },
-
-  setUserId,
-
-  // Replace userId placeholder in endpoint paths with the actual userId
-  updateEndpointPaths: () => {
-    for (const key in API_ENDPOINTS) {
-      API_ENDPOINTS[key] = replaceUserId(API_ENDPOINTS[key])
-    }
+  } else if (error.request) {
+    throw new Error('The request was made but no response was received.')
+  } else {
+    throw new Error(error.message)
   }
+}
+
+async function makeApiRequest (method, endpoint, data = null, params = null) {
+  try {
+    let response
+    if (method === 'get') {
+      response = await axiosInstance.get(endpoint, { params })
+    } else if (method === 'post') {
+      response = await axiosInstance.post(endpoint, data)
+    } else if (method === 'put') {
+      response = await axiosInstance.put(endpoint, data)
+    } else if (method === 'delete') {
+      response = await axiosInstance.delete(endpoint)
+    }
+    return response.data
+  } catch (error) {
+    handleApiError(error)
+  }
+}
+
+const api = {
+  loginWithUsername: (username, password) =>
+    makeApiRequest('post', API_ENDPOINTS.login, { username, password }),
+
+  loginWithEmail: (email, password) =>
+    makeApiRequest('post', API_ENDPOINTS.login, { email, password }),
+
+  register: (username, email, password, firstName, preferredUnits) =>
+    makeApiRequest('post', API_ENDPOINTS.register, {
+      username,
+      email,
+      password,
+      firstName,
+      preferredUnits
+    }),
+
+  logout: () => makeApiRequest('post', API_ENDPOINTS.logout),
+
+  forgotPassword: email =>
+    makeApiRequest('post', API_ENDPOINTS.forgotPassword, { email }),
+
+  createDive: diveData =>
+    makeApiRequest('post', API_ENDPOINTS.createDive, diveData),
+
+  createSighting: sightingData =>
+    makeApiRequest('post', API_ENDPOINTS.createSighting, sightingData),
+
+  getPages: (sortMethod, key) =>
+    makeApiRequest('get', API_ENDPOINTS.getPages, null, {
+      sortMethod,
+      key
+    }),
+
+  getDivesByDate: (startDate, endDate) =>
+    makeApiRequest('get', API_ENDPOINTS.getDivesByDate, null, {
+      startDate,
+      endDate
+    }),
+
+  getDivesByGuide: (diveGuide, page) =>
+    makeApiRequest('get', API_ENDPOINTS.getDivesByGuide, null, {
+      diveGuide,
+      page
+    }),
+
+  editDive: diveData => makeApiRequest('put', API_ENDPOINTS.editDive, diveData),
+
+  deleteDive: diveId =>
+    makeApiRequest('delete', API_ENDPOINTS.deleteDive, null, {
+      diveId
+    }),
+
+  getSightingsForDive: diveId =>
+    makeApiRequest('get', API_ENDPOINTS.getSightingsForDive, null, {
+      diveId
+    }),
+
+  getCurrentUser: () => makeApiRequest('get', API_ENDPOINTS.getCurrentUser),
+
+  updateUser: userData =>
+    makeApiRequest('put', API_ENDPOINTS.updateUser, userData),
+
+  getPreferences: () => makeApiRequest('get', API_ENDPOINTS.preferences),
+
+  updatePreferences: preferencesData =>
+    makeApiRequest('put', API_ENDPOINTS.preferences, preferencesData),
+
+  approveUser: userId => {
+    if (!userId) throw new Error('User ID is required')
+    const endpoint = API_ENDPOINTS.approveUser.replace(':userId', userId)
+    return makeApiRequest('put', endpoint)
+  },
+
+  disapproveUser: userId => {
+    if (!userId) throw new Error('User ID is required')
+    const endpoint = API_ENDPOINTS.disapproveUser.replace(':userId', userId)
+    return makeApiRequest('put', endpoint)
+  },
+
+  promoteUser: userId => {
+    if (!userId) throw new Error('User ID is required')
+    const endpoint = replaceUserId(API_ENDPOINTS.promoteUser, userId)
+    return makeApiRequest('put', endpoint)
+  },
+
+  demoteUser: userId => {
+    if (!userId) throw new Error('User ID is required')
+    const endpoint = replaceUserId(API_ENDPOINTS.demoteUser, userId)
+    return makeApiRequest('put', endpoint)
+  },
+
+  deleteUser: userId => {
+    if (!userId) throw new Error('User ID is required')
+    const endpoint = replaceUserId(API_ENDPOINTS.deleteUser, userId)
+    return makeApiRequest('delete', endpoint)
+  },
+
+  setUserId
 }
 
 export default api

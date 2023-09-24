@@ -4,11 +4,10 @@ from extensions import db
 from flask import Blueprint, jsonify, request, session
 from flask_jwt_extended import (create_access_token, get_jwt_identity,
                                 jwt_required)
-from models.user_preferences import UserPreferences
 from models.users import User
 from services.user_service import (create_user, get_user_by_email,
                                    get_user_by_id, get_user_by_username,
-                                   update_username, update_email, change_password)
+                                   update_username, update_email, change_password, change_user_preferences)
 
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
@@ -20,9 +19,10 @@ def login():
     username = data['username'] if 'username' in data else None
     email = data['email'] if 'email' in data else None
     password = data['password']
-    
+
     try:
-        user = get_user_by_username(username) if username else get_user_by_email(email)
+        user = get_user_by_username(
+            username) if username else get_user_by_email(email)
     except Exception as e:
         logging.error(
             f'Error retrieving user {username} from the database: {e}')
@@ -47,6 +47,8 @@ def register():
     username = data['username']
     email = data['email']
     password = data['password']
+    first_name = data['firstName'] if 'firstName' in data else None
+    preferred_units = data['preferredUnits'] if 'preferredUnits' in data else None
 
     # Validate email format
     if not User.validate_email_format(email):
@@ -70,35 +72,13 @@ def register():
                         'message': 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'
                         }), 400
 
-    # Check if the user exists
-    user = get_user_by_username(username)
-
-    if user is not None:
-        logging.info(f'User {username} already exists')
-        return jsonify({'status': 409, 'message': 'Username already exists'}), 409
-
     # If the user doesn't exist, create a new user
-    user = create_user(username=username, email=email, password=password)
-
-    # Save the user to the database
     try:
-        db.session.add(user)
-        db.session.commit()
+        user = create_user(username=username, email=email, password=password,
+                           first_name=first_name, preferred_units=preferred_units)
+
     except Exception as e:
         logging.error(f'Error saving user {username} to the database: {e}')
-        return jsonify({'status': 500, 'message': 'Database Connection Error'}), 500
-
-    # Create a user preference record for the user
-    user_preferences = UserPreferences(
-        user_id=user.id, preferred_units='imperial')
-
-    # Save the user preferences to the database
-    try:
-        db.session.add(user_preferences)
-        db.session.commit()
-    except Exception as e:
-        logging.error(
-            f'Error saving user preferences for user {username} to the database: {e}')
         return jsonify({'status': 500, 'message': 'Database Connection Error'}), 500
 
     return jsonify({'status': 201, 'message': 'User created successfully'}), 201
@@ -122,23 +102,19 @@ def forgot_password():
     # check if the user exists
     user = get_user_by_email(email)
     if not user:
-        return jsonify({'status': 404, 'message': 'User does not exist'}), 404
+        return jsonify({'status': 404, 'message': 'Email not found'}), 404
 
     # Generate a new password for the user
-    new_password = 'Password123'
-
-    user.password = new_password
     try:
-        db.session.commit()
+        change_password(user, 'password123')
     except Exception as e:
-        logging.error(
-            f'Error saving new password for user {user.username} to the database: {e}')
-        return jsonify({'status': 500, 'message': 'Database Connection Error'}), 500
+        logging.error(f'Error saving new password to the database: {e}')
+        return jsonify({'status': 500, 'message': 'Database connection error'}), 500
 
     # Send the new password to the user's email
     # TODO: Implement email sending
     # TODO: Replace with a link to reset password
-    return jsonify({'status': 200, 'message': 'New password has been sent'}), 200
+    return jsonify({'status': 200, 'message': 'New password is password123 -- Please change ASAP'}), 200
 
 
 @auth_bp.route('/current_user', methods=['GET'])
@@ -156,14 +132,20 @@ def get_current_user():
     email = user.email if hasattr(user, 'email') else None
     is_approved = user.is_approved if hasattr(user, 'is_approved') else None
     admin = user.admin if hasattr(user, 'admin') else None
+    first_name = user.user_preferences.first_name if hasattr(
+        user.user_preferences, 'first_name') else None
+    preferred_units = user.user_preferences.preferred_units if hasattr(
+        user.user_preferences, 'preferred_units') else None
 
     return jsonify({
         'status': 200,
         'message': 'User found',
-        'is_approved': is_approved,
+        'approved': is_approved,
         'admin': admin,
         'username': username,
-        'email': email
+        'email': email,
+        'firstName': first_name,
+        'preferredUnits': preferred_units
     }), 200
 
 
@@ -176,23 +158,29 @@ def update_user():
         return jsonify({'status': 404, 'message': 'User not found'}), 404
 
     data = request.json
-    allowed_keys = ['newUsername', 'newEmail', 'newPassword']
-    data_to_update = {k: v for k, v in data.items() if k in allowed_keys}
+    print("Data type:", type(data))
+    print("Data content:", data)
 
+    allowed_keys = ['newUsername', 'newEmail',
+                    'newPassword', 'newFirstName', 'newPreferredUnits']
+    data_to_update = {k: v for k, v in data.items() if k in allowed_keys}
+    print('data_to_update: ', data_to_update)
     if 'newUsername' in data_to_update:
         try:
             update_username(user, data_to_update['newUsername'])
             return jsonify({'status': 200, 'message': 'Username updated successfully'}), 200
         except Exception as e:
-            logging.error(f'Error updating username for user {user.username}: {e}')
+            logging.error(
+                f'Error updating username for user {user.username}: {e}')
             return jsonify({'status': 409, 'message': 'Username already exists'}), 409
 
     if 'newEmail' in data_to_update:
-        try: 
+        try:
             update_email(user, data_to_update['newEmail'])
             return jsonify({'status': 200, 'message': 'Email updated successfully'}), 200
         except Exception as e:
-            logging.error(f'Error updating email for user {user.username}: {e}')
+            logging.error(
+                f'Error updating email for user {user.username}: {e}')
             return jsonify({'status': 409, 'message': 'Email already exists'}), 409
 
     if 'newPassword' in data_to_update:
@@ -200,11 +188,34 @@ def update_user():
             change_password(user, data_to_update['newPassword'])
             return jsonify({'status': 200, 'message': 'Password updated successfully'}), 200
         except Exception as e:
-            logging.error(f'Error updating password for user {user.username}: {e}')
+            logging.error(
+                f'Error updating password for user {user.username}: {e}')
             return jsonify({'status': 400,
-                        'message': 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'
-                        }), 400
-            
+                            'message': 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one digit'
+                            }), 400
+
+    if 'newFirstName' in data_to_update or 'newPreferredUnits' in data_to_update:
+        print('data_to_update: ', data_to_update)
+        mapped_data_to_update = {}
+
+        if 'newFirstName' in data_to_update and data_to_update['newFirstName']:
+            mapped_data_to_update['first_name'] = data_to_update['newFirstName']
+
+        if 'newPreferredUnits' in data_to_update and data_to_update['newPreferredUnits']:
+            mapped_data_to_update['preferred_units'] = data_to_update['newPreferredUnits']
+
+        if mapped_data_to_update:
+            try:
+                change_user_preferences(user, **mapped_data_to_update)
+                return jsonify({'status': 200, 'message': 'User preferences updated successfully'}), 200
+            except Exception as e:
+                logging.error(
+                    f'Error updating user preferences for user {user.username}: {e}'
+                )
+                return jsonify({'status': 400, 'message': 'Invalid input'}), 400
+        else:
+            return jsonify({'status': 400, 'message': 'No valid data to update'}), 400
+
     if not data_to_update:
         return jsonify({'status': 400, 'message': 'No data to update'}), 400
 
@@ -220,24 +231,10 @@ def user_preferences():
     if not (user := get_user_by_id(current_identity)):
         return jsonify({'status': 404, 'message': 'User not found'}), 404
 
-    if request.method == 'GET':
-        # Get the user's current preferences
-        preferred_units = user.user_preferences.get_user_preferences()
-        return jsonify({'status': 200, 'preferredUnits': preferred_units}), 200
-
-    if request.method == 'PUT':
-        data = request.json
-        new_preferred_units = data.get('newPreferredUnits')
-
-        if not new_preferred_units:
-            return jsonify({'status': 400, 'message': 'Preferred units not provided'}), 400
-
-        # Update the user's preferences
-        user.user_preferences.update(preferred_units=new_preferred_units)
-        return jsonify({'status': 200, 'message': 'User preferences updated'}), 200
+    # Get the user's current preferences
+    preferred_units = user.user_preferences.get_user_preferences()
+    return jsonify({'status': 200, 'preferredUnits': preferred_units}), 200
 
 
 def register_routes(app):
     app.register_blueprint(auth_bp)
-    app.add_url_rule('/auth/preferences',
-                     view_func=user_preferences, methods=['GET', 'PUT'])
