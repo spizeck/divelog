@@ -59,6 +59,10 @@ const Register = inject('rootStore')(
       }
     }
 
+    const capitalizeFirstLetter = string => {
+      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
+    }
+
     return (
       <div className='login-container'>
         <Form onSubmit={handleRegister} className='login-form'>
@@ -73,7 +77,7 @@ const Register = inject('rootStore')(
             type='text'
             placeholder='First Name'
             value={formData.firstName}
-            setValue={value => setFormData({ ...formData, firstName: value })}
+            setValue={value => setFormData({ ...formData, firstName: capitalizeFirstLetter(value) })}
           />
           <FormInput
             type='text'

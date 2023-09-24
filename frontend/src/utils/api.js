@@ -126,7 +126,16 @@ const handleApiError = error => {
 
 async function makeApiRequest (method, endpoint, data = null, params = null) {
   try {
-    const response = await axiosInstance[method](endpoint, data)
+    let response
+    if (method === 'get') {
+      response = await axiosInstance.get(endpoint, { params })
+    } else if (method === 'post') {
+      response = await axiosInstance.post(endpoint, data)
+    } else if (method === 'put') {
+      response = await axiosInstance.put(endpoint, data)
+    } else if (method === 'delete') {
+      response = await axiosInstance.delete(endpoint)
+    }
     return response.data
   } catch (error) {
     handleApiError(error)

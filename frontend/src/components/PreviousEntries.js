@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { observer, inject } from 'mobx-react'
+import { toJS } from 'mobx'
 import {
   Table,
   Button,
@@ -9,7 +10,8 @@ import {
   Modal,
   Form,
   Input,
-  Pagination
+  Pagination,
+  Dropdown
 } from 'semantic-ui-react'
 import diveFormData from './DiveForm/steps/DiveFormData'
 import unitConverter from '../utils/convertUnits'
@@ -18,16 +20,25 @@ import '../styles/PreviousEntries.css'
 const PreviousEntries = inject('rootStore')(
   observer(({ rootStore }) => {
     const { diveStore, userStore } = rootStore
-    const { fetchDivesByGuide, dives, currentPage, totalPages, error } =
-      diveStore
+    const {
+      fetchDivesByGuide,
+      dives,
+      currentPage,
+      totalPages,
+      error,
+      editDive
+    } = diveStore
     const { firstName, preferredUnits } = userStore
     const [errorMessage, setErrorMessage] = useState('')
     const [successMessage, setSuccessMessage] = useState('')
     const [editOpen, setEditOpen] = useState(false)
     const [formState, setFormState] = useState({})
+    const [activePage, setActivePage] = useState(1)
 
     useEffect(() => {
-      fetchDivesByGuide({'diveGuide': firstName})
+      fetchDivesByGuide(firstName).then(() => {
+        console.log(toJS(dives))
+      })
     }, [firstName])
 
     const timeMap = {
@@ -43,181 +54,105 @@ const PreviousEntries = inject('rootStore')(
         ? { depth: 'ft', temperature: 'F' }
         : { depth: 'M', temperature: 'C' }
 
-    // Main content
+    const handleEditOpen = dive => {
+      setFormState(dive.diveId)
+      setEditOpen(true)
+    }
+
+    const handleEditClose = () => {
+      setEditOpen(false)
+      setFormState({})
+    }
+
+    const handleInputChange = (e, { name, value }) => {
+      setFormState({ ...formState, [name]: value })
+    }
+
+    const handleEditSubmit = async () => {
+      try {
+        await editDive(formState.diveId, formState)
+        setSuccessMessage(diveStore.successMessage)
+        setErrorMessage('')
+        handleEditClose()
+        fetchDivesByGuide({ diveGuide: firstName })
+      } catch (error) {
+        setErrorMessage(diveStore.errorMessage)
+      }
+    }
+
     return (
-      <>
-        <Container>
-          {errorMessage && (
-            <Message negative>
-              <Message.Header>Error</Message.Header>
-              <p>{errorMessage}</p>
-            </Message>
-          )}
-          {successMessage && (
-            <Message positive>
-              <Message.Header>Success</Message.Header>
-              <p>{successMessage}</p>
-            </Message>
-          )}
-          <Table celled textAlign='center' className='responsive-table'>
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell>Date</Table.HeaderCell>
-                <Table.HeaderCell>Dive Number</Table.HeaderCell>
-                <Table.HeaderCell>Boat Name</Table.HeaderCell>
-                <Table.HeaderCell>Dive Site</Table.HeaderCell>
-                <Table.HeaderCell>Max Depth ({units.depth})</Table.HeaderCell>
-                <Table.HeaderCell>
-                  Water Temperature ({units.temperature})
-                </Table.HeaderCell>
-                <Table.HeaderCell>Edit/Delete</Table.HeaderCell>
+      <Container>
+        {errorMessage && <Message negative content={errorMessage} />}
+        {successMessage && <Message positive content={successMessage} />}
+        <Table celled>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Date</Table.HeaderCell>
+              <Table.HeaderCell>Dive Number</Table.HeaderCell>
+              <Table.HeaderCell>Boat</Table.HeaderCell>
+              <Table.HeaderCell>Dive Site</Table.HeaderCell>
+              <Table.HeaderCell>Max Depth ({units.depth})</Table.HeaderCell>
+              <Table.HeaderCell>
+                Water Temp ({units.temperature})
+              </Table.HeaderCell>
+              <Table.HeaderCell>Edit</Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {dives.map((dive, index) => (
+              <Table.Row key={index}>
+                <Table.Cell>{dive.date}</Table.Cell>
+                <Table.Cell>{dive.diveNumber}</Table.Cell>
+                <Table.Cell>{dive.boat}</Table.Cell>
+                <Table.Cell>{dive.diveSite}</Table.Cell>
+                <Table.Cell>{dive.maxDepth}</Table.Cell>
+                <Table.Cell>{dive.waterTemperature}</Table.Cell>
+                <Table.Cell>
+                  <Button
+                    icon
+                    color='blue'
+                    size='small'
+                    onClick={() => handleEditOpen(dive)}
+                  >
+                    <Icon name='edit' />
+                  </Button>
+                </Table.Cell>
               </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {dives.map(dive => (
-                <Table.Row key={dive.diveId}>
-                  <Table.Cell>{dive.date}</Table.Cell>
-                  <Table.Cell>{timeMap[dive.diveNumber]}</Table.Cell>
-                  <Table.Cell>{dive.boatName}</Table.Cell>
-                  <Table.Cell>{dive.diveSite}</Table.Cell>
-                  <Table.Cell>{dive.maxDepth}</Table.Cell>
-                  <Table.Cell>{dive.waterTemperature}</Table.Cell>
-                  <Table.Cell>
-                    <Button
-                      size='tiny'
-                      icon
-                      // onClick={() => handleEditOpen(dive)}
-                    >
-                      <Icon name='edit' />
-                    </Button>
-                    <Button
-                      size='tiny'
-                      icon
-                      // onClick={() => handleDelete(dive.diveId)}
-                    >
-                      <Icon name='trash' />
-                    </Button>
-                  </Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-            <Table.Footer>
-              <Table.Row>
-                <Table.HeaderCell colSpan='7'>
-                  <Pagination
-                    // activePage={page}
-                    // totalPages={totalPages}
-                    // onPageChange={handlePageChange}
-                  />
-                </Table.HeaderCell>
-              </Table.Row>
-            </Table.Footer>
-          </Table>
-        </Container>
-      </>
+            ))}
+          </Table.Body>
+        </Table>
+
+        <Modal open={editOpen} onClose={handleEditClose}>
+          <Modal.Header>Edit Dive</Modal.Header>
+          <Modal.Content>
+            <Form onSubmit={handleEditSubmit}>
+              <Form.Field>
+                <label>Date</label>
+                <Input
+                  type='date'
+                  name='date'
+                  value={formState.date}
+                  onChange={handleInputChange}
+                />
+              </Form.Field>
+              <Form.Field>
+                <label>Dive Number</label>
+                <Dropdown
+                  placeholder='Select Dive Number'
+                  name='diveNumber'
+                  value={formState.diveNumber}
+                  onChange={handleInputChange}
+                  options={diveFormData.diveNumberOptions.options}
+                />
+              </Form.Field>
+              <Button type='submit'>Update</Button>
+              <Button onClick={handleEditClose}>Cancel</Button>
+            </Form>
+          </Modal.Content>
+        </Modal>
+      </Container>
     )
   })
 )
 
 export default PreviousEntries
-
-{
-  /* Edit Modal */
-}
-
-{
-  /* <Modal open={editOpen}>
-          <Modal.Header>Edit Dive --- ID: {formState.diveId}</Modal.Header>
-          <Modal.Content>
-            <Modal.Description>
-              <Form size='tiny' onSubmit={handleEditSubmit}>
-                {Object.entries(diveFormData).map(([key, value]) => {
-                  if (key === 'diveGuide') {
-                    return null
-                  }
-                  if (value.type === 'select') {
-                    return (
-                      <Form.Field key={key}>
-                        <label>{value.label}</label>
-                        <Form.Select
-                          name={value.name}
-                          options={value.options}
-                          value={formState[value.name]}
-                          onChange={handleInputChange}
-                        />
-                      </Form.Field>
-                    )
-                  } else if (value.name === 'waterTemperature') {
-                    return (
-                      <Form.Field key={key}>
-                        <label>
-                          {value.label} ({units.temp})
-                        </label>
-                        <Input
-                          type={value.type}
-                          name={value.name}
-                          value={formState[value.name]}
-                          onChange={handleInputChange}
-                        />
-                      </Form.Field>
-                    )
-                  } else if (value.name === 'maxDepth') {
-                    return (
-                      <Form.Field key={key}>
-                        <label>
-                          {value.label} ({units.depth})
-                        </label>
-                        <Input
-                          type={value.type}
-                          name={value.name}
-                          value={formState[value.name]}
-                          onChange={handleInputChange}
-                        />
-                      </Form.Field>
-                    )
-                  } else {
-                    return (
-                      <Form.Field key={key}>
-                        <label>{value.label}</label>
-                        <Input
-                          type={value.type}
-                          name={value.name}
-                          value={formState[value.name]}
-                          onChange={handleInputChange}
-                        />
-                      </Form.Field>
-                    )
-                  }
-                })}
-                <Button.Group fluid>
-                  <Button color='grey' type='button' onClick={handleEditClose}>
-                    Cancel
-                  </Button>
-                  <Button.Or className='or-button' />
-                  <Button primary type='submit'>
-                    Submit
-                  </Button>
-                </Button.Group>
-              </Form>
-              {errorMessage && (
-                <Message negative>
-                  <Message.Header>Error</Message.Header>
-                  <p>{errorMessage}</p>
-                </Message>
-              )}
-              {successMessage && (
-                <Message positive>
-                  <Message.Header>Success</Message.Header>
-                  <p>{successMessage}</p>
-                </Message>
-              )}
-            </Modal.Description>
-          </Modal.Content>
-        </Modal>
-      </>
-    )
-  })
-)
-
-export default PreviousEntries */
-}

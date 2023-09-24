@@ -7,6 +7,7 @@ class AuthStore {
   token = null
   authStatus = 'idle' // 'idle' | 'pending' | 'error'
   errorMessage = ''
+  loginMessage = ''
 
   constructor (rootStore) {
     this.rootStore = rootStore
@@ -91,6 +92,8 @@ class AuthStore {
 
   startAuthProcess () {
     this.authStatus = 'pending'
+    this.loginMessage = ''
+    this.errorMessage = ''
   }
 
   endAuthProcess () {
@@ -100,6 +103,8 @@ class AuthStore {
   handleSuccessfulLogin (response) {
     this.token = response.token
     this.loggedIn = true
+    this.loginMessage = response.message
+    this.errorMessage = null
     localStorage.setItem('token', this.token)
     localStorage.setItem('loggedIn', true)
   }

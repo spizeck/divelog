@@ -20,13 +20,15 @@ const Login = inject('rootStore')(
       e.preventDefault()
       try {
         await authStore.login(username, password)
-        if (authStore.authStatus === 'idle') {
+        if (authStore.errorMessage) {
+          setErrorMessage(authStore.errorMessage)
+          setSuccessMessage('')
+        } else {
           setSuccessMessage(authStore.loginMessage)
+          setErrorMessage('')
           setTimeout(() => {
             navigate('/home')
           }, 1500)
-        } else {
-          setErrorMessage(authStore.errorMessage)
         }
       } catch (error) {
         setErrorMessage(error.message)
