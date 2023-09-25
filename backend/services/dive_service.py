@@ -1,4 +1,5 @@
 import logging
+import math
 
 from dateutil.parser import parse
 from errors import (DiveInfoMissingError, DiveIntegrityError, DiveNotFound,
@@ -139,13 +140,12 @@ def get_dives_by_date_range(data):
 
 def get_dives_by_guide(data):  # sourcery skip: extract-method
 
-    entries_per_page = 10
-
     try:
         if 'diveGuide' not in data:
             raise MissingDiveGuideError()
 
         page = int(data.get('page', 1))
+        entries_per_page = int(data.get('entriesPerPage', 10))
 
         if page < 1:
             raise InvalidPageNumber()
@@ -158,7 +158,7 @@ def get_dives_by_guide(data):  # sourcery skip: extract-method
         
         response = {
             'dives': [dive.serialize() for dive in dives],
-            'totalCount': total_count,
+            'totalPages': math.ceil(total_count / entries_per_page),
             'perPage': entries_per_page,
             'currentPage': page,
             'status': 200
@@ -270,7 +270,7 @@ def get_count_for_pages(data):
         logging.error(e)
         return {'message': 'Failed to get count', 'status': 500}, 500
 
-def delete_dive(data):  # sourcery skip: extract-method
+def delete_dive_logic(data):  # sourcery skip: extract-method
     try:
         if 'diveId' not in data:
             raise MissingDiveId()

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { observer, inject } from 'mobx-react'
-import { toJS } from 'mobx'
 import {
   Table,
   Button,
@@ -11,7 +10,9 @@ import {
   Form,
   Input,
   Pagination,
-  Select
+  Select,
+  Grid,
+  Dropdown
 } from 'semantic-ui-react'
 import diveFormData from './DiveForm/steps/DiveFormData'
 import unitConverter from '../utils/convertUnits'
@@ -20,24 +21,25 @@ import '../styles/PreviousEntries.css'
 const PreviousEntries = inject('rootStore')(
   observer(({ rootStore }) => {
     const { diveStore, userStore } = rootStore
-    const {
-      fetchDivesByGuide,
-      dives,
-      currentPage,
-      totalPages,
-      editDive
-    } = diveStore
+    const { fetchDivesByGuide, dives, editDive, deleteDive } = diveStore
     const { firstName, preferredUnits } = userStore
     const [errorMessage, setErrorMessage] = useState('')
     const [successMessage, setSuccessMessage] = useState('')
     const [editOpen, setEditOpen] = useState(false)
     const [formState, setFormState] = useState({})
     const [activePage, setActivePage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
+    const [entriesPerPage, setEntriesPerPage] = useState(10)
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+    const [diveIdToDelete, setDiveIdToDelete] = useState(null)
 
     useEffect(() => {
-      fetchDivesByGuide(firstName).then(
-      console.log(toJS(dives)))
-    }, [firstName])
+      const fetchData = async () => {
+        await fetchDivesByGuide(firstName, activePage, entriesPerPage)
+        setTotalPages(diveStore.totalPages)
+      }
+      fetchData()
+    }, [firstName, activePage, entriesPerPage])
 
     const timeMap = {
       1: '9:00 am',
@@ -105,6 +107,28 @@ const PreviousEntries = inject('rootStore')(
       }
     }
 
+    const handleDeleteOpen = diveId => {
+      setDiveIdToDelete(diveId)
+      setDeleteConfirmOpen(true)
+    }
+
+    const handleDeleteDive = diveId => {
+      deleteDive(diveId)
+      fetchDivesByGuide(firstName, activePage, entriesPerPage)
+      setDeleteConfirmOpen(false)
+    }
+
+    const handlePageChange = (e, { newActivePage }) => {
+      setActivePage(newActivePage)
+      fetchDivesByGuide(firstName, activePage, entriesPerPage)
+    }
+
+    const handleEntriesPerPageChange = newEntriesPerPage => {
+      setEntriesPerPage(newEntriesPerPage)
+      setActivePage(1)
+      fetchDivesByGuide(firstName, activePage, newEntriesPerPage)
+    }
+
     return (
       <Container>
         {errorMessage && <Message negative content={errorMessage} />}
@@ -121,6 +145,7 @@ const PreviousEntries = inject('rootStore')(
                 Water Temp ({units.temperature})
               </Table.HeaderCell>
               <Table.HeaderCell>Edit</Table.HeaderCell>
+              <Table.HeaderCell>Delete</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -151,12 +176,43 @@ const PreviousEntries = inject('rootStore')(
                   >
                     <Icon name='edit' />
                   </Button>
+                  <Button
+                    icon
+                    color='blue'
+                    size='small'
+                    onClick={() => handleDeleteOpen(dive.id)}
+                  >
+                    <Icon name='trash alternate outline' />
+                  </Button>
                 </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
         </Table>
-
+        <Grid centered columns={1}>
+          <Grid.Column textAlign='center'>
+            <Pagination
+              activePage={activePage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          </Grid.Column>
+        </Grid>
+        <Grid centered columns={1}>
+          <Grid.Column textAlign='center'>
+            <label>Entries Per Page: </label>
+            <Dropdown
+              placeholder='Entries per page'
+              options={[
+                { key: '10', text: '10', value: 10 },
+                { key: '20', text: '20', value: 20 },
+                { key: '50', text: '50', value: 50 }
+              ]}
+              value={entriesPerPage}
+              onChange={(e, { value }) => handleEntriesPerPageChange(value)}
+            />
+          </Grid.Column>
+        </Grid>
         <Modal open={editOpen} onClose={handleEditClose}>
           <Modal.Header>Edit Dive #{formState.id}</Modal.Header>
           <Modal.Content>
@@ -222,6 +278,19 @@ const PreviousEntries = inject('rootStore')(
               <Button onClick={handleEditClose}>Cancel</Button>
             </Form>
           </Modal.Content>
+        </Modal>
+
+        <Modal open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
+          <Modal.Header>Delete Dive #{diveIdToDelete}</Modal.Header>
+          <Modal.Content>
+            <p>Are you sure you want to delete this dive?</p>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button color='red' onClick={() => handleDeleteDive(diveIdToDelete)}>
+              Delete
+            </Button>
+            <Button onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>
+          </Modal.Actions>
         </Modal>
       </Container>
     )

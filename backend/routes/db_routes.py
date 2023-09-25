@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request
 from models.dives import Dive
 from services.dive_service import (create_dive, create_sighting, edit_dive, get_count_for_pages,
                                    get_dives_by_date_range, get_dives_by_guide,
-                                   verify_database_connection, delete_dive)
+                                   verify_database_connection, delete_dive_logic)
 
 db_bp = Blueprint('db_bp', __name__, url_prefix='/db')
 
@@ -60,7 +60,7 @@ def get_count_for_pages_route():
 @db_bp.route('/dives/delete_dive', methods=['DELETE'])
 def delete_dive():
     data = request.args
-    response, status = delete_dive(data)
+    response, status = delete_dive_logic(data)
     return jsonify(response), status
 
 # todo: make a route to get sightings for a given dive
