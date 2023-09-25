@@ -35,3 +35,7 @@
     }
   }
   
+  .pagination-with-padding {
+    padding-top: 20px; /* Adjust as needed */
+  }
+  

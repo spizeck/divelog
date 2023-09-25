@@ -55,3 +55,9 @@
 .preferences-footer .small-buttons {
   width: calc(50% - 2px);
 }
+
+@media (max-width: 768px) {
+  .table-to-cards {
+    display: none;
+  }
+}

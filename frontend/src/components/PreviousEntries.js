@@ -15,6 +15,7 @@ import {
   Dropdown
 } from 'semantic-ui-react'
 import diveFormData from './DiveForm/steps/DiveFormData'
+import DiveCard from './DiveCard'
 import unitConverter from '../utils/convertUnits'
 import '../styles/PreviousEntries.css'
 
@@ -130,66 +131,82 @@ const PreviousEntries = inject('rootStore')(
     }
 
     return (
-      <Container>
+      <Container fluid>
         {errorMessage && <Message negative content={errorMessage} />}
         {successMessage && <Message positive content={successMessage} />}
-        <Table celled>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Date</Table.HeaderCell>
-              <Table.HeaderCell>Dive Number</Table.HeaderCell>
-              <Table.HeaderCell>Boat</Table.HeaderCell>
-              <Table.HeaderCell>Dive Site</Table.HeaderCell>
-              <Table.HeaderCell>Max Depth ({units.depth})</Table.HeaderCell>
-              <Table.HeaderCell>
-                Water Temp ({units.temperature})
-              </Table.HeaderCell>
-              <Table.HeaderCell>Edit</Table.HeaderCell>
-              <Table.HeaderCell>Delete</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {dives.map((dive, index) => (
-              <Table.Row key={index}>
-                <Table.Cell>{dive.date}</Table.Cell>
-                <Table.Cell>{timeMap[dive.diveNumber]}</Table.Cell>
-                <Table.Cell>{dive.boat}</Table.Cell>
-                <Table.Cell>{dive.diveSite}</Table.Cell>
-                <Table.Cell>
-                  {unitConverter.convertDepthToForm(
-                    dive.maxDepth,
-                    preferredUnits
-                  )}
-                </Table.Cell>
-                <Table.Cell>
-                  {unitConverter.convertTempToForm(
-                    dive.waterTemperature,
-                    preferredUnits
-                  )}
-                </Table.Cell>
-                <Table.Cell>
-                  <Button
-                    icon
-                    color='blue'
-                    size='small'
-                    onClick={() => handleEditOpen(dive)}
-                  >
-                    <Icon name='edit' />
-                  </Button>
-                  <Button
-                    icon
-                    color='blue'
-                    size='small'
-                    onClick={() => handleDeleteOpen(dive.id)}
-                  >
-                    <Icon name='trash alternate outline' />
-                  </Button>
-                </Table.Cell>
+        <div className='table-to-cards'>
+          <Table celled>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Date</Table.HeaderCell>
+                <Table.HeaderCell>Dive Number</Table.HeaderCell>
+                <Table.HeaderCell>Boat</Table.HeaderCell>
+                <Table.HeaderCell>Dive Site</Table.HeaderCell>
+                <Table.HeaderCell>Max Depth ({units.depth})</Table.HeaderCell>
+                <Table.HeaderCell>
+                  Water Temp ({units.temperature})
+                </Table.HeaderCell>
+                <Table.HeaderCell>Edit</Table.HeaderCell>
+                <Table.HeaderCell>Delete</Table.HeaderCell>
               </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-        <Grid centered columns={1}>
+            </Table.Header>
+            <Table.Body>
+              {dives.map((dive, index) => (
+                <Table.Row key={index}>
+                  <Table.Cell>{dive.date}</Table.Cell>
+                  <Table.Cell>{timeMap[dive.diveNumber]}</Table.Cell>
+                  <Table.Cell>{dive.boat}</Table.Cell>
+                  <Table.Cell>{dive.diveSite}</Table.Cell>
+                  <Table.Cell>
+                    {unitConverter.convertDepthToForm(
+                      dive.maxDepth,
+                      preferredUnits
+                    )}
+                  </Table.Cell>
+                  <Table.Cell>
+                    {unitConverter.convertTempToForm(
+                      dive.waterTemperature,
+                      preferredUnits
+                    )}
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Button
+                      icon
+                      color='blue'
+                      size='small'
+                      onClick={() => handleEditOpen(dive)}
+                    >
+                      <Icon name='edit' />
+                    </Button>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Button
+                      icon
+                      color='blue'
+                      size='small'
+                      onClick={() => handleDeleteOpen(dive.id)}
+                    >
+                      <Icon name='trash alternate outline' />
+                    </Button>
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
+        </div>
+        <div className='dive-card'>
+          {dives.map((dive, index) => (
+            <DiveCard
+              key={index}
+              dive={dive}
+              units={units}
+              handleEditOpen={handleEditOpen}
+              handleDeleteOpen={handleDeleteOpen}
+              timeMap={timeMap}
+            />
+          ))}
+        </div>
+        <Grid centered columns={1} className='pagination-with-padding'>
           <Grid.Column textAlign='center'>
             <Pagination
               activePage={activePage}
@@ -213,6 +230,7 @@ const PreviousEntries = inject('rootStore')(
             />
           </Grid.Column>
         </Grid>
+        
         <Modal open={editOpen} onClose={handleEditClose}>
           <Modal.Header>Edit Dive #{formState.id}</Modal.Header>
           <Modal.Content>
@@ -280,13 +298,19 @@ const PreviousEntries = inject('rootStore')(
           </Modal.Content>
         </Modal>
 
-        <Modal open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
+        <Modal
+          open={deleteConfirmOpen}
+          onClose={() => setDeleteConfirmOpen(false)}
+        >
           <Modal.Header>Delete Dive #{diveIdToDelete}</Modal.Header>
           <Modal.Content>
             <p>Are you sure you want to delete this dive?</p>
           </Modal.Content>
           <Modal.Actions>
-            <Button color='red' onClick={() => handleDeleteDive(diveIdToDelete)}>
+            <Button
+              color='red'
+              onClick={() => handleDeleteDive(diveIdToDelete)}
+            >
               Delete
             </Button>
             <Button onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>
