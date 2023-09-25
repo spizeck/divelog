@@ -134,7 +134,7 @@ async function makeApiRequest (method, endpoint, data = null, params = null) {
     } else if (method === 'put') {
       response = await axiosInstance.put(endpoint, data)
     } else if (method === 'delete') {
-      response = await axiosInstance.delete(endpoint)
+      response = await axiosInstance.delete(endpoint, { params })
     }
     return response.data
   } catch (error) {
@@ -181,10 +181,11 @@ const api = {
       endDate
     }),
 
-  getDivesByGuide: (diveGuide, page) =>
+  getDivesByGuide: (diveGuide, page, entriesPerPage) =>
     makeApiRequest('get', API_ENDPOINTS.getDivesByGuide, null, {
       diveGuide,
-      page
+      page,
+      entriesPerPage
     }),
 
   editDive: diveData => makeApiRequest('put', API_ENDPOINTS.editDive, diveData),

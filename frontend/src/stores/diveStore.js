@@ -7,18 +7,15 @@ class DiveStore {
   diveProcessStatus = 'idle'
   dives = []
   dive = {}
-  currentPage = 1
-  totalPages = 0
-  perPage = 10
+  totalPages = 1
+
 
   constructor (rootStore) {
     makeAutoObservable(this)
     this.rootStore = rootStore
     this.dives = []
     this.dive = {}
-    this.currentPage = 1
-    this.totalPages = 0
-    this.perPage = 10
+    this.totalPages = 1
   }
 
   _startDiveProcess () {
@@ -36,15 +33,13 @@ class DiveStore {
     this.errorMessage = error.message
   }
 
-  fetchDivesByGuide = flow(function* (diveGuide, page = 1) {
+  fetchDivesByGuide = flow(function* (diveGuide, page = 1, entriesPerPage = 10) {
     this._startDiveProcess()
     try {
-      const response = yield api.getDivesByGuide(diveGuide, page)
-      const { dives, totalCount, perPage, currentPage } = response
+      const response = yield api.getDivesByGuide(diveGuide, page, entriesPerPage)
+      const { dives, totalPages } = response
       this.dives = dives
-      this.totalPages = Math.ceil(totalCount / perPage)
-      this.currentPage = currentPage
-      this.perPage = perPage
+      this.totalPages = totalPages
     } catch (error) {
       this._handleDiveProcessError(error)
     } finally {
@@ -114,6 +109,21 @@ class DiveStore {
       if (response.status === 200) {
         this.successMessage =
           response.data.message || 'Dive updated successfully'
+      }
+    } catch (error) {
+      this._handleDiveProcessError(error)
+    } finally {
+      this._endDiveProcess()
+    }
+  }.bind(this))
+
+  deleteDive = flow(function* (diveId) {
+    this._startDiveProcess()
+    try {
+      const response = yield api.deleteDive(diveId)
+      if (response.status === 200) {
+        this.successMessage =
+          response.data.message || 'Dive deleted successfully'
       }
     } catch (error) {
       this._handleDiveProcessError(error)

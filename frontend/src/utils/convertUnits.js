@@ -7,7 +7,6 @@ const unitConverter = {
   },
   convertDepthToDatabase: (depth, units) => {
     if (units === 'imperial') {
-      console.log('Converting...')
       return Math.round(parseFloat(depth, 10) / 3.28084)
     }
     console.log('Its metric already')
@@ -21,7 +20,6 @@ const unitConverter = {
   },
   convertTempToDatabase: (temp, units) => {
     if (units === 'imperial') {
-      console.log('Converting...')
       return Math.round(((parseFloat(temp, 10) - 32) * 5) / 9)
     }
     console.log('Its metric already')
