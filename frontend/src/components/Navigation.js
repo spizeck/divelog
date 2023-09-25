@@ -13,7 +13,7 @@ const Navigation = inject('rootStore')(
     const location = useLocation()
     const [sidebarOpened, setSidebarOpened] = useState(false)
     const { authStore } = rootStore
-    const { loggedIn, logoutMessage, logout } = authStore
+    const { logoutMessage, logout } = authStore
     const navigate = useNavigate()
 
     const isActive = path => {
@@ -29,7 +29,7 @@ const Navigation = inject('rootStore')(
     }
 
     const handleSidebarToggle = () => {
-      setSidebarOpened(!sidebarOpened)
+      setSidebarOpened((prevState) => !prevState)
     }
 
     const contentMapping = {
@@ -41,10 +41,10 @@ const Navigation = inject('rootStore')(
 
     const content = contentMapping[location.pathname]
 
-    const renderMenuItem = (name, path, disabled = false) => {
-      if (disabled && !loggedIn) {
+    const renderMenuItem = (name, path, disabled = false, className = '') => {
+      if (disabled && !authStore.loggedIn) {
         return (
-          <Menu.Item name={name} disabled>
+          <Menu.Item name={name} disabled className={className}>
             {name}
           </Menu.Item>
         );
@@ -55,8 +55,9 @@ const Navigation = inject('rootStore')(
           active={isActive(path)}
           as={NavLink}
           to={path}
+          className={className}
           onClick={e => {
-            if (disabled && !loggedIn) {
+            if (disabled && !authStore.loggedIn) {
               e.preventDefault();
             }
           }}
@@ -68,7 +69,7 @@ const Navigation = inject('rootStore')(
     // Close the sidebar after logging in or out
     useEffect(() => {
       setSidebarOpened(false)
-    }, [loggedIn])
+    }, [authStore.loggedIn])
 
     return (
       <div>
@@ -83,11 +84,11 @@ const Navigation = inject('rootStore')(
           {renderMenuItem('Dive Log Entry', '/diveLogEntry', true)}
           {renderMenuItem('Previous Entries', '/previousEntries', true)}
           <Menu.Menu position='right'>
-            {renderMenuItem('Preferences', '/preferences', true)}
+            {renderMenuItem('Preferences', '/preferences', true, 'desktop-item')}
             <Menu.Item
               className='desktop-item'
-              name={loggedIn ? 'logout' : 'login'}
-              active={isActive(loggedIn ? '/logout' : '/login')}
+              name={authStore.loggedIn ? 'logout' : 'login'}
+              active={isActive(authStore.loggedIn ? '/logout' : '/login')}
               onClick={handleItemClick}
             />
           </Menu.Menu>
@@ -100,8 +101,8 @@ const Navigation = inject('rootStore')(
               onClick={handleItemClick}
             />
             <Menu.Item
-              name={loggedIn ? 'logout' : 'login'}
-              active={isActive(loggedIn ? '/logout' : '/login')}
+              name={authStore.loggedIn ? 'logout' : 'login'}
+              active={isActive(authStore.loggedIn ? '/logout' : '/login')}
               onClick={handleItemClick}
             />
           </Sidebar>
