@@ -6,7 +6,7 @@ from extensions import db
 def create_user(username, email, password, first_name=None, preferred_units='imperial', is_approved=False, admin=False): 
     # Create a new user
     user = User(
-        username=username.lower,
+        username=username.lower(),
         email=email,
         password=password,
         is_approved=is_approved,
