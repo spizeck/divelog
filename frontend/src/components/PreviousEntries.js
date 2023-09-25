@@ -176,6 +176,8 @@ const PreviousEntries = inject('rootStore')(
                   >
                     <Icon name='edit' />
                   </Button>
+                </Table.Cell>
+                <Table.Cell>
                   <Button
                     icon
                     color='blue'
@@ -280,13 +282,19 @@ const PreviousEntries = inject('rootStore')(
           </Modal.Content>
         </Modal>
 
-        <Modal open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
+        <Modal
+          open={deleteConfirmOpen}
+          onClose={() => setDeleteConfirmOpen(false)}
+        >
           <Modal.Header>Delete Dive #{diveIdToDelete}</Modal.Header>
           <Modal.Content>
             <p>Are you sure you want to delete this dive?</p>
           </Modal.Content>
           <Modal.Actions>
-            <Button color='red' onClick={() => handleDeleteDive(diveIdToDelete)}>
+            <Button
+              color='red'
+              onClick={() => handleDeleteDive(diveIdToDelete)}
+            >
               Delete
             </Button>
             <Button onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>
