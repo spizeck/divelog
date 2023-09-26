@@ -294,3 +294,16 @@ def delete_dive_logic(data):  # sourcery skip: extract-method
     except Exception as e:
         _log_and_rollback(e)
         return {'message': 'Failed to delete dive', 'status': 500}, 500
+    
+def get_sightings_for_dive(data):
+    try:
+        if 'diveId' not in data:
+            raise MissingDiveId()
+        
+        dive_id = data['diveId']
+        sightings = Sightings.query.filter(Sightings.dive_id == dive_id).all()
+        sightings_list = [sighting.to_dict() for sighting in sightings]
+        return {"sightings": sightings_list, 'status': 200}, 200
+        
+    except MissingDiveId as e:
+        return {'message': str(e),'status': 400}, 400

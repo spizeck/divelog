@@ -13,3 +13,11 @@ class Sightings(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+        
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "species": self.species,
+            "count": self.count,
+            "dive_id": self.dive_id
+        }

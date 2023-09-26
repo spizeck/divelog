@@ -7,6 +7,7 @@ const DiveCard = ({
   units,
   handleEditOpen,
   handleDeleteOpen,
+  handleViewSightingsOpen,
   timeMap
 }) => {
   return (
@@ -26,25 +27,33 @@ const DiveCard = ({
           </p>
         </Card.Description>
         <Card.Content extra>
-        <div className='ui two buttons'>
-          <Button
-            icon
-            color='blue'
-            size='small'
-            onClick={() => handleEditOpen(dive)}
-          >
-            <Icon name='edit' />
-          </Button>
-          
-          <Button
-            icon
-            color='red'
-            size='small'
-            onClick={() => handleDeleteOpen(dive.id)}
-          >
-            <Icon name='trash alternate outline' />
-          </Button>
-          </div>
+          <Button.Group fluid>
+            <Button
+              icon
+              color='green'
+              size='small'
+              onClick={() => handleViewSightingsOpen(dive)}
+            >
+              <Icon name='binoculars' />
+            </Button>
+            <Button
+              icon
+              color='blue'
+              size='small'
+              onClick={() => handleEditOpen(dive)}
+            >
+              <Icon name='edit' />
+            </Button>
+
+            <Button
+              icon
+              color='red'
+              size='small'
+              onClick={() => handleDeleteOpen(dive.id)}
+            >
+              <Icon name='trash alternate outline' />
+            </Button>
+          </Button.Group>
         </Card.Content>
       </Card.Content>
     </Card>

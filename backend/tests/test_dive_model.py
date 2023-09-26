@@ -101,7 +101,7 @@ class DivesModelTestCase(unittest.TestCase):
 
         # Save the dive to the database
         dive.save()
-        
+
         # Get the dive id from the database
         dive_id = dive.id
 
@@ -113,9 +113,9 @@ class DivesModelTestCase(unittest.TestCase):
             'dive_guide': 'Jane Doe',
             'dive_site': 'Site 2',
             'max_depth': 20,
-            'water_temperature': 30    
+            'water_temperature': 30
         }
-        
+
         # Update the dive in the database
         dive.update(**updated_data)
 

@@ -1,4 +1,5 @@
 import { flow, makeAutoObservable } from 'mobx'
+import { toJS } from 'mobx'
 import api from '../utils/api'
 
 class DiveStore {
@@ -8,7 +9,6 @@ class DiveStore {
   dives = []
   dive = {}
   totalPages = 1
-
 
   constructor (rootStore) {
     makeAutoObservable(this)
@@ -33,104 +33,123 @@ class DiveStore {
     this.errorMessage = error.message
   }
 
-  fetchDivesByGuide = flow(function* (diveGuide, page = 1, entriesPerPage = 10) {
-    this._startDiveProcess()
-    try {
-      const response = yield api.getDivesByGuide(diveGuide, page, entriesPerPage)
-      const { dives, totalPages } = response
-      this.dives = dives
-      this.totalPages = totalPages
-    } catch (error) {
-      this._handleDiveProcessError(error)
-    } finally {
-      this._endDiveProcess()
-    }
-  }.bind(this))
-
-  fetchDivesByDate = flow(function* (startDate, endDate) {
-    this._startDiveProcess()
-    try {
-      const response = yield api.getDivesByDate(startDate, endDate)
-      this.dives = response.data
-    } catch (error) {
-      this._handleDiveProcessError(error)
-    } finally {
-      this._endDiveProcess()
-    }
-  }.bind(this))
-
-  fetchSightingsForDive = flow(function* (diveId) {
-    this._startDiveProcess()
-    try {
-      const response = yield api.getSightingsForDive(diveId)
-      const dive = this.dives.find(d => d.diveId === diveId)
-      if (dive) {
-        dive.sightings = response.data
+  fetchDivesByGuide = flow(
+    function* (diveGuide, page = 1, entriesPerPage = 10) {
+      this._startDiveProcess()
+      try {
+        const response = yield api.getDivesByGuide(
+          diveGuide,
+          page,
+          entriesPerPage
+        )
+        const { dives, totalPages } = response
+        this.dives = dives
+        this.totalPages = totalPages
+      } catch (error) {
+        this._handleDiveProcessError(error)
+      } finally {
+        this._endDiveProcess()
       }
-    } catch (error) {
-      this._handleDiveProcessError(error)
-    } finally {
-      this._endDiveProcess()
-    }
-  }.bind(this))
+    }.bind(this)
+  )
 
-  saveDive = flow(function* (diveData) {
-    this._startDiveProcess()
-    try {
-      const response = yield api.createDive(diveData)
-      this.dives.push(response.data)
-      this.dive = response.data
-      return response.data.diveId // Return the diveId after successfully creating a dive.
-    } catch (error) {
-      this._handleDiveProcessError(error)
-    } finally {
-      this._endDiveProcess()
-    }
-  }.bind(this))
-
-  saveSightings = flow(function* (sightingsData) {
-    this._startDiveProcess()
-    try {
-      const response = yield api.createSighting(sightingsData)
-      if (this.dive.diveId === sightingsData.diveId) {
-        this.dive.sightings.push(...response.data)
+  fetchDivesByDate = flow(
+    function* (startDate, endDate) {
+      this._startDiveProcess()
+      try {
+        const response = yield api.getDivesByDate(startDate, endDate)
+        this.dives = response.data
+      } catch (error) {
+        this._handleDiveProcessError(error)
+      } finally {
+        this._endDiveProcess()
       }
-    } catch (error) {
-      this._handleDiveProcessError(error)
-    } finally {
-      this._endDiveProcess()
-    }
-  }.bind(this))
+    }.bind(this)
+  )
 
-  editDive = flow(function* (diveData) {
-    this._startDiveProcess()
-    try {
-      const response = yield api.editDive(diveData)
-      if (response.status === 200) {
-        this.successMessage =
-          response.data.message || 'Dive updated successfully'
+  fetchSightingsForDive = flow(
+    function* (diveId) {
+      this._startDiveProcess()
+      try {
+        const response = yield api.getSightingsForDive(diveId)
+        const dive = this.dives.find(d => d.id === diveId)
+        if (dive) {
+          dive.sightings = response.sightings
+          console.log('Updated dive with sightings:', JSON.stringify(toJS(dive), null, 2));
+        }
+      } catch (error) {
+        this._handleDiveProcessError(error)
+      } finally {
+        this._endDiveProcess()
       }
-    } catch (error) {
-      this._handleDiveProcessError(error)
-    } finally {
-      this._endDiveProcess()
-    }
-  }.bind(this))
+    }.bind(this)
+  )
 
-  deleteDive = flow(function* (diveId) {
-    this._startDiveProcess()
-    try {
-      const response = yield api.deleteDive(diveId)
-      if (response.status === 200) {
-        this.successMessage =
-          response.data.message || 'Dive deleted successfully'
+  saveDive = flow(
+    function* (diveData) {
+      this._startDiveProcess()
+      try {
+        const response = yield api.createDive(diveData)
+        this.dives.push(response.data)
+        this.dive = response.data
+        return response.data.diveId // Return the diveId after successfully creating a dive.
+      } catch (error) {
+        this._handleDiveProcessError(error)
+      } finally {
+        this._endDiveProcess()
       }
-    } catch (error) {
-      this._handleDiveProcessError(error)
-    } finally {
-      this._endDiveProcess()
-    }
-  }.bind(this))
+    }.bind(this)
+  )
+
+  saveSightings = flow(
+    function* (sightingsData) {
+      this._startDiveProcess()
+      try {
+        const response = yield api.createSighting(sightingsData)
+        if (this.dive.diveId === sightingsData.diveId) {
+          this.dive.sightings.push(...response.data)
+        }
+      } catch (error) {
+        this._handleDiveProcessError(error)
+      } finally {
+        this._endDiveProcess()
+      }
+    }.bind(this)
+  )
+
+  editDive = flow(
+    function* (diveData) {
+      this._startDiveProcess()
+      try {
+        const response = yield api.editDive(diveData)
+        if (response.status === 200) {
+          this.successMessage =
+            response.data.message || 'Dive updated successfully'
+        }
+      } catch (error) {
+        this._handleDiveProcessError(error)
+      } finally {
+        this._endDiveProcess()
+      }
+    }.bind(this)
+  )
+
+  deleteDive = flow(
+    function* (diveId) {
+      this._startDiveProcess()
+      try {
+        const response = yield api.deleteDive(diveId)
+        if (response.status === 200) {
+          this.successMessage =
+            response.data.message || 'Dive deleted successfully'
+        }
+      } catch (error) {
+        this._handleDiveProcessError(error)
+      } finally {
+        this._endDiveProcess()
+      }
+    }.bind(this)
+  )
 
   selectDive (diveId) {
     const dive = this.dives.find(d => d.diveId === diveId)

@@ -13,13 +13,20 @@ import diveFormData from './DiveForm/steps/DiveFormData'
 import DiveCard from './DiveCard'
 import EditDiveModal from './EditDiveModal'
 import DeleteDiveModal from './DeleteDiveModal'
+import SightingModal from './SightingModal'
 import unitConverter from '../utils/convertUnits'
 import '../styles/PreviousEntries.css'
 
 const PreviousEntries = inject('rootStore')(
   observer(({ rootStore }) => {
     const { diveStore, userStore } = rootStore
-    const { fetchDivesByGuide, dives, editDive, deleteDive } = diveStore
+    const {
+      fetchDivesByGuide,
+      dives,
+      editDive,
+      deleteDive,
+      fetchSightingsForDive
+    } = diveStore
     const { firstName, preferredUnits } = userStore
     const [editOpen, setEditOpen] = useState(false)
     const [formState, setFormState] = useState({})
@@ -28,6 +35,9 @@ const PreviousEntries = inject('rootStore')(
     const [entriesPerPage, setEntriesPerPage] = useState(10)
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
     const [diveIdToDelete, setDiveIdToDelete] = useState(null)
+    const [sightingsModalOpen, setSightingsModalOpen] = useState(false)
+    const [sightings, setSightings] = useState([])
+    const [diveId, setDiveId] = useState(null)
 
     useEffect(() => {
       const fetchData = async () => {
@@ -101,6 +111,23 @@ const PreviousEntries = inject('rootStore')(
       }
     }
 
+    const handleViewSightingsOpen = async dive => {
+      try {
+        await fetchSightingsForDive(dive.id)
+        const updatedDive = diveStore.dives.find(d => d.id === dive.id)
+
+        if (updatedDive) {
+          setSightings(updatedDive.sightings)
+          setDiveId(dive.id)
+          setSightingsModalOpen(true)
+        } else {
+          console.log('Updated dive not found in store')
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
     const handleDeleteOpen = diveId => {
       setDiveIdToDelete(diveId)
       setDeleteConfirmOpen(true)
@@ -137,6 +164,7 @@ const PreviousEntries = inject('rootStore')(
                 <Table.HeaderCell>
                   Water Temp ({units.temperature})
                 </Table.HeaderCell>
+                <Table.HeaderCell>View Sightings</Table.HeaderCell>
                 <Table.HeaderCell>Edit</Table.HeaderCell>
                 <Table.HeaderCell>Delete</Table.HeaderCell>
               </Table.Row>
@@ -166,9 +194,20 @@ const PreviousEntries = inject('rootStore')(
                       color='blue'
                       size='medium'
                       className='center-this-button'
+                      onClick={() => handleViewSightingsOpen(dive)}
+                    >
+                      <Icon name='binoculars' />
+                    </Button>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Button
+                      icon
+                      color='blue'
+                      size='medium'
+                      className='center-this-button'
                       onClick={() => handleEditOpen(dive)}
                     >
-                      <Icon name='edit' />
+                      <Icon name='edit outline' />
                     </Button>
                   </Table.Cell>
                   <Table.Cell>
@@ -195,6 +234,7 @@ const PreviousEntries = inject('rootStore')(
               units={units}
               handleEditOpen={handleEditOpen}
               handleDeleteOpen={handleDeleteOpen}
+              handleViewSightingsOpen={handleViewSightingsOpen}
               timeMap={timeMap}
             />
           ))}
@@ -239,6 +279,12 @@ const PreviousEntries = inject('rootStore')(
           setDeleteConfirmOpen={setDeleteConfirmOpen}
           diveIdToDelete={diveIdToDelete}
           handleDeleteDive={handleDeleteDive}
+        />
+        <SightingModal
+          sightingsModalOpen={sightingsModalOpen}
+          setSightingsModalOpen={setSightingsModalOpen}
+          sightings={sightings}
+          diveId={diveId}
         />
       </Container>
     )
