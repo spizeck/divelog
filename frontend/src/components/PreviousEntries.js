@@ -5,17 +5,14 @@ import {
   Button,
   Icon,
   Container,
-  Message,
-  Modal,
-  Form,
-  Input,
   Pagination,
-  Select,
   Grid,
   Dropdown
 } from 'semantic-ui-react'
 import diveFormData from './DiveForm/steps/DiveFormData'
 import DiveCard from './DiveCard'
+import EditDiveModal from './EditDiveModal'
+import DeleteDiveModal from './DeleteDiveModal'
 import unitConverter from '../utils/convertUnits'
 import '../styles/PreviousEntries.css'
 
@@ -132,8 +129,6 @@ const PreviousEntries = inject('rootStore')(
 
     return (
       <Container fluid>
-        {errorMessage && <Message negative content={errorMessage} />}
-        {successMessage && <Message positive content={successMessage} />}
         <div className='table-to-cards'>
           <Table celled textAlign='center'>
             <Table.Header>
@@ -169,7 +164,7 @@ const PreviousEntries = inject('rootStore')(
                       preferredUnits
                     )}
                   </Table.Cell>
-                  <Table.Cell >
+                  <Table.Cell>
                     <Button
                       icon
                       color='blue'
@@ -180,7 +175,7 @@ const PreviousEntries = inject('rootStore')(
                       <Icon name='edit' />
                     </Button>
                   </Table.Cell>
-                  <Table.Cell >
+                  <Table.Cell>
                     <Button
                       icon
                       color='red'
@@ -234,92 +229,21 @@ const PreviousEntries = inject('rootStore')(
             </Grid.Column>
           </Grid.Row>
         </Grid>
-
-        <Modal open={editOpen} onClose={handleEditClose}>
-          <Modal.Header>Edit Dive #{formState.id}</Modal.Header>
-          <Modal.Content>
-            <Form onSubmit={handleEditSubmit}>
-              <Form.Field>
-                <label>Date</label>
-                <Input
-                  type='date'
-                  name='date'
-                  value={formState.date}
-                  onChange={handleInputChange}
-                />
-              </Form.Field>
-              <Form.Field>
-                <label>Dive Number</label>
-                <Select
-                  placeholder='Select Dive Number'
-                  name='diveNumber'
-                  value={formState.diveNumber}
-                  onChange={handleInputChange}
-                  options={diveFormData.diveNumberOptions.options}
-                />
-              </Form.Field>
-              <Form.Field>
-                <label>Boat</label>
-                <Select
-                  placeholder='Select Boat'
-                  name='boat'
-                  value={formState.boat}
-                  onChange={handleInputChange}
-                  options={diveFormData.boatNameOptions.options}
-                />
-              </Form.Field>
-              <Form.Field>
-                <label>Dive Site</label>
-                <Select
-                  placeholder='Select Dive Site'
-                  name='diveSite'
-                  value={formState.diveSite}
-                  onChange={handleInputChange}
-                  options={diveFormData.diveSiteOptions.options}
-                />
-              </Form.Field>
-              <Form.Field>
-                <label>Max Depth ({units.depth})</label>
-                <Input
-                  type='number'
-                  name='maxDepth'
-                  value={formState.maxDepth}
-                  onChange={handleInputChange}
-                />
-              </Form.Field>
-              <Form.Field>
-                <label>Water Temp ({units.temperature})</label>
-                <Input
-                  type='number'
-                  name='waterTemperature'
-                  value={formState.waterTemperature}
-                  onChange={handleInputChange}
-                />
-              </Form.Field>
-              <Button type='submit'>Update</Button>
-              <Button onClick={handleEditClose}>Cancel</Button>
-            </Form>
-          </Modal.Content>
-        </Modal>
-
-        <Modal
-          open={deleteConfirmOpen}
-          onClose={() => setDeleteConfirmOpen(false)}
-        >
-          <Modal.Header>Delete Dive #{diveIdToDelete}</Modal.Header>
-          <Modal.Content>
-            <p>Are you sure you want to delete this dive?</p>
-          </Modal.Content>
-          <Modal.Actions>
-            <Button
-              color='red'
-              onClick={() => handleDeleteDive(diveIdToDelete)}
-            >
-              Delete
-            </Button>
-            <Button onClick={() => setDeleteConfirmOpen(false)}>Cancel</Button>
-          </Modal.Actions>
-        </Modal>
+        <EditDiveModal
+          editOpen={editOpen}
+          handleEditClose={handleEditClose}
+          handleInputChange={handleInputChange}
+          handleEditSubmit={handleEditSubmit}
+          formState={formState}
+          units={units}
+          diveFormData={diveFormData}
+        />
+        <DeleteDiveModal
+          deleteConfirmOpen={deleteConfirmOpen}
+          setDeleteConfirmOpen={setDeleteConfirmOpen}
+          diveIdToDelete={diveIdToDelete}
+          handleDeleteDive={handleDeleteDive}
+        />
       </Container>
     )
   })
