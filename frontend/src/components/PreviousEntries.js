@@ -119,7 +119,7 @@ const PreviousEntries = inject('rootStore')(
       setDeleteConfirmOpen(false)
     }
 
-    const handlePageChange = (e, data ) => {
+    const handlePageChange = (e, data) => {
       setActivePage(data.activePage)
       fetchDivesByGuide(firstName, data.activePage, entriesPerPage)
     }
@@ -135,7 +135,7 @@ const PreviousEntries = inject('rootStore')(
         {errorMessage && <Message negative content={errorMessage} />}
         {successMessage && <Message positive content={successMessage} />}
         <div className='table-to-cards'>
-          <Table celled>
+          <Table celled textAlign='center'>
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>Date</Table.HeaderCell>
@@ -169,21 +169,23 @@ const PreviousEntries = inject('rootStore')(
                       preferredUnits
                     )}
                   </Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell >
                     <Button
                       icon
                       color='blue'
-                      size='small'
+                      size='medium'
+                      className='center-this-button'
                       onClick={() => handleEditOpen(dive)}
                     >
                       <Icon name='edit' />
                     </Button>
                   </Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell >
                     <Button
                       icon
-                      color='blue'
-                      size='small'
+                      color='red'
+                      size='medium'
+                      className='center-this-button'
                       onClick={() => handleDeleteOpen(dive.id)}
                     >
                       <Icon name='trash alternate outline' />
@@ -206,33 +208,33 @@ const PreviousEntries = inject('rootStore')(
             />
           ))}
         </div>
-        <Grid centered columns={1} padded >
+        <Grid centered columns={1} padded>
           <Grid.Row>
-          <Grid.Column textAlign='center'>
-            <Pagination
-              activePage={activePage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </Grid.Column>
+            <Grid.Column textAlign='center'>
+              <Pagination
+                activePage={activePage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </Grid.Column>
           </Grid.Row>
           <Grid.Row>
-          <Grid.Column textAlign='center'>
-            <label>Entries Per Page: </label>
-            <Dropdown
-              placeholder='Entries per page'
-              options={[
-                { key: '10', text: '10', value: 10 },
-                { key: '20', text: '20', value: 20 },
-                { key: '50', text: '50', value: 50 }
-              ]}
-              value={entriesPerPage}
-              onChange={(e, { value }) => handleEntriesPerPageChange(value)}
-            />
-          </Grid.Column>
+            <Grid.Column textAlign='center'>
+              <label>Entries Per Page: </label>
+              <Dropdown
+                placeholder='Entries per page'
+                options={[
+                  { key: '10', text: '10', value: 10 },
+                  { key: '20', text: '20', value: 20 },
+                  { key: '50', text: '50', value: 50 }
+                ]}
+                value={entriesPerPage}
+                onChange={(e, { value }) => handleEntriesPerPageChange(value)}
+              />
+            </Grid.Column>
           </Grid.Row>
         </Grid>
-        
+
         <Modal open={editOpen} onClose={handleEditClose}>
           <Modal.Header>Edit Dive #{formState.id}</Modal.Header>
           <Modal.Content>
