@@ -119,9 +119,9 @@ const PreviousEntries = inject('rootStore')(
       setDeleteConfirmOpen(false)
     }
 
-    const handlePageChange = (e, { newActivePage }) => {
-      setActivePage(newActivePage)
-      fetchDivesByGuide(firstName, activePage, entriesPerPage)
+    const handlePageChange = (e, data ) => {
+      setActivePage(data.activePage)
+      fetchDivesByGuide(firstName, data.activePage, entriesPerPage)
     }
 
     const handleEntriesPerPageChange = newEntriesPerPage => {
@@ -206,7 +206,7 @@ const PreviousEntries = inject('rootStore')(
             />
           ))}
         </div>
-        <Grid centered columns={1} className='pagination-with-padding'>
+        <Grid centered columns={1}>
           <Grid.Column textAlign='center'>
             <Pagination
               activePage={activePage}

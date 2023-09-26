@@ -25,7 +25,7 @@ const Home = inject('rootStore')(
             Welcome to the Dive Log App{loggedIn && `, ${firstName}`}!
           </Header>
           <div>
-            <h2>🚧 We're Under Construction! 🚧</h2>
+            <h2>🚧 We're Under Construction!</h2>
             <p>
               We're excited to have you here! Please note that this app is still
               in development, but the database is live.

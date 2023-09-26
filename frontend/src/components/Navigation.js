@@ -74,12 +74,13 @@ const Navigation = inject('rootStore')(
     return (
       <div>
         <Menu pointing secondary>
+          <div className='sidebar-toggle'>
           <Menu.Item onClick={handleSidebarToggle}>
-            <div className='sidebar-toggle'>
+            
               <Icon name='sidebar' />
-            </div>
+            
           </Menu.Item>
-
+          </div>
           {renderMenuItem('Home', '/home')}
           {renderMenuItem('Dive Log Entry', '/diveLogEntry', true)}
           {renderMenuItem('Previous Entries', '/previousEntries', true)}
@@ -93,6 +94,7 @@ const Navigation = inject('rootStore')(
             />
           </Menu.Menu>
         </Menu>
+        { sidebarOpened ? (
         <Sidebar.Pushable>
           <Sidebar as={Menu} animation='push' vertical visible={sidebarOpened}>
             <Menu.Item
@@ -111,6 +113,12 @@ const Navigation = inject('rootStore')(
             {logoutMessage && <Message positive>{logoutMessage}</Message>}
           </Sidebar.Pusher>
         </Sidebar.Pushable>
+        ) : (
+          <div>
+            {content}
+        {logoutMessage && <Message positive>{logoutMessage}</Message>}
+      </div>
+    )}
       </div>
     )
   })
