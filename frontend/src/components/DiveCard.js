@@ -11,33 +11,42 @@ const DiveCard = ({
 }) => {
   return (
     <Card className='dive-card' centered>
-      <h3>Date: {dive.date}</h3>
-      <p>Dive Number: {timeMap[dive.diveNumber]}</p>
-      <p>Boat: {dive.boat}</p>
-      <p>Dive Site: {dive.diveSite}</p>
-      <p>
-        Max Depth: {dive.maxDepth} {units.depth}
-      </p>
-      <p>
-        Water Temp: {dive.waterTemperature} {units.temperature}
-      </p>
-      <div>
-      <Button
-        icon
-        color='blue'
-        size='small'
-        onClick={() => handleEditOpen(dive)}
-      >
-        <Icon name='edit' />
-      </Button>
-      <Button
-        icon
-        color='blue'
-        size='small'
-        onClick={() => handleDeleteOpen(dive.id)}
-      >
-        <Icon name='trash alternate outline' />
-      </Button></div>
+      <Card.Content>
+        <Card.Header>Date: {dive.date}</Card.Header>
+        <Card.Meta>Dive ID: {dive.id}</Card.Meta>
+        <Card.Description>
+          <p>Dive Number: {timeMap[dive.diveNumber]}</p>
+          <p>Boat: {dive.boat}</p>
+          <p>Dive Site: {dive.diveSite}</p>
+          <p>
+            Max Depth: {dive.maxDepth} {units.depth}
+          </p>
+          <p>
+            Water Temp: {dive.waterTemperature} {units.temperature}
+          </p>
+        </Card.Description>
+        <Card.Content extra>
+        <div className='ui two buttons'>
+          <Button
+            icon
+            color='blue'
+            size='small'
+            onClick={() => handleEditOpen(dive)}
+          >
+            <Icon name='edit' />
+          </Button>
+          
+          <Button
+            icon
+            color='red'
+            size='small'
+            onClick={() => handleDeleteOpen(dive.id)}
+          >
+            <Icon name='trash alternate outline' />
+          </Button>
+          </div>
+        </Card.Content>
+      </Card.Content>
     </Card>
   )
 }
