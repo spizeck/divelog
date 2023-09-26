@@ -21,8 +21,6 @@ const PreviousEntries = inject('rootStore')(
     const { diveStore, userStore } = rootStore
     const { fetchDivesByGuide, dives, editDive, deleteDive } = diveStore
     const { firstName, preferredUnits } = userStore
-    const [errorMessage, setErrorMessage] = useState('')
-    const [successMessage, setSuccessMessage] = useState('')
     const [editOpen, setEditOpen] = useState(false)
     const [formState, setFormState] = useState({})
     const [activePage, setActivePage] = useState(1)
@@ -96,12 +94,10 @@ const PreviousEntries = inject('rootStore')(
       }
       try {
         await editDive(updatedDive)
-        setSuccessMessage(diveStore.successMessage)
-        setErrorMessage('')
         handleEditClose()
         fetchDivesByGuide(firstName)
       } catch (error) {
-        setErrorMessage(diveStore.errorMessage)
+        console.log(error)
       }
     }
 
