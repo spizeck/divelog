@@ -206,7 +206,8 @@ const PreviousEntries = inject('rootStore')(
             />
           ))}
         </div>
-        <Grid centered columns={1}>
+        <Grid centered columns={1} padded >
+          <Grid.Row>
           <Grid.Column textAlign='center'>
             <Pagination
               activePage={activePage}
@@ -214,8 +215,8 @@ const PreviousEntries = inject('rootStore')(
               onPageChange={handlePageChange}
             />
           </Grid.Column>
-        </Grid>
-        <Grid centered columns={1}>
+          </Grid.Row>
+          <Grid.Row>
           <Grid.Column textAlign='center'>
             <label>Entries Per Page: </label>
             <Dropdown
@@ -229,6 +230,7 @@ const PreviousEntries = inject('rootStore')(
               onChange={(e, { value }) => handleEntriesPerPageChange(value)}
             />
           </Grid.Column>
+          </Grid.Row>
         </Grid>
         
         <Modal open={editOpen} onClose={handleEditClose}>
