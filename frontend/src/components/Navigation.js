@@ -12,13 +12,23 @@ const Navigation = inject('rootStore')(
   observer(({ rootStore }) => {
     const location = useLocation()
     const [sidebarOpened, setSidebarOpened] = useState(false)
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     const { authStore } = rootStore
-    const { logoutMessage, logout } = authStore
+    const { logout } = authStore
     const navigate = useNavigate()
+
+    const contentMapping = {
+      '/home': <Home />,
+      '/diveLogEntry': <DiveForm />,
+      '/previousEntries': <PreviousEntries />,
+      '/preferences': <Preferences />
+    }
 
     const isActive = path => {
       return location.pathname === path
     }
+
+    const content = contentMapping[location.pathname]
 
     const handleItemClick = (e, { name }) => {
       if (name === 'logout') {
@@ -29,25 +39,41 @@ const Navigation = inject('rootStore')(
     }
 
     const handleSidebarToggle = () => {
-      setSidebarOpened((prevState) => !prevState)
+      setSidebarOpened(prevState => !prevState)
     }
 
-    const contentMapping = {
-      '/home': <Home />,
-      '/diveLogEntry': <DiveForm />,
-      '/previousEntries': <PreviousEntries />,
-      '/preferences': <Preferences />
-    }
+    useEffect(() => {
+      setSidebarOpened(false)
+    }, [authStore.loggedIn])
 
-    const content = contentMapping[location.pathname]
+    useEffect(() => {
+      const updateSize = () => {
+        setIsMobile(window.innerWidth <= 768)
+      }
+      window.addEventListener('resize', updateSize)
+      return () => {
+        window.removeEventListener('resize', updateSize)
+      }
+    }, [])
 
-    const renderMenuItem = (name, path, disabled = false, className = '') => {
-      if (disabled && !authStore.loggedIn) {
+    useEffect(() => {
+      if (!isMobile && sidebarOpened) {
+        setSidebarOpened(false)
+      }
+    }, [isMobile])
+
+    const renderMenuItem = (
+      name,
+      path,
+      requiresLogin = false,
+      className = ''
+    ) => {
+      if (requiresLogin && !authStore.loggedIn) {
         return (
           <Menu.Item name={name} disabled className={className}>
             {name}
           </Menu.Item>
-        );
+        )
       }
       return (
         <Menu.Item
@@ -56,69 +82,66 @@ const Navigation = inject('rootStore')(
           as={NavLink}
           to={path}
           className={className}
-          onClick={e => {
-            if (disabled && !authStore.loggedIn) {
-              e.preventDefault();
-            }
-          }}
         />
-      );
-    };
-    
-
-    // Close the sidebar after logging in or out
-    useEffect(() => {
-      setSidebarOpened(false)
-    }, [authStore.loggedIn])
+      )
+    }
 
     return (
       <div>
         <Menu pointing secondary>
-          <div className='sidebar-toggle'>
-          <Menu.Item onClick={handleSidebarToggle}>
-            
+          {isMobile && (
+            <Menu.Item onClick={handleSidebarToggle}>
               <Icon name='sidebar' />
-            
-          </Menu.Item>
-          </div>
-          {renderMenuItem('Home', '/home')}
+            </Menu.Item>
+          )}
+          {renderMenuItem('Home', '/home', false)}
           {renderMenuItem('Dive Log Entry', '/diveLogEntry', true)}
           {renderMenuItem('Previous Entries', '/previousEntries', true)}
           <Menu.Menu position='right'>
-            {renderMenuItem('Preferences', '/preferences', true, 'desktop-item')}
-            <Menu.Item
-              className='desktop-item'
-              name={authStore.loggedIn ? 'logout' : 'login'}
-              active={isActive(authStore.loggedIn ? '/logout' : '/login')}
-              onClick={handleItemClick}
-            />
+            {!isMobile && renderMenuItem('Preferences', '/preferences', true)}
+            {!isMobile && (
+              <Menu.Item
+                name={authStore.loggedIn ? 'logout' : 'login'}
+                active={isActive(authStore.loggedIn ? '/logout' : '/login')}
+                onClick={handleItemClick}
+              />
+            )}
           </Menu.Menu>
         </Menu>
-        { sidebarOpened ? (
-        <Sidebar.Pushable>
-          <Sidebar as={Menu} animation='push' vertical visible={sidebarOpened}>
-            <Menu.Item
-              name='Preferences'
-              active={isActive('/preferences')}
-              onClick={handleItemClick}
-            />
-            <Menu.Item
-              name={authStore.loggedIn ? 'logout' : 'login'}
-              active={isActive(authStore.loggedIn ? '/logout' : '/login')}
-              onClick={handleItemClick}
-            />
-          </Sidebar>
-          <Sidebar.Pusher dimmed={sidebarOpened}>
-            {content}
-            {logoutMessage && <Message positive>{logoutMessage}</Message>}
-          </Sidebar.Pusher>
-        </Sidebar.Pushable>
+        {sidebarOpened ? (
+          <Sidebar.Pushable>
+            <Sidebar
+              as={Menu}
+              animation='push'
+              vertical
+              visible={sidebarOpened}
+            >
+              <Menu.Item
+                name='Preferences'
+                active={isActive('/preferences')}
+                onClick={handleItemClick}
+              />
+              <Menu.Item
+                name={authStore.loggedIn ? 'logout' : 'login'}
+                active={isActive(authStore.loggedIn ? '/logout' : '/login')}
+                onClick={handleItemClick}
+              />
+            </Sidebar>
+            <Sidebar.Pusher dimmed={sidebarOpened}>
+              {content}
+              {authStore.logoutMessage && (
+                <Message positive>{authStore.logoutMessage}</Message>
+              )}
+            </Sidebar.Pusher>
+          </Sidebar.Pushable>
         ) : (
           <div>
             {content}
-        {logoutMessage && <Message positive>{logoutMessage}</Message>}
-      </div>
-    )}
+            {authStore.logoutMessage && (
+              <Message positive>{authStore.logoutMessage}</Message>
+            )}
+          </div>
+        )}
       </div>
     )
   })

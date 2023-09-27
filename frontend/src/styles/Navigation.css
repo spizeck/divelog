@@ -31,21 +31,6 @@
   padding: 5px;
 }
 
-@media (min-width: 600px) {
-  .sidebar-toggle {
-    display: none;
-  }
-}
-
-@media (max-width: 600px) {
-  .desktop-item {
-    display: none !important;
-  }
-  .sidebar-toggle {
-    display: block;
-  }
-}
-
 .error-popup {
   position: absolute;
   top: 50%;

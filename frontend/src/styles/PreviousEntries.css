@@ -10,7 +10,7 @@
   border-spacing: 0;
 }
 
-@media only screen and (max-width: 768px) {
+/* @media only screen and (max-width: 768px) {
   .responsive-table {
     font-size: 0.9rem;
   }
@@ -38,7 +38,7 @@
   .responsive-table td:last-child {
     border-bottom: 0;
   }
-}
+} */
 
 @media (max-width: 768px) {
   .table-to-cards {

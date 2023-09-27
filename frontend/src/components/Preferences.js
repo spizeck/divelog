@@ -20,10 +20,7 @@ import '../styles/Preferences.css'
 const Preferences = inject('rootStore')(
   observer(({ rootStore }) => {
     const { authStore, userStore } = rootStore
-    // const { firstName, username, email, preferredUnits, approved, admin } =
-    //   userStore
     const { updateUser } = authStore
-
     const [isEditing, setIsEditing] = useState(false)
     const [editingField, setEditingField] = useState('')
     const [newFirstName, setNewFirstName] = useState('')
@@ -203,7 +200,7 @@ const Preferences = inject('rootStore')(
     )
 
     const renderPreferencesView = () => (
-      <Container className='preferences-container'>
+      <Container >
         <Table celled>
           <Table.Header>
             <Table.Row>
