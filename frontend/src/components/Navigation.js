@@ -5,7 +5,7 @@ import { Sidebar, Menu, Message, Icon } from 'semantic-ui-react'
 import Home from './Home'
 import DiveForm from '../components/DiveForm/DiveForm'
 import Preferences from './Preferences'
-import PreviousEntries from './PreviousEntries'
+import PreviousEntries from './PreviousEntries/PreviousEntries'
 import '../styles/Navigation.css'
 
 const Navigation = inject('rootStore')(

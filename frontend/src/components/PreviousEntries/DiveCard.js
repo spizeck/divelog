@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, Card, Icon } from 'semantic-ui-react'
-import '../styles/DiveCard.css'
+import '../../styles/DiveCard.css'
 
 const DiveCard = ({
   dive,
