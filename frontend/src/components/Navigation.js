@@ -36,6 +36,7 @@ const Navigation = inject('rootStore')(
       } else {
         navigate(name)
       }
+      setSidebarOpened(false)
     }
 
     const handleSidebarToggle = () => {
@@ -44,6 +45,9 @@ const Navigation = inject('rootStore')(
 
     useEffect(() => {
       setSidebarOpened(false)
+      if (!authStore.loggedIn) {
+        navigate('/home')
+      }
     }, [authStore.loggedIn])
 
     useEffect(() => {
@@ -118,7 +122,9 @@ const Navigation = inject('rootStore')(
             >
               <Menu.Item
                 name='Preferences'
-                active={isActive('/preferences')}
+                active={isActive('/preferences') && authStore.loggedIn}
+                as={NavLink}
+                to={authStore.loggedIn ? '/preferences' : '/login'}
                 onClick={handleItemClick}
               />
               <Menu.Item
