@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { observer, inject } from 'mobx-react'
 import {
-  Table,
-  Button,
-  Icon,
   Container,
   Pagination,
   Grid,
-  Dropdown
+  Dropdown,
+  Segment,
+  Button,
+  Icon,
 } from 'semantic-ui-react'
 import diveFormData from '../DiveForm/steps/DiveFormData'
 import DiveCard from './DiveCard'
@@ -39,7 +39,11 @@ const PreviousEntries = inject('rootStore')(
     const [sightingsModalOpen, setSightingsModalOpen] = useState(false)
     const [sightings, setSightings] = useState([])
     const [diveId, setDiveId] = useState(null)
-
+    const [filterModalOpen, setFilterModalOpen] = useState(false)
+    const [selectedDiveGuide, setSelectedDiveGuide] = useState(null)
+    const [selectedBoat, setSelectedBoat] = useState(null)
+    const [selectedDiveSite, setSelectedDiveSite] = useState(null)
+    
     useEffect(() => {
       const fetchData = async () => {
         await fetchDivesByGuide(firstName, activePage, entriesPerPage)
@@ -153,16 +157,25 @@ const PreviousEntries = inject('rootStore')(
 
     return (
       <Container fluid>
+    <Segment.Group horizontal>
+      <Segment>
+      <Button primary fluid icon onClick={() => setFilterModalOpen(true)}>Filter Dives <Icon name='filter' /></Button>
+      </Segment>
+        <Segment textAlign='center'><strong>Dive Guide:</strong> {selectedDiveGuide || 'All'}</Segment>
+        <Segment textAlign='center'><strong>Boat:</strong> {selectedBoat || 'All'}</Segment>
+        <Segment textAlign='center'><strong>Dive Site:</strong> {selectedDiveSite || 'All'}</Segment>
+    
+    </Segment.Group>
         <div className='table-to-cards'>
-        <DiveTable 
-        dives={dives}
-        preferredUnits={preferredUnits} 
-        units={units} 
-        handleEditOpen={handleEditOpen} 
-        handleDeleteOpen={handleDeleteOpen} 
-        handleViewSightingsOpen={handleViewSightingsOpen} 
-        timeMap={timeMap}
-      />
+          <DiveTable
+            dives={dives}
+            preferredUnits={preferredUnits}
+            units={units}
+            handleEditOpen={handleEditOpen}
+            handleDeleteOpen={handleDeleteOpen}
+            handleViewSightingsOpen={handleViewSightingsOpen}
+            timeMap={timeMap}
+          />
         </div>
         <div className='dive-card'>
           {dives.map((dive, index) => (
