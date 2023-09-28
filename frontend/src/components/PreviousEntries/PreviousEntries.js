@@ -5,7 +5,7 @@ import {
   Pagination,
   Grid,
   Dropdown,
-  Divider,
+  Divider
 } from 'semantic-ui-react'
 import diveFormData from '../DiveForm/steps/DiveFormData'
 import DiveCard from './DiveCard'
@@ -25,7 +25,7 @@ const PreviousEntries = inject('rootStore')(
       dives,
       editDive,
       deleteDive,
-      fetchSightingsForDive,
+      fetchSightingsForDive
     } = diveStore
     const { firstName, preferredUnits } = userStore
     const [editOpen, setEditOpen] = useState(false)
@@ -41,11 +41,17 @@ const PreviousEntries = inject('rootStore')(
     const [selectedDiveGuides, setSelectedDiveGuides] = useState([])
     const [selectedBoats, setSelectedBoats] = useState([])
     const [selectedDiveSites, setSelectedDiveSites] = useState([])
+    const [diveGuides, setDiveGuides] = useState([])
 
     useEffect(() => {
-     diveStore.getUniqueDiveGuides()
-     console.log(diveGuides)
-    }, [])
+      const fetchData = async () => {
+        await diveStore.getUniqueDiveGuides();
+        const diveGuides = diveStore.diveGuides.map(guide => ({text:guide, value: guide }));
+        setDiveGuides(diveGuides);
+      };
+  
+      fetchData();
+    }, []);
 
     useEffect(() => {
       const fetchData = async () => {
@@ -62,12 +68,6 @@ const PreviousEntries = inject('rootStore')(
       4: '3:00 pm',
       5: 'Night Dive'
     }
-
-    // const diveGuides = diveStore.diveGuides.map(dive => ({
-    //   key: dive.diveGuideId,
-    //   value: dive.diveGuideId,
-    //   text: dive.
-    // }))
 
     const units =
       preferredUnits === 'imperial'
@@ -166,7 +166,7 @@ const PreviousEntries = inject('rootStore')(
 
     return (
       <Container fluid>
-        <Grid >
+        <Grid>
           <Grid.Row columns={3}>
             <Grid.Column>
               <Dropdown

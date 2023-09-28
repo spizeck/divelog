@@ -158,7 +158,7 @@ class DiveStore {
       this._startDiveProcess()
       try {
         const response = yield api.getUniqueDiveGuides()
-        this.diveGuides = response.data
+        this.diveGuides = response.diveGuides
       } catch (error) {
         this._handleDiveProcessError(error)
       } finally {
