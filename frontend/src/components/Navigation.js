@@ -2,10 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { observer, inject } from 'mobx-react'
 import { Sidebar, Menu, Message, Icon } from 'semantic-ui-react'
-import Home from './Home'
-import DiveForm from '../components/DiveForm/DiveForm'
-import Preferences from './Preferences'
-import PreviousEntries from './PreviousEntries/PreviousEntries'
 import '../styles/Navigation.css'
 
 const Navigation = inject('rootStore')(
@@ -17,18 +13,9 @@ const Navigation = inject('rootStore')(
     const { logout } = authStore
     const navigate = useNavigate()
 
-    const contentMapping = {
-      '/home': <Home />,
-      '/diveLogEntry': <DiveForm />,
-      '/previousEntries': <PreviousEntries />,
-      '/preferences': <Preferences />
-    }
-
     const isActive = path => {
       return location.pathname === path
     }
-
-    const content = contentMapping[location.pathname]
 
     const handleItemClick = (e, { name }) => {
       if (name === 'logout') {
@@ -134,7 +121,6 @@ const Navigation = inject('rootStore')(
               />
             </Sidebar>
             <Sidebar.Pusher dimmed={sidebarOpened}>
-              {content}
               {authStore.logoutMessage && (
                 <Message positive>{authStore.logoutMessage}</Message>
               )}
@@ -142,7 +128,6 @@ const Navigation = inject('rootStore')(
           </Sidebar.Pushable>
         ) : (
           <div>
-            {content}
             {authStore.logoutMessage && (
               <Message positive>{authStore.logoutMessage}</Message>
             )}
