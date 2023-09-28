@@ -5,9 +5,7 @@ import {
   Pagination,
   Grid,
   Dropdown,
-  Segment,
-  Button,
-  Icon,
+  Divider,
 } from 'semantic-ui-react'
 import diveFormData from '../DiveForm/steps/DiveFormData'
 import DiveCard from './DiveCard'
@@ -16,6 +14,7 @@ import DeleteDiveModal from './DeleteDiveModal'
 import SightingModal from './SightingModal'
 import DiveTable from './DiveTable'
 import unitConverter from '../../utils/convertUnits'
+import DiveFormData from '../DiveForm/steps/DiveFormData'
 import '../../styles/PreviousEntries.css'
 
 const PreviousEntries = inject('rootStore')(
@@ -39,11 +38,10 @@ const PreviousEntries = inject('rootStore')(
     const [sightingsModalOpen, setSightingsModalOpen] = useState(false)
     const [sightings, setSightings] = useState([])
     const [diveId, setDiveId] = useState(null)
-    const [filterModalOpen, setFilterModalOpen] = useState(false)
-    const [selectedDiveGuide, setSelectedDiveGuide] = useState(null)
-    const [selectedBoat, setSelectedBoat] = useState(null)
-    const [selectedDiveSite, setSelectedDiveSite] = useState(null)
-    
+    const [selectedDiveGuides, setSelectedDiveGuides] = useState([])
+    const [selectedBoats, setSelectedBoats] = useState([])
+    const [selectedDiveSites, setSelectedDiveSites] = useState([])
+
     useEffect(() => {
       const fetchData = async () => {
         await fetchDivesByGuide(firstName, activePage, entriesPerPage)
@@ -155,17 +153,53 @@ const PreviousEntries = inject('rootStore')(
       fetchDivesByGuide(firstName, activePage, newEntriesPerPage)
     }
 
+    const diveGuides = [
+      { key: 'Chad', text: 'Chad', value: 'Chad' },
+      { key: 'Otto', text: 'Otto', value: 'Otto' },
+      { key: 'Vicky', text: 'Vicky', value: 'Vicky' }
+    ]
+
     return (
       <Container fluid>
-    <Segment.Group horizontal>
-      <Segment>
-      <Button primary fluid icon onClick={() => setFilterModalOpen(true)}>Filter Dives <Icon name='filter' /></Button>
-      </Segment>
-        <Segment textAlign='center'><strong>Dive Guide:</strong> {selectedDiveGuide || 'All'}</Segment>
-        <Segment textAlign='center'><strong>Boat:</strong> {selectedBoat || 'All'}</Segment>
-        <Segment textAlign='center'><strong>Dive Site:</strong> {selectedDiveSite || 'All'}</Segment>
-    
-    </Segment.Group>
+        <Grid >
+          <Grid.Row columns={3}>
+            <Grid.Column>
+              <Dropdown
+                multiple
+                fluid
+                selection
+                options={diveGuides}
+                placeholder='Filter by Dive Guide'
+                value={selectedDiveGuides}
+                title={selectedDiveGuides.join(', ')}
+                onChange={(e, { value }) => setSelectedDiveGuides(value)}
+              />
+            </Grid.Column>
+            <Grid.Column>
+              <Dropdown
+                multiple
+                fluid
+                selection
+                options={DiveFormData.boatNameOptions.options}
+                placeholder='Filter by Boat'
+                value={selectedBoats}
+                onChange={(e, { value }) => setSelectedBoats(value)}
+              />
+            </Grid.Column>
+            <Grid.Column>
+              <Dropdown
+                multiple
+                fluid
+                selection
+                options={DiveFormData.diveSiteOptions.options}
+                placeholder='Filter by Dive Site'
+                value={selectedDiveSites}
+                onChange={(e, { value }) => setSelectedDiveSites(value)}
+              />
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+        <Divider />
         <div className='table-to-cards'>
           <DiveTable
             dives={dives}

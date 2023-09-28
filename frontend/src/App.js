@@ -18,10 +18,11 @@ const AppRoutes = observer(() => {
   return (
     <Routes>
       <Route path='/' element={<Navigate to='/home' />} />
-      <Route path='/home' element={<BasePage />} />
+      <Route path='/home' element={<Home />} />
       <Route path='/register' element={<Register />} />
       <Route path='/forgot_password' element={<ForgotPassword />} />
       <Route path='/login' element={<Login />} />
+
       {/* <Route path='*' element={<NotFound />} /> */}
     </Routes>
   )

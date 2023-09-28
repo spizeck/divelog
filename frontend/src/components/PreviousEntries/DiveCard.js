@@ -11,7 +11,7 @@ const DiveCard = ({
   timeMap
 }) => {
   return (
-    <Card className='dive-card' centered>
+    <Card className='dive-card' fluid >
       <Card.Content>
         <Card.Header>Date: {dive.date}</Card.Header>
         <Card.Meta>Dive ID: {dive.id}</Card.Meta>
@@ -27,7 +27,7 @@ const DiveCard = ({
           </p>
         </Card.Description>
         <Card.Content extra>
-          <Button.Group fluid>
+          <Button.Group fluid >
             <Button
               icon
               color='green'
