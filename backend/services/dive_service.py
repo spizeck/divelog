@@ -307,3 +307,13 @@ def get_sightings_for_dive(data):
         
     except MissingDiveId as e:
         return {'message': str(e),'status': 400}, 400
+    
+def get_unique_dive_guides():
+    try: 
+        unique_dive_guides = Dive.query.with_entities(Dive.dive_guide).distinct().all()
+        unique_dive_guides_list = [unique_dive_guide[0] for unique_dive_guide in unique_dive_guides]
+        return {"diveGuides": unique_dive_guides_list,'status': 200}, 200
+        
+    except Exception as e:
+        logging.error(e)
+        return {'message': 'Failed to get dive guides','status': 500}, 500

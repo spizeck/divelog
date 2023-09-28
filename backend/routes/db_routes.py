@@ -3,9 +3,13 @@ import logging
 from app import db
 from flask import Blueprint, jsonify, request
 from models.dives import Dive
-from services.dive_service import (create_dive, create_sighting, edit_dive, get_count_for_pages,
+from services.dive_service import (create_dive, create_sighting,
+                                   delete_dive_logic, edit_dive,
+                                   get_count_for_pages,
                                    get_dives_by_date_range, get_dives_by_guide,
-                                   verify_database_connection, delete_dive_logic, get_sightings_for_dive)
+                                   get_sightings_for_dive,
+                                   get_unique_dive_guides,
+                                   verify_database_connection)
 
 db_bp = Blueprint('db_bp', __name__, url_prefix='/db')
 
@@ -65,11 +69,20 @@ def delete_dive():
 
 # todo: make a route to get sightings for a given dive
 # The frontend is calling the route /db/sightings/for_dive and passing the dive id as a parameter
+
+
 @db_bp.route('/sightings/for_dive', methods=['GET'])
 def get_sightings_for_dive_route():
     data = request.args
     response, status = get_sightings_for_dive(data)
     return jsonify(response), status
+
+
+@db_bp.route('/dives/get_dive_guides', methods=['GET'])
+def get_unique_dive_guides_route():
+    response, status = get_unique_dive_guides()
+    return jsonify(response), status
+
 
 def register_routes(app):
     app.register_blueprint(db_bp)

@@ -9,6 +9,7 @@ class DiveStore {
   dives = []
   dive = {}
   totalPages = 1
+  diveGuides = []
 
   constructor (rootStore) {
     makeAutoObservable(this)
@@ -16,6 +17,7 @@ class DiveStore {
     this.dives = []
     this.dive = {}
     this.totalPages = 1
+    this.diveGuides = []
   }
 
   _startDiveProcess () {
@@ -143,6 +145,20 @@ class DiveStore {
           this.successMessage =
             response.data.message || 'Dive deleted successfully'
         }
+      } catch (error) {
+        this._handleDiveProcessError(error)
+      } finally {
+        this._endDiveProcess()
+      }
+    }.bind(this)
+  )
+
+  getUniqueDiveGuides = flow(
+    function* () {
+      this._startDiveProcess()
+      try {
+        const response = yield api.getUniqueDiveGuides()
+        this.diveGuides = response.data
       } catch (error) {
         this._handleDiveProcessError(error)
       } finally {

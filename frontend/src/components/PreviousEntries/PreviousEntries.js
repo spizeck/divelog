@@ -25,7 +25,7 @@ const PreviousEntries = inject('rootStore')(
       dives,
       editDive,
       deleteDive,
-      fetchSightingsForDive
+      fetchSightingsForDive,
     } = diveStore
     const { firstName, preferredUnits } = userStore
     const [editOpen, setEditOpen] = useState(false)
@@ -43,6 +43,11 @@ const PreviousEntries = inject('rootStore')(
     const [selectedDiveSites, setSelectedDiveSites] = useState([])
 
     useEffect(() => {
+     diveStore.getUniqueDiveGuides()
+     console.log(diveGuides)
+    }, [])
+
+    useEffect(() => {
       const fetchData = async () => {
         await fetchDivesByGuide(firstName, activePage, entriesPerPage)
         setTotalPages(diveStore.totalPages)
@@ -57,6 +62,12 @@ const PreviousEntries = inject('rootStore')(
       4: '3:00 pm',
       5: 'Night Dive'
     }
+
+    // const diveGuides = diveStore.diveGuides.map(dive => ({
+    //   key: dive.diveGuideId,
+    //   value: dive.diveGuideId,
+    //   text: dive.
+    // }))
 
     const units =
       preferredUnits === 'imperial'
@@ -153,12 +164,6 @@ const PreviousEntries = inject('rootStore')(
       fetchDivesByGuide(firstName, activePage, newEntriesPerPage)
     }
 
-    const diveGuides = [
-      { key: 'Chad', text: 'Chad', value: 'Chad' },
-      { key: 'Otto', text: 'Otto', value: 'Otto' },
-      { key: 'Vicky', text: 'Vicky', value: 'Vicky' }
-    ]
-
     return (
       <Container fluid>
         <Grid >
@@ -173,6 +178,7 @@ const PreviousEntries = inject('rootStore')(
                 value={selectedDiveGuides}
                 title={selectedDiveGuides.join(', ')}
                 onChange={(e, { value }) => setSelectedDiveGuides(value)}
+                onClose={() => console.log(selectedDiveGuides)}
               />
             </Grid.Column>
             <Grid.Column>
@@ -184,6 +190,7 @@ const PreviousEntries = inject('rootStore')(
                 placeholder='Filter by Boat'
                 value={selectedBoats}
                 onChange={(e, { value }) => setSelectedBoats(value)}
+                onClose={() => console.log(selectedBoats)}
               />
             </Grid.Column>
             <Grid.Column>
@@ -195,6 +202,7 @@ const PreviousEntries = inject('rootStore')(
                 placeholder='Filter by Dive Site'
                 value={selectedDiveSites}
                 onChange={(e, { value }) => setSelectedDiveSites(value)}
+                onClose={() => console.log(selectedDiveSites)}
               />
             </Grid.Column>
           </Grid.Row>
