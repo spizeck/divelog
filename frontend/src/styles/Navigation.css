@@ -40,7 +40,11 @@
   padding: 1em;
   border: 1px solid black;
 }
+.ui.sidebar {
+  z-index: 1000 !important;
+}
 
 body {
   font-family: Arial, sans-serif;
 }
+

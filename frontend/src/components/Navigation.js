@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { observer, inject } from 'mobx-react'
-import { Sidebar, Menu, Message, Icon } from 'semantic-ui-react'
+import { Menu, Message, Icon } from 'semantic-ui-react'
 import '../styles/Navigation.css'
 
 const Navigation = inject('rootStore')(
-  observer(({ rootStore }) => {
+  observer(({ rootStore, isMobile, handleSidebarToggle }) => {
     const location = useLocation()
-    const [sidebarOpened, setSidebarOpened] = useState(false)
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
     const { authStore } = rootStore
     const { logout } = authStore
     const navigate = useNavigate()
@@ -23,35 +21,7 @@ const Navigation = inject('rootStore')(
       } else {
         navigate(name)
       }
-      setSidebarOpened(false)
     }
-
-    const handleSidebarToggle = () => {
-      setSidebarOpened(prevState => !prevState)
-    }
-
-    useEffect(() => {
-      setSidebarOpened(false)
-      if (!authStore.loggedIn) {
-        navigate('/home')
-      }
-    }, [authStore.loggedIn])
-
-    useEffect(() => {
-      const updateSize = () => {
-        setIsMobile(window.innerWidth <= 768)
-      }
-      window.addEventListener('resize', updateSize)
-      return () => {
-        window.removeEventListener('resize', updateSize)
-      }
-    }, [])
-
-    useEffect(() => {
-      if (!isMobile && sidebarOpened) {
-        setSidebarOpened(false)
-      }
-    }, [isMobile])
 
     const renderMenuItem = (
       name,
@@ -99,40 +69,11 @@ const Navigation = inject('rootStore')(
             )}
           </Menu.Menu>
         </Menu>
-        {sidebarOpened ? (
-          <Sidebar.Pushable>
-            <Sidebar
-              as={Menu}
-              animation='push'
-              vertical
-              visible={sidebarOpened}
-            >
-              <Menu.Item
-                name='Preferences'
-                active={isActive('/preferences') && authStore.loggedIn}
-                as={NavLink}
-                to={authStore.loggedIn ? '/preferences' : '/login'}
-                onClick={handleItemClick}
-              />
-              <Menu.Item
-                name={authStore.loggedIn ? 'logout' : 'login'}
-                active={isActive(authStore.loggedIn ? '/logout' : '/login')}
-                onClick={handleItemClick}
-              />
-            </Sidebar>
-            <Sidebar.Pusher dimmed={sidebarOpened}>
-              {authStore.logoutMessage && (
-                <Message positive>{authStore.logoutMessage}</Message>
-              )}
-            </Sidebar.Pusher>
-          </Sidebar.Pushable>
-        ) : (
-          <div>
-            {authStore.logoutMessage && (
-              <Message positive>{authStore.logoutMessage}</Message>
-            )}
-          </div>
-        )}
+        <div>
+          {authStore.logoutMessage && (
+            <Message positive>{authStore.logoutMessage}</Message>
+          )}
+        </div>
       </div>
     )
   })

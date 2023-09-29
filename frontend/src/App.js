@@ -1,9 +1,16 @@
 // Used for: Main app component
-import React, { useEffect, useMemo } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import React, { useEffect, useMemo, useState } from 'react'
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  NavLink,
+  useLocation
+} from 'react-router-dom'
 import { Provider, observer } from 'mobx-react'
 import RootStore from './stores/RootStore'
-import { Container } from 'semantic-ui-react'
+import { Container, Sidebar, Menu } from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css'
 
 import AppHeader from './components/Header'
@@ -35,8 +42,28 @@ const AppRoutes = observer(() => {
 
 const App = observer(() => {
   const rootStore = useMemo(() => new RootStore(), [])
-  const { userStore } = rootStore
+  const { userStore, authStore } = rootStore
   const { fetchUserData } = userStore
+  const location = useLocation()
+  const [sidebarOpened, setSidebarOpened] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+
+  const handleSidebarToggle = () => {
+    setSidebarOpened(prevState => !prevState)
+  }
+
+  const isActive = path => {
+    return location.pathname === path;
+  }
+
+  const handleItemClick = (e, { name }) => {
+    if (name === 'logout') {
+      authStore.logout()
+    } else {
+      NavLink(name)
+    }
+    setSidebarOpened(false)
+  }
 
   useEffect(() => {
     // Check if the user is logged in based on the token presence and validity
@@ -50,13 +77,58 @@ const App = observer(() => {
     fetchData()
   }, [fetchUserData])
 
+  useEffect(() => {
+    const updateSize = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    window.addEventListener('resize', updateSize)
+    return () => {
+      window.removeEventListener('resize', updateSize)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isMobile && sidebarOpened) {
+      setSidebarOpened(false)
+    }
+  }, [isMobile])
+
   return (
     <BrowserRouter>
+    
       <Container>
+        
         <Provider rootStore={rootStore}>
           <AppHeader />
-          <Navigation />
-          <AppRoutes />
+          <Navigation
+            handleSidebarToggle={handleSidebarToggle}
+            isMobile={isMobile}
+          />
+          <Sidebar.Pushable>
+            <Sidebar
+              as={Menu}
+              animation='push'
+              vertical
+              visible={sidebarOpened}
+              onHide={handleSidebarToggle}
+            >
+              <Menu.Item
+                name='Preferences'
+                active={isActive('/preferences') && authStore.loggedIn}
+                as={NavLink}
+                to={authStore.loggedIn ? '/preferences' : '/login'}
+                onClick={handleItemClick}
+              />
+              <Menu.Item
+                name={authStore.loggedIn ? 'logout' : 'login'}
+                active={isActive(authStore.loggedIn ? '/logout' : '/login')}
+                onClick={handleItemClick}
+              />
+            </Sidebar>
+            <Sidebar.Pusher dimmed={sidebarOpened}>
+            <AppRoutes />
+            </Sidebar.Pusher>
+          </Sidebar.Pushable>
         </Provider>
       </Container>
     </BrowserRouter>
