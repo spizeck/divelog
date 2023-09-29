@@ -123,7 +123,7 @@ const DiveForm = inject('rootStore')(
     )
 
     const handleResetForm = () => {
-      console.log('Resetting form')
+      
       setStep(1)
       setFormData(defaultData)
       setSightingData(SightingsFormData)

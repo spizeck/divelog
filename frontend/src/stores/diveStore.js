@@ -77,10 +77,6 @@ class DiveStore {
         const dive = this.dives.find(d => d.id === diveId)
         if (dive) {
           dive.sightings = response.sightings
-          console.log(
-            'Updated dive with sightings:',
-            JSON.stringify(toJS(dive), null, 2)
-          )
         }
       } catch (error) {
         this._handleDiveProcessError(error)
@@ -182,7 +178,6 @@ class DiveStore {
         const { dives, totalPages } = response
         this.dives = dives
         this.totalPages = totalPages
-        console.log('Filtered dives:', dives)
       } catch (error) {
         this._handleDiveProcessError(error)
       } finally {
