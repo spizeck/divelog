@@ -6,7 +6,8 @@ import {
   Route,
   Navigate,
   NavLink,
-  useLocation
+  useLocation,
+  useNavigate,
 } from 'react-router-dom'
 import { Provider, observer } from 'mobx-react'
 import RootStore from './stores/RootStore'
@@ -45,6 +46,7 @@ const App = observer(() => {
   const { userStore, authStore } = rootStore
   const { fetchUserData } = userStore
   const location = useLocation()
+  const navigate = useNavigate()
   const [sidebarOpened, setSidebarOpened] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
 
@@ -53,14 +55,15 @@ const App = observer(() => {
   }
 
   const isActive = path => {
-    return location.pathname === path;
+    return location.pathname === path
   }
 
   const handleItemClick = (e, { name }) => {
     if (name === 'logout') {
       authStore.logout()
+      navigate('/login')
     } else {
-      NavLink(name)
+      navigate(name)
     }
     setSidebarOpened(false)
   }
@@ -94,45 +97,49 @@ const App = observer(() => {
   }, [isMobile])
 
   return (
-    <BrowserRouter>
-    
-      <Container>
-        
-        <Provider rootStore={rootStore}>
-          <AppHeader />
-          <Navigation
-            handleSidebarToggle={handleSidebarToggle}
-            isMobile={isMobile}
-          />
-          <Sidebar.Pushable>
-            <Sidebar
-              as={Menu}
-              animation='push'
-              vertical
-              visible={sidebarOpened}
-              onHide={handleSidebarToggle}
-            >
-              <Menu.Item
-                name='Preferences'
-                active={isActive('/preferences') && authStore.loggedIn}
-                as={NavLink}
-                to={authStore.loggedIn ? '/preferences' : '/login'}
-                onClick={handleItemClick}
-              />
-              <Menu.Item
-                name={authStore.loggedIn ? 'logout' : 'login'}
-                active={isActive(authStore.loggedIn ? '/logout' : '/login')}
-                onClick={handleItemClick}
-              />
-            </Sidebar>
-            <Sidebar.Pusher dimmed={sidebarOpened}>
+    <Container>
+      <Provider rootStore={rootStore}>
+        <AppHeader />
+        <Navigation
+          handleSidebarToggle={handleSidebarToggle}
+          isMobile={isMobile}
+          isActive={isActive}
+          handleItemClick={handleItemClick}
+        />
+        <Sidebar.Pushable>
+          <Sidebar
+            as={Menu}
+            animation='push'
+            vertical
+            visible={sidebarOpened}
+            
+          >
+            <Menu.Item
+              name='Preferences'
+              active={isActive('/preferences') && authStore.loggedIn}
+              as={NavLink}
+              to={authStore.loggedIn ? '/preferences' : '/login'}
+              onClick={handleItemClick}
+            />
+            <Menu.Item
+              name={authStore.loggedIn ? 'logout' : 'login'}
+              active={isActive(authStore.loggedIn ? '/logout' : '/login')}
+              onClick={handleItemClick}
+            />
+          </Sidebar>
+          <Sidebar.Pusher dimmed={sidebarOpened}>
             <AppRoutes />
-            </Sidebar.Pusher>
-          </Sidebar.Pushable>
-        </Provider>
-      </Container>
-    </BrowserRouter>
+          </Sidebar.Pusher>
+        </Sidebar.Pushable>
+      </Provider>
+    </Container>
   )
 })
 
-export default App
+const Root = () => (
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+)
+
+export default Root

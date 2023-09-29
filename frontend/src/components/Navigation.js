@@ -1,27 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import React from 'react'
+import { NavLink } from'react-router-dom'
 import { observer, inject } from 'mobx-react'
 import { Menu, Message, Icon } from 'semantic-ui-react'
 import '../styles/Navigation.css'
 
 const Navigation = inject('rootStore')(
-  observer(({ rootStore, isMobile, handleSidebarToggle }) => {
-    const location = useLocation()
+  observer(({ rootStore, isMobile, handleSidebarToggle , isActive, handleItemClick}) => {
     const { authStore } = rootStore
-    const { logout } = authStore
-    const navigate = useNavigate()
-
-    const isActive = path => {
-      return location.pathname === path
-    }
-
-    const handleItemClick = (e, { name }) => {
-      if (name === 'logout') {
-        logout()
-      } else {
-        navigate(name)
-      }
-    }
 
     const renderMenuItem = (
       name,

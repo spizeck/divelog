@@ -1,10 +1,10 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App'; 
+import Root from './App'; 
 // import reportWebVitals from './reportWebVitals';
 
 const rootContainer = document.getElementById('root');
-createRoot(rootContainer).render(<App />);
+createRoot(rootContainer).render(<Root />);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
