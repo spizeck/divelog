@@ -11,6 +11,7 @@ const DiveTable = ({ dives, units, preferredUnits, handleEditOpen, handleDeleteO
                 <Table.HeaderCell>Date</Table.HeaderCell>
                 <Table.HeaderCell>Dive Number</Table.HeaderCell>
                 <Table.HeaderCell>Boat</Table.HeaderCell>
+                <Table.HeaderCell>Dive Guide</Table.HeaderCell>
                 <Table.HeaderCell>Dive Site</Table.HeaderCell>
                 <Table.HeaderCell>Max Depth ({units.depth})</Table.HeaderCell>
                 <Table.HeaderCell>
@@ -27,6 +28,7 @@ const DiveTable = ({ dives, units, preferredUnits, handleEditOpen, handleDeleteO
                   <Table.Cell>{dive.date}</Table.Cell>
                   <Table.Cell>{timeMap[dive.diveNumber]}</Table.Cell>
                   <Table.Cell>{dive.boat}</Table.Cell>
+                  <Table.Cell>{dive.diveGuide}</Table.Cell>
                   <Table.Cell>{dive.diveSite}</Table.Cell>
                   <Table.Cell>
                     {unitConverter.convertDepthToForm(

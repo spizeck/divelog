@@ -9,7 +9,8 @@ from services.dive_service import (create_dive, create_sighting,
                                    get_dives_by_date_range, get_dives_by_guide,
                                    get_sightings_for_dive,
                                    get_unique_dive_guides,
-                                   verify_database_connection)
+                                   verify_database_connection,
+                                   get_filtered_dives)
 
 db_bp = Blueprint('db_bp', __name__, url_prefix='/db')
 
@@ -67,9 +68,6 @@ def delete_dive():
     response, status = delete_dive_logic(data)
     return jsonify(response), status
 
-# todo: make a route to get sightings for a given dive
-# The frontend is calling the route /db/sightings/for_dive and passing the dive id as a parameter
-
 
 @db_bp.route('/sightings/for_dive', methods=['GET'])
 def get_sightings_for_dive_route():
@@ -83,6 +81,12 @@ def get_unique_dive_guides_route():
     response, status = get_unique_dive_guides()
     return jsonify(response), status
 
+
+@db_bp.route('/dives/get_filtered_dives', methods=['GET'])
+def get_filtered_dives_route():
+    data = request.args
+    response, status = get_filtered_dives(data)
+    return jsonify(response), status
 
 def register_routes(app):
     app.register_blueprint(db_bp)

@@ -45,6 +45,15 @@ const EditDiveModal = ({
             />
           </Form.Field>
           <Form.Field>
+            <label>Dive Guide</label>
+            <Input
+            type='text'
+            name='diveGuide'
+            value={formState.diveGuide}
+            onChange={handleInputChange}
+            />
+          </Form.Field>
+          <Form.Field>
             <label>Dive Site</label>
             <Select
               placeholder='Select Dive Site'

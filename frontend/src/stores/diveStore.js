@@ -77,7 +77,10 @@ class DiveStore {
         const dive = this.dives.find(d => d.id === diveId)
         if (dive) {
           dive.sightings = response.sightings
-          console.log('Updated dive with sightings:', JSON.stringify(toJS(dive), null, 2));
+          console.log(
+            'Updated dive with sightings:',
+            JSON.stringify(toJS(dive), null, 2)
+          )
         }
       } catch (error) {
         this._handleDiveProcessError(error)
@@ -159,6 +162,27 @@ class DiveStore {
       try {
         const response = yield api.getUniqueDiveGuides()
         this.diveGuides = response.diveGuides
+      } catch (error) {
+        this._handleDiveProcessError(error)
+      } finally {
+        this._endDiveProcess()
+      }
+    }.bind(this)
+  )
+
+  fetchFilteredDives = flow(
+    function* (filters, page = 1, entriesPerPage = 10) {
+      this._startDiveProcess()
+      try {
+        const response = yield api.getFilteredDives(
+          filters,
+          page,
+          entriesPerPage
+        )
+        const { dives, totalPages } = response
+        this.dives = dives
+        this.totalPages = totalPages
+        console.log('Filtered dives:', dives)
       } catch (error) {
         this._handleDiveProcessError(error)
       } finally {

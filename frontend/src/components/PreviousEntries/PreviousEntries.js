@@ -21,13 +21,13 @@ const PreviousEntries = inject('rootStore')(
   observer(({ rootStore }) => {
     const { diveStore, userStore } = rootStore
     const {
-      fetchDivesByGuide,
+      fetchFilteredDives,
       dives,
       editDive,
       deleteDive,
       fetchSightingsForDive
     } = diveStore
-    const { firstName, preferredUnits } = userStore
+    const { preferredUnits } = userStore
     const [editOpen, setEditOpen] = useState(false)
     const [formState, setFormState] = useState({})
     const [activePage, setActivePage] = useState(1)
@@ -42,7 +42,15 @@ const PreviousEntries = inject('rootStore')(
     const [selectedBoats, setSelectedBoats] = useState([])
     const [selectedDiveSites, setSelectedDiveSites] = useState([])
     const [diveGuides, setDiveGuides] = useState([])
-
+    const [filters, setFilters] = useState({
+      boat: [],
+      diveSite: [],
+      diveGuide: []
+    })
+    useEffect(() => {
+      console.log("Updated filters: ", filters);
+    }, [filters]);
+    
     useEffect(() => {
       const fetchData = async () => {
         await diveStore.getUniqueDiveGuides();
@@ -54,12 +62,23 @@ const PreviousEntries = inject('rootStore')(
     }, []);
 
     useEffect(() => {
+      setFilters( prevFilters =>({
+        ...prevFilters,
+        boat: selectedBoats,
+        diveSite: selectedDiveSites,
+        diveGuide: selectedDiveGuides
+      }))
+      console.log("selectedBoats: ", selectedBoats);
+      console.log("filters: ", filters);
+    }, [selectedBoats, selectedDiveSites, selectedDiveGuides])
+
+    useEffect(() => {
       const fetchData = async () => {
-        await fetchDivesByGuide(firstName, activePage, entriesPerPage)
+        await fetchFilteredDives(filters, activePage, entriesPerPage)
         setTotalPages(diveStore.totalPages)
       }
       fetchData()
-    }, [firstName, activePage, entriesPerPage])
+    }, [filters, activePage, entriesPerPage])
 
     const timeMap = {
       1: '9:00 am',
@@ -119,7 +138,7 @@ const PreviousEntries = inject('rootStore')(
       try {
         await editDive(updatedDive)
         handleEditClose()
-        fetchDivesByGuide(firstName)
+        fetchFilteredDives(filters, activePage, entriesPerPage)
       } catch (error) {
         console.log(error)
       }
@@ -149,19 +168,19 @@ const PreviousEntries = inject('rootStore')(
 
     const handleDeleteDive = diveId => {
       deleteDive(diveId)
-      fetchDivesByGuide(firstName, activePage, entriesPerPage)
+      fetchFilteredDives(filters, activePage, entriesPerPage)
       setDeleteConfirmOpen(false)
     }
 
     const handlePageChange = (e, data) => {
       setActivePage(data.activePage)
-      fetchDivesByGuide(firstName, data.activePage, entriesPerPage)
+      fetchFilteredDives(filters, activePage, entriesPerPage)
     }
 
     const handleEntriesPerPageChange = newEntriesPerPage => {
       setEntriesPerPage(newEntriesPerPage)
       setActivePage(1)
-      fetchDivesByGuide(firstName, activePage, newEntriesPerPage)
+      fetchFilteredDives(filters, activePage, entriesPerPage)
     }
 
     return (

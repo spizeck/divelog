@@ -317,3 +317,45 @@ def get_unique_dive_guides():
     except Exception as e:
         logging.error(e)
         return {'message': 'Failed to get dive guides','status': 500}, 500
+
+def get_filtered_dives(data):
+    try:
+        dive_guides = data.getlist('diveGuide[]')
+        dive_sites = data.getlist('diveSite[]')
+        boats = data.getlist('boat[]')
+        print(boats)
+        print("data received", data)
+
+        page = int(data.get('page', 1))
+        entries_per_page = int(data.get('entriesPerPage', 10))
+
+        if page < 1:
+            raise InvalidPageNumber()
+
+        offset = (page - 1) * entries_per_page
+
+        query = Dive.query
+
+        if dive_guides:
+            query = query.filter(Dive.dive_guide.in_(dive_guides))
+
+        if boats:
+            query = query.filter(Dive.boat.in_(boats))
+
+        if dive_sites:
+            query = query.filter(Dive.dive_site.in_(dive_sites))
+
+        dives = query.order_by(Dive.date.desc()).limit(entries_per_page).offset(offset).all()
+        total_count = query.count()
+
+        return {
+            'dives': [dive.serialize() for dive in dives],
+            'totalPages': math.ceil(total_count / entries_per_page),
+            'perPage': entries_per_page,
+            'currentPage': page,
+            'status': 200
+        }, 200
+
+    except Exception as e:
+        logging.error(e)
+        return {'message': 'Failed to get dives', 'status': 500}, 500

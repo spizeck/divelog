@@ -84,6 +84,7 @@ const API_ENDPOINTS = {
   getPages: '/db/dives/pages',
   getSightingsForDive: '/db/sightings/for_dive',
   getUniqueDiveGuides: '/db/dives/get_dive_guides',
+  getFilteredDives: '/db/dives/get_filtered_dives'
 }
 
 let userId = null
@@ -241,8 +242,15 @@ const api = {
     return makeApiRequest('delete', endpoint)
   },
 
-  getUniqueDiveGuides: () => makeApiRequest('get', API_ENDPOINTS.getUniqueDiveGuides),
+  getUniqueDiveGuides: () =>
+    makeApiRequest('get', API_ENDPOINTS.getUniqueDiveGuides),
 
+  getFilteredDives: (filters, page, entriesPerPage) =>
+    makeApiRequest('get', API_ENDPOINTS.getFilteredDives, null, {
+      ...filters,
+      page,
+      entriesPerPage
+    }),
 
   setUserId
 }

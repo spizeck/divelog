@@ -18,6 +18,7 @@ const DiveCard = ({
         <Card.Description>
           <p>Dive Number: {timeMap[dive.diveNumber]}</p>
           <p>Boat: {dive.boat}</p>
+          <p>Dive Guide: {dive.diveGuide}</p>
           <p>Dive Site: {dive.diveSite}</p>
           <p>
             Max Depth: {dive.maxDepth} {units.depth}
