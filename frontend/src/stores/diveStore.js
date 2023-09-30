@@ -1,5 +1,4 @@
 import { flow, makeAutoObservable } from 'mobx'
-import { toJS } from 'mobx'
 import api from '../utils/api'
 
 class DiveStore {

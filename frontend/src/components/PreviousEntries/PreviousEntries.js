@@ -47,9 +47,7 @@ const PreviousEntries = inject('rootStore')(
       diveSite: [],
       diveGuide: []
     })
-    useEffect(() => {
-  
-    }, [filters])
+    useEffect(() => {}, [filters])
 
     useEffect(() => {
       const fetchData = async () => {
@@ -246,6 +244,7 @@ const PreviousEntries = inject('rootStore')(
               handleDeleteOpen={handleDeleteOpen}
               handleViewSightingsOpen={handleViewSightingsOpen}
               timeMap={timeMap}
+              preferredUnits={preferredUnits}
             />
           ))}
         </div>

@@ -1,5 +1,6 @@
 import React from 'react'
 import { Button, Card, Icon } from 'semantic-ui-react'
+import unitConverter from '../../utils/convertUnits';
 import '../../styles/DiveCard.css'
 
 const DiveCard = ({
@@ -8,7 +9,8 @@ const DiveCard = ({
   handleEditOpen,
   handleDeleteOpen,
   handleViewSightingsOpen,
-  timeMap
+  timeMap,
+  preferredUnits
 }) => {
   return (
     <Card className='dive-card' fluid >
@@ -21,10 +23,10 @@ const DiveCard = ({
           <p>Dive Guide: {dive.diveGuide}</p>
           <p>Dive Site: {dive.diveSite}</p>
           <p>
-            Max Depth: {dive.maxDepth} {units.depth}
+            Max Depth: {unitConverter.convertDepthToForm(dive.maxDepth, preferredUnits)} {units.depth}
           </p>
           <p>
-            Water Temp: {dive.waterTemperature} {units.temperature}
+            Water Temp: {unitConverter.convertTempToForm(dive.waterTemperature, preferredUnits)} {units.temperature}
           </p>
         </Card.Description>
         <Card.Content extra>
