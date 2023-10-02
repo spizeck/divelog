@@ -24,7 +24,7 @@ const handleSubmit = async (
         parseInt(formData.waterTemperature, 10),
         units.units
       )
-      console.log('Form data:', formData)
+      // console.log('Form data:', formData)
     // Submit dive data to the /dives endpoint
     try {
       const diveResponse = await api.createDive(formData)

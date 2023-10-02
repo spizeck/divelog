@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, Card, Icon } from 'semantic-ui-react'
-import unitConverter from '../../utils/convertUnits';
+import unitConverter from '../../utils/convertUnits'
 import '../../styles/DiveCard.css'
 
 const DiveCard = ({
@@ -13,7 +13,7 @@ const DiveCard = ({
   preferredUnits
 }) => {
   return (
-    <Card className='dive-card' fluid >
+    <Card className='dive-card' fluid>
       <Card.Content>
         <Card.Header>Date: {dive.date}</Card.Header>
         <Card.Meta>Dive ID: {dive.id}</Card.Meta>
@@ -23,14 +23,21 @@ const DiveCard = ({
           <p>Dive Guide: {dive.diveGuide}</p>
           <p>Dive Site: {dive.diveSite}</p>
           <p>
-            Max Depth: {unitConverter.convertDepthToForm(dive.maxDepth, preferredUnits)} {units.depth}
+            Max Depth:{' '}
+            {unitConverter.convertDepthToForm(dive.maxDepth, preferredUnits)}{' '}
+            {units.depth}
           </p>
           <p>
-            Water Temp: {unitConverter.convertTempToForm(dive.waterTemperature, preferredUnits)} {units.temperature}
+            Water Temp:{' '}
+            {unitConverter.convertTempToForm(
+              dive.waterTemperature,
+              preferredUnits
+            )}{' '}
+            {units.temperature}
           </p>
         </Card.Description>
         <Card.Content extra>
-          <Button.Group fluid >
+          <Button.Group fluid widths={3}>
             <Button
               icon
               color='green'
@@ -47,7 +54,6 @@ const DiveCard = ({
             >
               <Icon name='edit' />
             </Button>
-
             <Button
               icon
               color='red'
