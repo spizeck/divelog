@@ -9,6 +9,10 @@ class DiveStore {
   dive = {}
   totalPages = 1
   diveGuides = []
+  sightingsModalOpen = false
+  editSightings = false
+  showConfirmation = false
+  
 
   constructor (rootStore) {
     makeAutoObservable(this)
@@ -17,6 +21,9 @@ class DiveStore {
     this.dive = {}
     this.totalPages = 1
     this.diveGuides = []
+    this.sightingsModalOpen = false
+    this.editSightings = false
+    this.showConfirmation = false
   }
 
   _startDiveProcess () {
@@ -32,6 +39,36 @@ class DiveStore {
   _handleDiveProcessError (error) {
     this.diveProcessStatus = 'error'
     this.errorMessage = error.message
+  }
+
+  openSightingsModal = () => {
+    this.sightingsModalOpen = true
+    this.editSightings = false
+    this.showConfirmation = false
+  }
+
+  closeSightingsModal = () => {
+    this.sightingsModalOpen = false
+    this.editSightings = false
+    this.showConfirmation = false
+  }
+
+  openEditSightingsModal = () => {
+    this.editSightings = true
+    this.showConfirmation = false
+  }
+
+  closeEditSightingsModal = () => {
+    this.editSightings = false
+    this.showConfirmation = false
+  }
+
+  openConfirmationModal = () => {
+    this.showConfirmation = true
+  }
+
+  closeConfirmationModal = () => {
+    this.showConfirmation = false
   }
 
   fetchDivesByGuide = flow(

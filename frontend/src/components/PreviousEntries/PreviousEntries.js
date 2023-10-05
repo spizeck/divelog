@@ -72,6 +72,10 @@ const PreviousEntries = inject('rootStore')(
     }, [selectedBoats, selectedDiveSites, selectedDiveGuides])
 
     useEffect(() => {
+      setActivePage(1)
+    }, [filters])
+
+    useEffect(() => {
       const fetchData = async () => {
         await fetchFilteredDives(filters, activePage, entriesPerPage)
         setTotalPages(diveStore.totalPages)
