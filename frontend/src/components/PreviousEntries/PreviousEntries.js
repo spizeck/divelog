@@ -35,7 +35,6 @@ const PreviousEntries = inject('rootStore')(
     const [entriesPerPage, setEntriesPerPage] = useState(10)
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
     const [diveIdToDelete, setDiveIdToDelete] = useState(null)
-    const [sightingsModalOpen, setSightingsModalOpen] = useState(false)
     const [sightings, setSightings] = useState([])
     const [diveId, setDiveId] = useState(null)
     const [selectedDiveGuides, setSelectedDiveGuides] = useState([])
@@ -155,9 +154,9 @@ const PreviousEntries = inject('rootStore')(
         if (updatedDive) {
           setSightings(updatedDive.sightings)
           setDiveId(dive.id)
-          setSightingsModalOpen(true)
+          diveStore.openSightingsModal()
         } else {
-          console.log('Updated dive not found in store')
+          console.log('Sightings not found')
         }
       } catch (error) {
         console.log(error)
@@ -294,8 +293,6 @@ const PreviousEntries = inject('rootStore')(
           handleDeleteDive={handleDeleteDive}
         />
         <SightingModal
-          sightingsModalOpen={sightingsModalOpen}
-          setSightingsModalOpen={setSightingsModalOpen}
           sightings={sightings}
           diveId={diveId}
         />

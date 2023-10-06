@@ -1,36 +1,47 @@
-import React from 'react';
-import { Modal, Button, List } from 'semantic-ui-react';
+import React from 'react'
+import { Modal, Button, List } from 'semantic-ui-react'
+import { observer, inject } from 'mobx-react'
 
-
-const EditSightingsConfirm = ({ formState, handleEditSightingClose, handleUpdateSubmit }) => {
+const EditSightingsConfirm = inject('rootStore')(
+  observer(({ rootStore, formState, diveId }) => {
+    const { diveStore } = rootStore
     return (
-      <Modal open={true} onClose={handleEditSightingClose}>
-        <Modal.Header>Confirm Sightings for Dive</Modal.Header>
+      <Modal open={diveStore.showConfirmation}>
+        <Modal.Header>Confirm Sightings for Dive #{diveId}</Modal.Header>
         <Modal.Content>
-            
-                
-          <h2>Please confirm your sightings</h2>
           <List>
-          <List.Item>
-                {formState
-                  .filter(item => item.count > 0)
-                  .map(item => (
-                    <li key={item.name}>
-                      <strong>{item.name}:</strong> {item.count}
-                    </li>
-                  ))}
+            <List.Item>
+              {formState
+                .filter(item => item.count > 0)
+                .map(item => (
+                  <li key={item.name}>
+                    <strong>{item.name}:</strong> {item.count}
+                  </li>
+                ))}
             </List.Item>
           </List>
         </Modal.Content>
         <Modal.Actions>
-          <Button primary onClick={handleUpdateSubmit}>
-            Confirm
-          </Button>
-          <Button onClick={handleEditSightingClose}>Cancel</Button>
+          <Button.Group widths={2}>
+            <Button
+              primary
+              className='small-buttons'
+              onClick={() => console.log('Update button clicked')}
+            >
+              Confirm
+            </Button>
+            <Button.Or className='or-button' />
+            <Button
+              className='small-buttons'
+              negative
+              onClick={() => diveStore.closeConfirmationModal()}
+            >
+              Cancel
+            </Button>
+          </Button.Group>
         </Modal.Actions>
       </Modal>
-    );
-  };
-  
-  export default EditSightingsConfirm;
-  
+    )
+  })
+)
+export default EditSightingsConfirm

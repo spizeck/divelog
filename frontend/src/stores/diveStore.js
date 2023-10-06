@@ -1,4 +1,4 @@
-import { flow, makeAutoObservable } from 'mobx'
+import { flow, makeAutoObservable, runInAction } from 'mobx'
 import api from '../utils/api'
 
 class DiveStore {
@@ -12,18 +12,10 @@ class DiveStore {
   sightingsModalOpen = false
   editSightings = false
   showConfirmation = false
-  
 
   constructor (rootStore) {
     makeAutoObservable(this)
     this.rootStore = rootStore
-    this.dives = []
-    this.dive = {}
-    this.totalPages = 1
-    this.diveGuides = []
-    this.sightingsModalOpen = false
-    this.editSightings = false
-    this.showConfirmation = false
   }
 
   _startDiveProcess () {
@@ -42,33 +34,39 @@ class DiveStore {
   }
 
   openSightingsModal = () => {
-    this.sightingsModalOpen = true
-    this.editSightings = false
-    this.showConfirmation = false
+    runInAction(() => {
+      this.sightingsModalOpen = true
+    })
   }
 
   closeSightingsModal = () => {
-    this.sightingsModalOpen = false
-    this.editSightings = false
-    this.showConfirmation = false
+    runInAction(() => {
+      this.sightingsModalOpen = false
+    })
   }
 
   openEditSightingsModal = () => {
-    this.editSightings = true
-    this.showConfirmation = false
+    runInAction(() => {
+      this.editSightings = true
+    })
   }
 
   closeEditSightingsModal = () => {
-    this.editSightings = false
-    this.showConfirmation = false
+    runInAction(() => {
+      this.editSightings = false
+    })
   }
 
   openConfirmationModal = () => {
-    this.showConfirmation = true
+    runInAction(() => {
+      this.showConfirmation = true
+    })
   }
 
   closeConfirmationModal = () => {
-    this.showConfirmation = false
+    runInAction(() => {
+      this.showConfirmation = false
+    })
   }
 
   fetchDivesByGuide = flow(
@@ -139,11 +137,11 @@ class DiveStore {
   )
 
   saveSightings = flow(
-    function* (sightingsData) {
+    function* (sightingsData, diveId) {
       this._startDiveProcess()
       try {
-        const response = yield api.createSighting(sightingsData)
-        if (this.dive.diveId === sightingsData.diveId) {
+        const response = yield api.createSighting({sightings: sightingsData})
+        if (this.dive.diveId === diveId) {
           this.dive.sightings.push(...response.data)
         }
       } catch (error) {
