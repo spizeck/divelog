@@ -1,6 +1,6 @@
 import React from 'react'
 import { Modal, Button, List } from 'semantic-ui-react'
-import EditSightingsModal from './EditSightingsModal'
+
 import { observer, inject } from 'mobx-react'
 
 const SightingModal = inject('rootStore')(
@@ -40,7 +40,7 @@ const SightingModal = inject('rootStore')(
             </Button.Group>
           </Modal.Actions>
         </Modal>
-        <EditSightingsModal sightings={sightings} diveId={diveId} />
+        
       </>
     )
   })

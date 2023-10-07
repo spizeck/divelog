@@ -2,18 +2,14 @@ import { flow, makeAutoObservable } from 'mobx'
 import api from '../utils/api'
 
 class AuthStore {
-  rootStore
-  loggedIn = false
-  token = null
-  authStatus = 'idle' // 'idle' | 'pending' | 'error'
-  errorMessage = ''
-  loginMessage = ''
 
   constructor (rootStore) {
     this.rootStore = rootStore
     makeAutoObservable(this)
     this.token = localStorage.getItem('token') || null
     this.loggedIn = localStorage.getItem('loggedIn') === 'true' || false
+    this.loginMessage = ''
+    this.errorMessage = ''
   }
 
   login = flow(
@@ -58,6 +54,7 @@ class AuthStore {
         yield api.register(username, email, password, firstName, preferredUnits)
       } catch (error) {
         this.handleAuthError(error)
+        throw error
       } finally {
         this.endAuthProcess()
       }

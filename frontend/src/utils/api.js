@@ -84,7 +84,8 @@ const API_ENDPOINTS = {
   getPages: '/db/dives/pages',
   getSightingsForDive: '/db/sightings/for_dive',
   getUniqueDiveGuides: '/db/dives/get_dive_guides',
-  getFilteredDives: '/db/dives/get_filtered_dives'
+  getFilteredDives: '/db/dives/get_filtered_dives',
+  updateSightings: '/db/sightings/update_sightings'
 }
 
 let userId = null
@@ -251,6 +252,12 @@ const api = {
       page,
       entriesPerPage
     }),
+
+  updateSightings: (sightings, diveId) =>
+  makeApiRequest('put', API_ENDPOINTS.updateSightings, {
+    sightings,
+    diveId
+  }),
 
   setUserId
 }

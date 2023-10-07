@@ -140,7 +140,7 @@ class DiveStore {
     function* (sightingsData, diveId) {
       this._startDiveProcess()
       try {
-        const response = yield api.createSighting({sightings: sightingsData})
+        const response = yield api.createSighting({ sightings: sightingsData })
         if (this.dive.diveId === diveId) {
           this.dive.sightings.push(...response.data)
         }
@@ -212,6 +212,25 @@ class DiveStore {
         const { dives, totalPages } = response
         this.dives = dives
         this.totalPages = totalPages
+      } catch (error) {
+        this._handleDiveProcessError(error)
+      } finally {
+        this._endDiveProcess()
+      }
+    }.bind(this)
+  )
+
+  updateSightings = flow(
+    function* (sightingsData, diveId) {
+      this._startDiveProcess()
+      try {
+        const response = yield api.updateSightings(sightingsData, diveId)
+        this.successMessage =
+          response.message || 'Sightings updated successfully'
+        yield new Promise(resolve => setTimeout(resolve, 2000))
+        this.closeConfirmationModal()
+        this.closeEditSightingsModal()
+        this.closeSightingsModal()
       } catch (error) {
         this._handleDiveProcessError(error)
       } finally {

@@ -6,7 +6,7 @@ from errors import (DiveInfoMissingError, DiveIntegrityError, DiveNotFound,
                     InvalidDateFormatError, InvalidPageNumber,
                     InvalidSortMethodError, MissingDateError,
                     MissingDiveGuideError, MissingDiveId,
-                    MissingSortMethodOrKeyError)
+                    MissingSortMethodOrKeyError, MissingSightings)
 from extensions import db
 from models.dives import Dive
 from models.sightings import Sightings
@@ -153,9 +153,10 @@ def get_dives_by_guide(data):  # sourcery skip: extract-method
         offset = (page - 1) * entries_per_page
         dives = Dive.query.filter(Dive.dive_guide == data['diveGuide']).order_by(
             Dive.date.desc()).limit(entries_per_page).offset(offset).all()
-        
-        total_count = Dive.query.filter(Dive.dive_guide == data['diveGuide']).count()
-        
+
+        total_count = Dive.query.filter(
+            Dive.dive_guide == data['diveGuide']).count()
+
         response = {
             'dives': [dive.serialize() for dive in dives],
             'totalPages': math.ceil(total_count / entries_per_page),
@@ -270,6 +271,7 @@ def get_count_for_pages(data):
         logging.error(e)
         return {'message': 'Failed to get count', 'status': 500}, 500
 
+
 def delete_dive_logic(data):  # sourcery skip: extract-method
     try:
         if 'diveId' not in data:
@@ -294,37 +296,40 @@ def delete_dive_logic(data):  # sourcery skip: extract-method
     except Exception as e:
         _log_and_rollback(e)
         return {'message': 'Failed to delete dive', 'status': 500}, 500
-    
+
+
 def get_sightings_for_dive(data):
     try:
         if 'diveId' not in data:
             raise MissingDiveId()
-        
+
         dive_id = data['diveId']
         sightings = Sightings.query.filter(Sightings.dive_id == dive_id).all()
         sightings_list = [sighting.to_dict() for sighting in sightings]
         return {"sightings": sightings_list, 'status': 200}, 200
-        
+
     except MissingDiveId as e:
-        return {'message': str(e),'status': 400}, 400
-    
+        return {'message': str(e), 'status': 400}, 400
+
+
 def get_unique_dive_guides():
-    try: 
-        unique_dive_guides = Dive.query.with_entities(Dive.dive_guide).distinct().all()
-        unique_dive_guides_list = [unique_dive_guide[0] for unique_dive_guide in unique_dive_guides]
-        return {"diveGuides": unique_dive_guides_list,'status': 200}, 200
-        
+    try:
+        unique_dive_guides = Dive.query.with_entities(
+            Dive.dive_guide).distinct().all()
+        unique_dive_guides_list = [unique_dive_guide[0]
+                                   for unique_dive_guide in unique_dive_guides]
+        return {"diveGuides": unique_dive_guides_list, 'status': 200}, 200
+
     except Exception as e:
         logging.error(e)
-        return {'message': 'Failed to get dive guides','status': 500}, 500
+        return {'message': 'Failed to get dive guides', 'status': 500}, 500
+
 
 def get_filtered_dives(data):
     try:
         dive_guides = data.getlist('diveGuide[]')
         dive_sites = data.getlist('diveSite[]')
         boats = data.getlist('boat[]')
-        print(boats)
-        print("data received", data)
 
         page = int(data.get('page', 1))
         entries_per_page = int(data.get('entriesPerPage', 10))
@@ -345,7 +350,8 @@ def get_filtered_dives(data):
         if dive_sites:
             query = query.filter(Dive.dive_site.in_(dive_sites))
 
-        dives = query.order_by(Dive.date.desc()).limit(entries_per_page).offset(offset).all()
+        dives = query.order_by(Dive.date.desc()).limit(
+            entries_per_page).offset(offset).all()
         total_count = query.count()
 
         return {
@@ -359,3 +365,53 @@ def get_filtered_dives(data):
     except Exception as e:
         logging.error(e)
         return {'message': 'Failed to get dives', 'status': 500}, 500
+
+
+def update_sightings_for_dive(data):
+    try:
+        if 'diveId' not in data:
+            raise MissingDiveId()
+
+        if 'sightings' not in data:
+            raise MissingSightings()
+
+        dive_id = data['diveId']
+        new_sightings = data['sightings']
+
+        # Check that a dive with the given ID exists
+        dive = Dive.query.filter(Dive.id == dive_id).first()
+        if not dive:
+            raise DiveNotFound()
+
+        # Delete all existing sightings for this dive
+        sightings = Sightings.query.filter(Sightings.dive_id == dive_id).all()
+        for sighting in sightings:
+            db.session.delete(sighting)
+
+        sightings_to_save = []
+        for new_sighting in new_sightings:
+            species = new_sighting.get('name')
+            count = new_sighting.get('count')
+
+            if species is not None and count is not None and count != 0:
+                sighting_instance = Sightings(
+                    species=species,
+                    count=count,
+                    dive_id=dive_id
+                )
+                sightings_to_save.append(sighting_instance)
+
+        if sightings_to_save:
+            db.session.add_all(sightings_to_save)
+            db.session.commit()
+
+        return {'message': 'Sightings updated successfully', 'status': 200}, 200
+
+    except MissingDiveId as e:
+        return {'message': str(e), 'status': 400}, 400
+
+    except MissingSightings as e:
+        return {'message': str(e), 'status': 404}, 404
+
+    except DiveNotFound as e:
+        return {'message': str(e), 'status': 404}, 404

@@ -134,3 +134,9 @@ class InvalidSortMethodError(Exception):
         logging.error(message)
         self.message = message
         super().__init__(self.message)
+        
+class MissingSightings(Exception):
+    def __init__(self, message="Sightings are missing"):
+        logging.error(message)
+        self.message = message
+        super().__init__(self.message)

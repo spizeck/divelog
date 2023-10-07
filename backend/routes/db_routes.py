@@ -10,7 +10,7 @@ from services.dive_service import (create_dive, create_sighting,
                                    get_sightings_for_dive,
                                    get_unique_dive_guides,
                                    verify_database_connection,
-                                   get_filtered_dives)
+                                   get_filtered_dives, update_sightings_for_dive)
 
 db_bp = Blueprint('db_bp', __name__, url_prefix='/db')
 
@@ -87,6 +87,14 @@ def get_filtered_dives_route():
     data = request.args
     response, status = get_filtered_dives(data)
     return jsonify(response), status
+
+
+@db_bp.route('/sightings/update_sightings', methods=['PUT'])
+def update_sightings_route():
+    data = request.json
+    response, status = update_sightings_for_dive(data)
+    return jsonify(response), status
+
 
 def register_routes(app):
     app.register_blueprint(db_bp)

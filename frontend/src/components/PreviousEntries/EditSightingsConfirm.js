@@ -1,10 +1,11 @@
 import React from 'react'
-import { Modal, Button, List } from 'semantic-ui-react'
+import { Modal, Button, List, Message } from 'semantic-ui-react'
 import { observer, inject } from 'mobx-react'
 
 const EditSightingsConfirm = inject('rootStore')(
   observer(({ rootStore, formState, diveId }) => {
     const { diveStore } = rootStore
+
     return (
       <Modal open={diveStore.showConfirmation}>
         <Modal.Header>Confirm Sightings for Dive #{diveId}</Modal.Header>
@@ -20,13 +21,20 @@ const EditSightingsConfirm = inject('rootStore')(
                 ))}
             </List.Item>
           </List>
+          {diveStore.successMessage && (
+            <Message positive>{diveStore.successMessage}</Message>
+          )}
+
+          {diveStore.errorMessage && (
+            <Message negative>{diveStore.errorMessage}</Message>
+          )}
         </Modal.Content>
         <Modal.Actions>
           <Button.Group widths={2}>
             <Button
               primary
               className='small-buttons'
-              onClick={() => console.log('Update button clicked')}
+              onClick={() => diveStore.updateSightings(formState, diveId)}
             >
               Confirm
             </Button>

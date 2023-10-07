@@ -15,6 +15,7 @@ import SightingModal from './SightingModal'
 import DiveTable from './DiveTable'
 import unitConverter from '../../utils/convertUnits'
 import DiveFormData from '../DiveForm/steps/DiveFormData'
+import EditSightingsModal from './EditSightingsModal'
 import '../../styles/PreviousEntries.css'
 
 const PreviousEntries = inject('rootStore')(
@@ -296,6 +297,7 @@ const PreviousEntries = inject('rootStore')(
           sightings={sightings}
           diveId={diveId}
         />
+        <EditSightingsModal sightings={sightings} diveId={diveId} />
       </Container>
     )
   })
