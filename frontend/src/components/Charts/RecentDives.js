@@ -8,7 +8,8 @@ import {
   Tooltip,
   CartesianGrid,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
+  LabelList
 } from 'recharts'
 
 const RecentDives = inject('rootStore')(
@@ -89,9 +90,17 @@ const RecentDives = inject('rootStore')(
     return (
       <div style={{ width: '100%', height: '100%' }}>
         <h2>Where are we diving lately?</h2>
-        <ResponsiveContainer width='100%' height={300}>
-          <BarChart width={800} height={400} data={chartData}>
-            <XAxis dataKey='name' />
+        <ResponsiveContainer width='100%' height={400} >
+          <BarChart data={chartData} margin={{bottom: 75}}>
+            <XAxis
+              dataKey='name'
+              tick={{
+                angle: 45,
+                textAnchor: 'start',
+                dominantBaseline: 'ideographic',
+                dy: 5 // Optional: To move the tick labels slightly down
+              }}
+            />
             <YAxis
               label={{
                 value: 'Number of Dives',
@@ -103,32 +112,39 @@ const RecentDives = inject('rootStore')(
               allowDecimals={false}
             />
             <Tooltip />
-            <Legend formatter={legendFormatter} />
+            <Legend
+              formatter={legendFormatter}
+              layout='horizontal'
+              align='center'
+              verticalAlign='top'
+            />
             <CartesianGrid stroke='#eee' strokeDasharray='5 5' />
             <Bar
               dataKey='dive1'
               stackId='a'
               fill='#8884d8'
               name={legendFormatter('dive1')}
-            />
+            ></Bar>
             <Bar
               dataKey='dive2'
               stackId='a'
               fill='#82ca9d'
               name={legendFormatter('dive2')}
-            />
+            ></Bar>
             <Bar
               dataKey='dive3'
               stackId='a'
               fill='#ffc658'
               name={legendFormatter('dive3')}
-            />
+            >
+              {/* <LabelList dataKey='name' position='top' angle={-90} /> */}
+            </Bar>
             <Bar
-            dataKey='dive4'
-            stackId='a'
-            fill='#ff6347'
-            name={legendFormatter('dive4')}
-            />
+              dataKey='dive4'
+              stackId='a'
+              fill='#ff6347'
+              name={legendFormatter('dive4')}
+            ></Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
