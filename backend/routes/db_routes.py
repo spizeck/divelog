@@ -37,7 +37,9 @@ def create_sighting_route():
 
 @db_bp.route('/dives/by_date', methods=['GET'])
 def get_dives_by_date_range_route():
-    data = request.json
+    start_date = request.args.get('startDate')
+    end_date = request.args.get('endDate')
+    data = {'startDate': start_date, 'endDate': end_date}        
     return get_dives_by_date_range(data)
 
 

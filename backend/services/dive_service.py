@@ -116,6 +116,10 @@ def get_dives_by_date_range(data):
         try:
             start_date = parse(data['startDate']).date()
             end_date = parse(data['endDate']).date()
+
+            if start_date > end_date:
+                start_date, end_date = end_date, start_date
+                
         except ValueError as e:
             raise InvalidDateFormatError() from e
 

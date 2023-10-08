@@ -2,20 +2,19 @@ import { flow, makeAutoObservable, runInAction } from 'mobx'
 import api from '../utils/api'
 
 class DiveStore {
-  errorMessage = null
-  successMessage = null
-  diveProcessStatus = 'idle'
-  dives = []
-  dive = {}
-  totalPages = 1
-  diveGuides = []
-  sightingsModalOpen = false
-  editSightings = false
-  showConfirmation = false
 
   constructor (rootStore) {
     makeAutoObservable(this)
     this.rootStore = rootStore
+    this.errorMessage = null
+    this.successMessage = null
+    this.dives = []
+    this.dive = {}
+    this.totalPages = 1
+    this.diveGuides = []
+    this.sightingsModalOpen = false
+    this.editSightings = false
+    this.showConfirmation = false
   }
 
   _startDiveProcess () {
@@ -94,7 +93,7 @@ class DiveStore {
       this._startDiveProcess()
       try {
         const response = yield api.getDivesByDate(startDate, endDate)
-        this.dives = response.data
+        this.dives = response
       } catch (error) {
         this._handleDiveProcessError(error)
       } finally {

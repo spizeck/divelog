@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { observer, inject } from 'mobx-react'
 import { Container, Header, Message } from 'semantic-ui-react'
+import RecentDives from './Charts/RecentDives'
 
 // Home class that takes firstName from the userStore
 const Home = inject('rootStore')(
@@ -24,6 +25,7 @@ const Home = inject('rootStore')(
           <Header as='h1'>
             Welcome to the Dive Log App{loggedIn && `, ${firstName}`}!
           </Header>
+          <RecentDives />
           <div>
             <h2>🚧 We're Under Construction!</h2>
             <p>
