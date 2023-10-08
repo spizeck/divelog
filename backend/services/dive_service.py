@@ -350,7 +350,7 @@ def get_filtered_dives(data):
         if dive_sites:
             query = query.filter(Dive.dive_site.in_(dive_sites))
 
-        dives = query.order_by(Dive.date.desc()).limit(
+        dives = query.order_by(Dive.date.desc(), Dive.dive_number, Dive.boat).limit(
             entries_per_page).offset(offset).all()
         total_count = query.count()
 
