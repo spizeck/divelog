@@ -5,7 +5,7 @@ import { observer, inject } from 'mobx-react'
 
 const SightingModal = inject('rootStore')(
   observer(({ rootStore, sightings, diveId }) => {
-    const { diveStore } = rootStore
+    const { diveStore, userStore } = rootStore
 
     return (
       <>
@@ -25,6 +25,7 @@ const SightingModal = inject('rootStore')(
               <Button
                 className='small-buttons'
                 primary
+                disabled={!userStore.approved}
                 onClick={() => diveStore.openEditSightingsModal()}
               >
                 Edit Sightings

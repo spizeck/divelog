@@ -47,10 +47,10 @@ const EditDiveModal = ({
           <Form.Field>
             <label>Dive Guide</label>
             <Input
-            type='text'
-            name='diveGuide'
-            value={formState.diveGuide}
-            onChange={handleInputChange}
+              type='text'
+              name='diveGuide'
+              value={formState.diveGuide}
+              onChange={handleInputChange}
             />
           </Form.Field>
           <Form.Field>
@@ -81,8 +81,15 @@ const EditDiveModal = ({
               onChange={handleInputChange}
             />
           </Form.Field>
-          <Button type='submit'>Update</Button>
-          <Button onClick={handleEditClose}>Cancel</Button>
+          <Button.Group fluid>
+            <Button className='small-buttons' primary type='submit'>
+              Update
+            </Button>
+            <Button.Or className='or-button' />
+            <Button className='small-buttons' negative onClick={handleEditClose}>
+              Cancel
+            </Button>
+          </Button.Group>
         </Form>
       </Modal.Content>
     </Modal>

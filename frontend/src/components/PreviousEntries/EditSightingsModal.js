@@ -71,6 +71,7 @@ const EditSightingsModal = inject('rootStore')(
             <Button
               className='small-buttons'
               primary
+              
               onClick={() => diveStore.openConfirmationModal()}
             >
               Review Changes

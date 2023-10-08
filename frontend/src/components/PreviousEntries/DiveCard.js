@@ -10,7 +10,8 @@ const DiveCard = ({
   handleDeleteOpen,
   handleViewSightingsOpen,
   timeMap,
-  preferredUnits
+  preferredUnits,
+  userStore
 }) => {
   return (
     <Card className='dive-card' fluid>
@@ -35,6 +36,7 @@ const DiveCard = ({
             )}{' '}
             {units.temperature}
           </p>
+          <p></p>
         </Card.Description>
         <Card.Content extra>
           <Button.Group fluid widths={3}>
@@ -46,19 +48,22 @@ const DiveCard = ({
             >
               <Icon name='binoculars' />
             </Button>
+            <Button.Or className='or-button' />
             <Button
               icon
               color='blue'
               size='small'
               onClick={() => handleEditOpen(dive)}
+              disabled={!userStore.approved}
             >
               <Icon name='edit' />
-            </Button>
+            </Button><Button.Or className='or-button' />
             <Button
               icon
               color='red'
               size='small'
               onClick={() => handleDeleteOpen(dive.id)}
+              disabled={!userStore.approved}
             >
               <Icon name='trash alternate outline' />
             </Button>

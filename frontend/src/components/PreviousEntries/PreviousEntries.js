@@ -236,6 +236,7 @@ const PreviousEntries = inject('rootStore')(
             handleDeleteOpen={handleDeleteOpen}
             handleViewSightingsOpen={handleViewSightingsOpen}
             timeMap={timeMap}
+            userStore={userStore}
           />
         </div>
         <div className='dive-card'>
@@ -249,6 +250,7 @@ const PreviousEntries = inject('rootStore')(
               handleViewSightingsOpen={handleViewSightingsOpen}
               timeMap={timeMap}
               preferredUnits={preferredUnits}
+              userStore={userStore}
             />
           ))}
         </div>
