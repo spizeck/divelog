@@ -2,6 +2,15 @@ import { flow, makeAutoObservable } from 'mobx'
 import api from '../utils/api'
 
 class UserStore {
+  username = ''
+  firstName = ''
+  preferredUnits = ''
+  approved = false
+  admin = false
+  email = ''
+  userStatus = 'idle' // 'idle' | 'pending' | 'error'
+  errorMessage = ''
+
   constructor (rootStore) {
     makeAutoObservable(this)
     this.rootStore = rootStore

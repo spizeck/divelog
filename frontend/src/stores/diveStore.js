@@ -2,6 +2,16 @@ import { flow, makeAutoObservable, runInAction } from 'mobx'
 import api from '../utils/api'
 
 class DiveStore {
+  errorMessage = null;
+  successMessage = null;
+  dives = [];
+  dive = {};
+  dataToVisualize = [];
+  totalPages = 1;
+  diveGuides = [];
+  sightingsModalOpen = false;
+  editSightings = false;
+  showConfirmation = false;
 
   constructor (rootStore) {
     makeAutoObservable(this)

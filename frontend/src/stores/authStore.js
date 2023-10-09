@@ -2,6 +2,10 @@ import { flow, makeAutoObservable } from 'mobx'
 import api from '../utils/api'
 
 class AuthStore {
+token = null
+  loggedIn = false
+  loginMessage = ''
+  errorMessage = ''
 
   constructor (rootStore) {
     this.rootStore = rootStore

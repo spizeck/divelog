@@ -42,7 +42,7 @@ const Navigation = inject('rootStore')(
           )}
           {renderMenuItem('Home', '/home', false)}
           {renderMenuItem('Dive Log Entry', '/diveLogEntry', true)}
-          {renderMenuItem('Previous Entries', '/previousEntries', true)}
+          {renderMenuItem('Previous Entries', '/previousEntries', false)}
           <Menu.Menu position='right'>
             {!isMobile && renderMenuItem('Preferences', '/preferences', true)}
             {!isMobile && (

@@ -295,10 +295,7 @@ const PreviousEntries = inject('rootStore')(
           diveIdToDelete={diveIdToDelete}
           handleDeleteDive={handleDeleteDive}
         />
-        <SightingModal
-          sightings={sightings}
-          diveId={diveId}
-        />
+        <SightingModal sightings={sightings} diveId={diveId} />
         <EditSightingsModal sightings={sightings} diveId={diveId} />
       </Container>
     )
