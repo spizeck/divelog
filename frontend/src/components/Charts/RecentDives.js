@@ -106,8 +106,8 @@ const RecentDives = inject('rootStore')(
             data={chartData}
             margin={
               isMobile
-                ? { top: 20, right: 20, left: -25, bottom: 80 }
-                : { top: 20, right: 20, left: 0, bottom: 80 }
+                ? { top: 20, right: 20, left: -25, bottom: 85 }
+                : { top: 20, right: 20, left: 0, bottom: 85 }
             }
           >
             <XAxis
