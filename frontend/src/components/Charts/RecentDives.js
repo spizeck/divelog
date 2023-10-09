@@ -21,6 +21,17 @@ const RecentDives = inject('rootStore')(
     const formattedToday = today.toISOString().slice(0, 10)
     const fourteenDaysAgo = new Date(today - 14 * 24 * 60 * 60 * 1000)
     const formattedFourteenDaysAgo = fourteenDaysAgo.toISOString().slice(0, 10)
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+
+    useEffect(() => {
+      const handleResize = () => {
+        setIsMobile(window.innerWidth <= 768)
+      }
+      window.addEventListener('resize', handleResize)
+      return () => {
+        window.removeEventListener('resize', handleResize)
+      }
+    }, [])
 
     useEffect(() => {
       const fetchData = async () => {
@@ -29,7 +40,7 @@ const RecentDives = inject('rootStore')(
             formattedToday,
             formattedFourteenDaysAgo
           )
-          const data = diveStore.dives
+          const data = diveStore.dataToVisualize
           const preparedData = prepareChartData(data.dives)
           setChartData(preparedData)
         } catch (error) {
@@ -90,12 +101,19 @@ const RecentDives = inject('rootStore')(
     return (
       <div style={{ width: '100%', height: '100%' }}>
         <h2>Where are we diving lately?</h2>
-        <ResponsiveContainer width='100%' height={400} >
-          <BarChart data={chartData} margin={{bottom: 75}}>
+        <ResponsiveContainer width='100%' height={400}>
+          <BarChart
+            data={chartData}
+            margin={
+              isMobile
+                ? { top: 20, right: 20, left: -25, bottom: 80 }
+                : { top: 20, right: 20, left: 0, bottom: 80 }
+            }
+          >
             <XAxis
               dataKey='name'
               tick={{
-                angle: 45,
+                angle: 60,
                 textAnchor: 'start',
                 dominantBaseline: 'ideographic',
                 dy: 5 // Optional: To move the tick labels slightly down
@@ -103,41 +121,42 @@ const RecentDives = inject('rootStore')(
             />
             <YAxis
               label={{
-                value: 'Number of Dives',
+                value: isMobile ? '' : 'Number of Dives',
                 angle: -90,
-                position: 'insideLeft'
+                position: 'insideLeft',
+                dx: 20
               }}
               domain={[0, 'dataMax']}
               tickCount={10}
               allowDecimals={false}
             />
             <Tooltip />
-            <Legend
+            {!isMobile ? <Legend
               formatter={legendFormatter}
               layout='horizontal'
               align='center'
               verticalAlign='top'
-            />
+              
+            /> : null}
             <CartesianGrid stroke='#eee' strokeDasharray='5 5' />
             <Bar
               dataKey='dive1'
               stackId='a'
-              fill='#8884d8'
+              fill='#003f5c'
               name={legendFormatter('dive1')}
             ></Bar>
             <Bar
               dataKey='dive2'
               stackId='a'
-              fill='#82ca9d'
+              fill='#7a5195'
               name={legendFormatter('dive2')}
             ></Bar>
             <Bar
               dataKey='dive3'
               stackId='a'
-              fill='#ffc658'
+              fill='#ffa600'
               name={legendFormatter('dive3')}
             >
-              {/* <LabelList dataKey='name' position='top' angle={-90} /> */}
             </Bar>
             <Bar
               dataKey='dive4'

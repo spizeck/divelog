@@ -10,6 +10,7 @@ class DiveStore {
     this.successMessage = null
     this.dives = []
     this.dive = {}
+    this.dataToVisualize = []
     this.totalPages = 1
     this.diveGuides = []
     this.sightingsModalOpen = false
@@ -93,7 +94,7 @@ class DiveStore {
       this._startDiveProcess()
       try {
         const response = yield api.getDivesByDate(startDate, endDate)
-        this.dives = response
+        this.dataToVisualize = response
       } catch (error) {
         this._handleDiveProcessError(error)
       } finally {
