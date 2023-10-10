@@ -9,7 +9,6 @@ import {
   CartesianGrid,
   Legend,
   ResponsiveContainer,
-  LabelList
 } from 'recharts'
 
 const RecentDives = inject('rootStore')(
@@ -58,7 +57,7 @@ const RecentDives = inject('rootStore')(
         const key = `${diveSite}-${date}-${boat}`
 
         if (!siteData[diveSite]) {
-          siteData[diveSite] = { dive1: 0, dive2: 0, dive3: 0 }
+          siteData[diveSite] = { dive1: 0, dive2: 0, dive3: 0, dive4: 0 }
         }
 
         if (!siteData[diveSite][key]) {
@@ -70,7 +69,7 @@ const RecentDives = inject('rootStore')(
 
       Object.keys(siteData).forEach(site => {
         const keys = Object.keys(siteData[site]).filter(
-          key => key !== 'dive1' && key !== 'dive2' && key !== 'dive3'
+          key => key !== 'dive1' && key !== 'dive2' && key !== 'dive3' && key!== 'dive4'
         )
         keys.forEach(key => {
           siteData[site][key].forEach(diveNumber => {
