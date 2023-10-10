@@ -36,10 +36,6 @@ const EditSightingsModal = inject('rootStore')(
       setFormState(updatedCounts)
     }, [sightings])
 
-    // useEffect(() => {
-    //   console.log(formState)
-    // }, [formState])
-
     return (
       <>
       <Modal open={diveStore.editSightings}>

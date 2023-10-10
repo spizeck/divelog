@@ -17,6 +17,7 @@ import unitConverter from '../../utils/convertUnits'
 import DiveFormData from '../DiveForm/steps/DiveFormData'
 import EditSightingsModal from './EditSightingsModal'
 import '../../styles/PreviousEntries.css'
+import { toJS } from 'mobx';
 
 const PreviousEntries = inject('rootStore')(
   observer(({ rootStore }) => {
@@ -75,11 +76,12 @@ const PreviousEntries = inject('rootStore')(
       setActivePage(1)
     }, [filters])
 
+    const fetchData = async () => {
+      await fetchFilteredDives(filters, activePage, entriesPerPage)
+      setTotalPages(diveStore.totalPages)
+    }
+
     useEffect(() => {
-      const fetchData = async () => {
-        await fetchFilteredDives(filters, activePage, entriesPerPage)
-        setTotalPages(diveStore.totalPages)
-      }
       fetchData()
     }, [filters, activePage, entriesPerPage])
 
