@@ -51,7 +51,7 @@ const PreviousEntries = inject('rootStore')(
     useEffect(() => {}, [filters])
 
     useEffect(() => {
-      const fetchData = async () => {
+      const fetchDiveGuides = async () => {
         await diveStore.getUniqueDiveGuides()
         const diveGuides = diveStore.diveGuides.map(guide => ({
           text: guide,
@@ -59,8 +59,7 @@ const PreviousEntries = inject('rootStore')(
         }))
         setDiveGuides(diveGuides)
       }
-
-      fetchData()
+      fetchDiveGuides()
     }, [])
 
     useEffect(() => {
@@ -83,7 +82,7 @@ const PreviousEntries = inject('rootStore')(
 
     useEffect(() => {
       fetchData()
-    }, [filters, activePage, entriesPerPage])
+    }, [activePage, JSON.stringify(filters), JSON.stringify(entriesPerPage)])
 
     const timeMap = {
       1: '9:00 am',
@@ -179,7 +178,6 @@ const PreviousEntries = inject('rootStore')(
 
     const handlePageChange = (e, data) => {
       setActivePage(data.activePage)
-      fetchFilteredDives(filters, activePage, entriesPerPage)
     }
 
     const handleEntriesPerPageChange = newEntriesPerPage => {

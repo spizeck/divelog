@@ -131,13 +131,14 @@ const RecentDives = inject('rootStore')(
               allowDecimals={false}
             />
             <Tooltip />
-            {!isMobile ? <Legend
-              formatter={legendFormatter}
-              layout='horizontal'
-              align='center'
-              verticalAlign='top'
-              
-            /> : null}
+            {!isMobile && (
+              <Legend
+                formatter={legendFormatter}
+                layout='horizontal'
+                align='center'
+                verticalAlign='top'
+              />
+            )}
             <CartesianGrid stroke='#eee' strokeDasharray='5 5' />
             <Bar
               dataKey='dive1'
@@ -156,8 +157,7 @@ const RecentDives = inject('rootStore')(
               stackId='a'
               fill='#ffa600'
               name={legendFormatter('dive3')}
-            >
-            </Bar>
+            ></Bar>
             <Bar
               dataKey='dive4'
               stackId='a'

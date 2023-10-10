@@ -31,7 +31,7 @@ const DiveTable = ({
       </Table.Header>
       <Table.Body>
         {dives.map((dive, index) => (
-          <Table.Row key={index}>
+          <Table.Row key={dive.id || index}>
             <Table.Cell>{dive.date}</Table.Cell>
             <Table.Cell>{timeMap[dive.diveNumber]}</Table.Cell>
             <Table.Cell>{dive.boat}</Table.Cell>
