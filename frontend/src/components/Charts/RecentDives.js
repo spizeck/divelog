@@ -154,13 +154,13 @@ const RecentDives = inject('rootStore')(
             <Bar
               dataKey='dive2'
               stackId='a'
-              fill='#7a5195'
+              fill='#58508d'
               name={legendFormatter('dive2')}
             ></Bar>
             <Bar
               dataKey='dive3'
               stackId='a'
-              fill='#ffa600'
+              fill='#bc5090'
               name={legendFormatter('dive3')}
             ></Bar>
             <Bar
