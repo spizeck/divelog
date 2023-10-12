@@ -8,7 +8,7 @@ import {
   Tooltip,
   CartesianGrid,
   Legend,
-  ResponsiveContainer,
+  ResponsiveContainer
 } from 'recharts'
 
 const RecentDives = inject('rootStore')(
@@ -57,7 +57,7 @@ const RecentDives = inject('rootStore')(
         const key = `${diveSite}-${date}-${boat}`
 
         if (!siteData[diveSite]) {
-          siteData[diveSite] = { dive1: 0, dive2: 0, dive3: 0, dive4: 0 }
+          siteData[diveSite] = { dive1: 0, dive2: 0, dive3: 0, dive4: 0, dive5:0 }
         }
 
         if (!siteData[diveSite][key]) {
@@ -69,7 +69,12 @@ const RecentDives = inject('rootStore')(
 
       Object.keys(siteData).forEach(site => {
         const keys = Object.keys(siteData[site]).filter(
-          key => key !== 'dive1' && key !== 'dive2' && key !== 'dive3' && key!== 'dive4'
+          key =>
+            key !== 'dive1' &&
+            key !== 'dive2' &&
+            key !== 'dive3' &&
+            key !== 'dive4' &&
+            key !== 'dive5'
         )
         keys.forEach(key => {
           siteData[site][key].forEach(diveNumber => {
@@ -161,8 +166,14 @@ const RecentDives = inject('rootStore')(
             <Bar
               dataKey='dive4'
               stackId='a'
-              fill='#ff6347'
+              fill='#ff6361'
               name={legendFormatter('dive4')}
+            ></Bar>
+            <Bar
+              dataKey='dive5'
+              stackId='a'
+              fill='#ffa600'
+              name={legendFormatter('dive5')}
             ></Bar>
           </BarChart>
         </ResponsiveContainer>
