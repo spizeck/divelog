@@ -93,7 +93,8 @@ const RecentDives = inject('rootStore')(
         dive1: '9:00 AM',
         dive2: '11:00 AM',
         dive3: '1:00 PM',
-        dive4: 'Night Dive'
+        dive4: '3:00 PM',
+        dive5: 'Night Dive'
       }
       return legendMapping[name] || name
     }
