@@ -1,13 +1,16 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flask_mail import Mail, Message
 from config import app_config
 from errors import register_error_handlers
 from extensions import db, jwt
 
+mail = Mail()
 
 def create_app(config_class=app_config):
     app = Flask(__name__)
-    CORS(app, resources={r"/*": {"origins": "*", "allow_headers": ["Content-Type", "Authorization"]}})
+    CORS(app, resources={r"/*": {"origins": "*",
+         "allow_headers": ["Content-Type", "Authorization"]}})
 
     # Configure Flask app
     app.config.from_object(config_class)
@@ -15,6 +18,7 @@ def create_app(config_class=app_config):
     # Initialize Flask extensions
     db.init_app(app)
     jwt.init_app(app)
+    mail.init_app(app)
 
     # Register error handlers
     register_error_handlers(app)
@@ -35,6 +39,15 @@ def create_app(config_class=app_config):
     @app.route('/')
     def index():
         return jsonify(message='Welcome to the Dive Log API'), 200
+
+    @app.route('/send_test_email', methods=['GET'])
+    def send_test_email():
+        msg = Message("Hello", sender="office@seasaba.com",
+                      recipients=["chad@seasaba.com"])
+        msg.body = "This is a test email sent from your Flask app."
+        mail.send(msg)
+
+        return jsonify(message='Test email sent!'), 200
 
     return app
 
