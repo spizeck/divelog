@@ -1,11 +1,10 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from flask_mail import Mail, Message
+from postmarker.core import PostmarkClient
 from config import app_config
 from errors import register_error_handlers
 from extensions import db, jwt
 
-mail = Mail()
 
 def create_app(config_class=app_config):
     app = Flask(__name__)
@@ -18,7 +17,7 @@ def create_app(config_class=app_config):
     # Initialize Flask extensions
     db.init_app(app)
     jwt.init_app(app)
-    mail.init_app(app)
+    app.postmark = PostmarkClient(server_token=config_class.POSTMARK_SERVER_TOKEN)
 
     # Register error handlers
     register_error_handlers(app)
@@ -35,19 +34,24 @@ def create_app(config_class=app_config):
     with app.app_context():
         # db.drop_all() # comment out for production
         db.create_all()
+        
+    @app.route('/send_test_email', methods=['GET'])
+    def send_test_email():
+        result = app.postmark.emails.send(
+            From='chad@seasaba.com',
+            To='katy@seasaba.com',
+            Subject='Test email from Postmark',
+            TextBody='This is a test email sent via Postmark.'
+        )
+        if result:
+            return jsonify(message='Test email sent successfully!'), 200
+        else:
+            return jsonify(message='Failed to send test email.'), 500
+
 
     @app.route('/')
     def index():
         return jsonify(message='Welcome to the Dive Log API'), 200
-
-    @app.route('/send_test_email', methods=['GET'])
-    def send_test_email():
-        msg = Message("Hello", sender="office@seasaba.com",
-                      recipients=["chad@seasaba.com"])
-        msg.body = "This is a test email sent from your Flask app."
-        mail.send(msg)
-
-        return jsonify(message='Test email sent!'), 200
 
     return app
 
