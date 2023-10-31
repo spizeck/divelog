@@ -1,9 +1,9 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from postmarker.core import PostmarkClient
+init_postmark
 from config import app_config
 from errors import register_error_handlers
-from extensions import db, jwt
+from extensions import db, jwt, init_postmark
 
 
 def create_app(config_class=app_config):
@@ -17,7 +17,7 @@ def create_app(config_class=app_config):
     # Initialize Flask extensions
     db.init_app(app)
     jwt.init_app(app)
-    app.postmark = PostmarkClient(server_token=config_class.POSTMARK_SERVER_TOKEN)
+    init_postmark(app, config_class.POSTMARK_SERVER_TOKEN)
 
     # Register error handlers
     register_error_handlers(app)
@@ -34,12 +34,12 @@ def create_app(config_class=app_config):
     with app.app_context():
         # db.drop_all() # comment out for production
         db.create_all()
-        
+
     @app.route('/send_test_email', methods=['GET'])
     def send_test_email():
         result = app.postmark.emails.send(
-            From='chad@seasaba.com',
-            To='katy@seasaba.com',
+            From='divelog@seasaba.com',
+            To='chad@seasaba.com',
             Subject='Test email from Postmark',
             TextBody='This is a test email sent via Postmark.'
         )
@@ -47,7 +47,6 @@ def create_app(config_class=app_config):
             return jsonify(message='Test email sent successfully!'), 200
         else:
             return jsonify(message='Failed to send test email.'), 500
-
 
     @app.route('/')
     def index():

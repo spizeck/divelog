@@ -1,6 +1,8 @@
 from models.users import User
 from models.user_preferences import UserPreferences
-from extensions import db
+from models.password_reset import PasswordResetTokens
+from extensions import db, postmark_client
+import secrets
 
 
 def create_user(username, email, password, first_name=None, preferred_units='imperial', is_approved=False, admin=False): 
@@ -94,3 +96,22 @@ def change_user_preferences(user, **kwargs):
             setattr(user.user_preferences, key, value)
     
     db.session.commit()
+
+def generate_reset_token(email):
+    token = secrets.token_hex(16)
+    token_entry = PasswordResetTokens(email=email, reset_token=token)
+    db.session.add(token_entry)
+    db.session.commit()
+    
+def send_reset_email(email, reset_token):
+    try:
+        postmark_client.emails.send(
+            From='divelog@seasaba.com',
+            To=email,
+            Subject='Reset your password',
+            HtmlBody=f'<h1>Password Reset</h1><p>Please use the following token to reset your password: {reset_token}</p>'
+        )
+        return True
+    except Exception as e:
+        print(f'Error sending email: {e}')
+        return False

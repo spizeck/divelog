@@ -97,25 +97,32 @@ def logout():
 @auth_bp.route('/forgot_password', methods=['POST'])
 def forgot_password():
     data = request.json
-    email = data['email']
+    email = data.get('email', None)
+    
+    if email is None:
+        return jsonify({'status': 400,'message': 'Email is required'}), 400
 
     # check if the user exists
     user = get_user_by_email(email)
     if not user:
         return jsonify({'status': 404, 'message': 'Email not found'}), 404
 
-    # Generate a new password for the user
     try:
-        change_password(user, 'password123')
+        reset_token = generate_reset_token(email)
     except Exception as e:
-        logging.error(f'Error saving new password to the database: {e}')
-        return jsonify({'status': 500, 'message': 'Database connection error'}), 500
+        logging.error(f'Error saving reset token to the database: {e}')
+        return jsonify({'status': 500,'message': 'Token generation error'}), 500
 
-    # Send the new password to the user's email
-    # TODO: Implement email sending
-    # TODO: Replace with a link to reset password
-    return jsonify({'status': 200, 'message': 'New password is password123 -- Please change ASAP'}), 200
-
+    try:
+        email_sent = send_email(email, reset_token)
+    except Exception as e:
+        logging.error(f'Error sending email to {email}: {e}')
+        return jsonify({'status': 500,'message': 'Email sending error'}), 500
+    
+    if email_sent:
+        return jsonify({'status': 200,'message': 'Password reset email sent'}), 200
+    else:
+        return jsonify({'status': 500,'message': 'Email sending error'}), 500
 
 @auth_bp.route('/current_user', methods=['GET'])
 @jwt_required()
