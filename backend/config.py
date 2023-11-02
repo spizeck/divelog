@@ -11,7 +11,6 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     POSTMARK_SERVER_TOKEN = os.environ.get('POSTMARK_SERVER_TOKEN')
 
-
 class DevelopmentConfig(Config):
     debug = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')

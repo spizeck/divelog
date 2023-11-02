@@ -2,7 +2,7 @@ import { flow, makeAutoObservable } from 'mobx'
 import api from '../utils/api'
 
 class AuthStore {
-token = null
+  token = null
   loggedIn = false
   loginMessage = ''
   errorMessage = ''
@@ -65,11 +65,11 @@ token = null
     }.bind(this)
   )
 
-  resetPassword = flow(
+  forgotPassword = flow(
     function* (email) {
       this.startAuthProcess()
       try {
-        yield api.forgotPassword(email)
+        return yield api.forgotPassword(email);
       } catch (error) {
         this.handleAuthError(error)
       } finally {
@@ -83,6 +83,19 @@ token = null
       this.startAuthProcess()
       try {
         yield api.updateUser(userData)
+      } catch (error) {
+        this.handleAuthError(error)
+      } finally {
+        this.endAuthProcess()
+      }
+    }.bind(this)
+  )
+
+  changePassword = flow(
+    function* (token, newPassword) {
+      this.startAuthProcess()
+      try {
+        return yield api.resetPassword(token, newPassword)
       } catch (error) {
         this.handleAuthError(error)
       } finally {

@@ -7,7 +7,8 @@ from flask_jwt_extended import (create_access_token, get_jwt_identity,
 from models.users import User
 from services.user_service import (create_user, get_user_by_email,
                                    get_user_by_id, get_user_by_username,
-                                   update_username, update_email, change_password, change_user_preferences)
+                                   update_username, update_email, change_password, 
+                                   change_user_preferences, send_reset_email, perform_reset_password)
 
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
@@ -16,29 +17,28 @@ auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.json
-    username = data['username'] if 'username' in data else None
-    email = data['email'] if 'email' in data else None
+    username = data.get('username', None)
+    email = data.get('email', None)
     password = data['password']
 
+    user = None
     try:
-        user = get_user_by_username(
-            username) if username else get_user_by_email(email)
+        if username:
+            user = get_user_by_username(username.lower().strip())
+        elif email:
+            user = get_user_by_email(email.strip())
     except Exception as e:
-        logging.error(
-            f'Error retrieving user {username} from the database: {e}')
-        return jsonify({'status': 500, 'message': 'Database connection error'}), 500
+        logging.error(f'Error retrieving user: {e}')
+        return jsonify({'status': 500, 'message': 'An error occurred while retrieving user information'}), 500
 
-    if user is None or not user.verify_password(password):
-        logging.info(f'User {username} failed to log in')
+    if not user or not user.verify_password(password):
+        logging.info('Failed login attempt')
         return jsonify({'status': 401, 'message': 'Invalid credentials'}), 401
 
     # If the user exists, generate an access token for them
     token = create_access_token(identity=user.id)
 
-    # Save the token to the session
-    session['token'] = token
-
-    return jsonify({'status': 200, 'message': 'Login successful', 'token': token, 'username': username}), 200
+    return jsonify({'status': 200, 'message': 'Login successful', 'token': token}), 200
 
 
 @auth_bp.route('/register', methods=['POST'])
@@ -98,9 +98,9 @@ def logout():
 def forgot_password():
     data = request.json
     email = data.get('email', None)
-    
+
     if email is None:
-        return jsonify({'status': 400,'message': 'Email is required'}), 400
+        return jsonify({'status': 400, 'message': 'Email is required'}), 400
 
     # check if the user exists
     user = get_user_by_email(email)
@@ -108,21 +108,31 @@ def forgot_password():
         return jsonify({'status': 404, 'message': 'Email not found'}), 404
 
     try:
-        reset_token = generate_reset_token(email)
-    except Exception as e:
-        logging.error(f'Error saving reset token to the database: {e}')
-        return jsonify({'status': 500,'message': 'Token generation error'}), 500
-
-    try:
-        email_sent = send_email(email, reset_token)
+        email_sent = send_reset_email(email)
     except Exception as e:
         logging.error(f'Error sending email to {email}: {e}')
-        return jsonify({'status': 500,'message': 'Email sending error'}), 500
-    
+        return jsonify({'status': 500, 'message': 'Email sending error'}), 500
+
     if email_sent:
-        return jsonify({'status': 200,'message': 'Password reset email sent'}), 200
+        return jsonify({'status': 200, 'message': 'Password reset email sent'}), 200
     else:
-        return jsonify({'status': 500,'message': 'Email sending error'}), 500
+        return jsonify({'status': 500, 'message': 'Email sending error'}), 500
+
+@auth_bp.route('/reset_password', methods=['POST'])
+def reset_password():
+    data = request.json
+    token = data.get('token', None)
+    new_password = data.get('newPassword', None)
+    
+    if token is None or new_password is None:
+        return jsonify({'status': 400, 'message': 'Invalid request'}), 400
+    success, message = perform_reset_password(token, new_password)
+
+    if success:
+        return jsonify({'status': 200,'message': message}), 200
+    else:
+        return jsonify({'status': 500,'message': message}), 500
+
 
 @auth_bp.route('/current_user', methods=['GET'])
 @jwt_required()

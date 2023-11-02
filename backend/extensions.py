@@ -4,7 +4,8 @@ from postmarker.core import PostmarkClient
 
 db = SQLAlchemy()
 jwt = JWTManager()
-postmark_client = PostmarkClient()
+postmark_client = None
 
-def init_postmark(app, server_token):
-    postmark_client.server_token = server_token
+def init_postmark(server_token):
+    global postmark_client
+    postmark_client = PostmarkClient(server_token)

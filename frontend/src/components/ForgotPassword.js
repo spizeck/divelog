@@ -16,12 +16,14 @@ const ForgotPassword = inject('rootStore')(
     const [email, setEmail] = useState('')
     const [errorMessage, setErrorMessage] = useState('')
     const [successMessage, setSuccessMessage] = useState('')
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const navigate = useNavigate()
 
     // Forgot password function in the authStore
     const handleForgotPassword = async e => {
       e.preventDefault()
+      if (isSubmitting) return
 
       if (email === '') {
         setErrorMessage('Please enter your email')
@@ -31,6 +33,7 @@ const ForgotPassword = inject('rootStore')(
         setErrorMessage('Please enter a valid email')
         return
       }
+      setIsSubmitting(true)
 
       try {
         const forgotPasswordResponse = await authStore.forgotPassword(email)
@@ -40,10 +43,12 @@ const ForgotPassword = inject('rootStore')(
             navigate('/login')
           }, 3000)
         } else {
-          setErrorMessage(forgotPasswordResponse.message)
+          setErrorMessage(authStore.errorMessage)
         }
       } catch (error) {
-        setErrorMessage(error.message)
+        setErrorMessage(authStore.errorMessage)
+      } finally {
+        setIsSubmitting(false)
       }
     }
 
@@ -57,7 +62,7 @@ const ForgotPassword = inject('rootStore')(
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
-          <Button fluid type='submit' primary>
+          <Button fluid type='submit' primary disabled={isSubmitting}>
             Reset Password
           </Button>
           <p></p>

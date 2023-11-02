@@ -23,6 +23,7 @@ import Navigation from './components/Navigation'
 import Login from './components/Login'
 import Register from './components/Register'
 import ForgotPassword from './components/ForgotPassword'
+import ResetPassword from './components/ResetPassword'
 // import NotFound from './components/NotFound.js'
 
 const AppRoutes = observer(() => {
@@ -36,6 +37,7 @@ const AppRoutes = observer(() => {
       <Route path='/diveLogEntry' element={<DiveForm />} />
       <Route path='/previousEntries' element={<PreviousEntries />} />
       <Route path='/preferences' element={<Preferences />} />
+      <Route path='/reset_password' element={<ResetPassword />} />
       {/* <Route path='*' element={<NotFound />} /> */}
     </Routes>
   )

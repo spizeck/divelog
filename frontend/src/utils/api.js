@@ -67,6 +67,7 @@ const API_ENDPOINTS = {
   getCurrentUser: '/auth/current_user',
   updateUser: '/auth/update_user',
   preferences: '/auth/preferences',
+  resetPassword: '/auth/reset_password',
   // Admin endpoints
   getUsers: 'admin/users',
   approveUser: `admin/users/:userId/approve`,
@@ -165,6 +166,12 @@ const api = {
 
   forgotPassword: email =>
     makeApiRequest('post', API_ENDPOINTS.forgotPassword, { email }),
+
+  resetPassword: (token, newPassword) =>
+    makeApiRequest('post', API_ENDPOINTS.resetPassword, {
+      token,
+      newPassword
+    }),
 
   createDive: diveData =>
     makeApiRequest('post', API_ENDPOINTS.createDive, diveData),
