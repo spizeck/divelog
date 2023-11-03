@@ -36,7 +36,11 @@ const Preferences = inject('rootStore')(
       userStore.fetchUserData()
     }, [userStore, authStore])
 
-    const privileges = userStore.approved ? (userStore.admin ? 'Admin' : 'Basic') : 'Read-Only'
+    const privileges = userStore.approved
+      ? userStore.admin
+        ? 'Admin'
+        : 'Basic'
+      : 'Read-Only'
 
     const handleUpdate = async () => {
       let userData = {}
@@ -80,8 +84,7 @@ const Preferences = inject('rootStore')(
       }
       // setIsEditing(false)
       try {
-        updateUser(userData).then(
-        setSuccessMessage('Success!'))
+        updateUser(userData).then(setSuccessMessage('Success!'))
         setTimeout(function () {
           handleCloseModal()
         }, 1500)
@@ -179,7 +182,7 @@ const Preferences = inject('rootStore')(
                   { key: 'metric', text: 'Metric', value: 'metric' }
                 ]}
                 value={newPreferredUnits}
-                onChange={(e, { value }) =>{
+                onChange={(e, { value }) => {
                   setNewPreferredUnits(value)
                 }}
               />
@@ -200,7 +203,7 @@ const Preferences = inject('rootStore')(
     )
 
     const renderPreferencesView = () => (
-      <Container >
+      <Container>
         <Table celled>
           <Table.Header>
             <Table.Row>
@@ -214,17 +217,19 @@ const Preferences = inject('rootStore')(
               <Table.Cell>Username:</Table.Cell>
               <Table.Cell>{userStore.username}</Table.Cell>
               <Table.Cell>
-                <Button fluid onClick={() => handleEdit('username')}>
-                  Change
+                <Button fluid primary onClick={() => handleEdit('username')}>
+                  Change Username
                 </Button>
               </Table.Cell>
             </Table.Row>
             <Table.Row>
               <Table.Cell>First Name:</Table.Cell>
-              <Table.Cell>{capitalizeFirstLetter(userStore.firstName)}</Table.Cell>
               <Table.Cell>
-                <Button fluid onClick={() => handleEdit('firstName')}>
-                  Change
+                {capitalizeFirstLetter(userStore.firstName)}
+              </Table.Cell>
+              <Table.Cell>
+                <Button fluid primary onClick={() => handleEdit('firstName')}>
+                  Change First Name
                 </Button>
               </Table.Cell>
             </Table.Row>
@@ -232,23 +237,34 @@ const Preferences = inject('rootStore')(
               <Table.Cell>Email:</Table.Cell>
               <Table.Cell>{userStore.email}</Table.Cell>
               <Table.Cell>
-                <Button fluid onClick={() => handleEdit('email')}>
-                  Change
+                <Button fluid primary onClick={() => handleEdit('email')}>
+                  Change Email
                 </Button>
               </Table.Cell>
             </Table.Row>
             <Table.Row>
               <Table.Cell>Preferred Units:</Table.Cell>
-              <Table.Cell>{capitalizeFirstLetter(userStore.preferredUnits)}</Table.Cell>
               <Table.Cell>
-                <Button fluid onClick={() => handleEdit('preferredUnits')}>
-                  Change
+                {capitalizeFirstLetter(userStore.preferredUnits)}
+              </Table.Cell>
+              <Table.Cell>
+                <Button fluid primary onClick={() => handleEdit('preferredUnits')}>
+                  Change Preferred Units
                 </Button>
               </Table.Cell>
             </Table.Row>
             <Table.Row>
               <Table.Cell>User Privileges</Table.Cell>
-              <Table.Cell colSpan='2'>{privileges}</Table.Cell>
+              <Table.Cell>{privileges}</Table.Cell>
+              <Table.Cell>
+                <Button
+                  fluid
+                  negative
+                  onClick={() => handleEdit('password')}
+                >
+                  Change Password
+                </Button>
+              </Table.Cell>
             </Table.Row>
           </Table.Body>
         </Table>
