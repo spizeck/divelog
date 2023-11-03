@@ -1,7 +1,8 @@
 import logging
+import os
 
 from app import db
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, after_this_request, jsonify, request, send_file
 from models.dives import Dive
 from services.dive_service import (create_dive, create_sighting,
                                    delete_dive_logic, edit_dive,
@@ -11,6 +12,7 @@ from services.dive_service import (create_dive, create_sighting,
                                    get_unique_dive_guides,
                                    verify_database_connection,
                                    get_filtered_dives, update_sightings_for_dive)
+from services.divelog_service import (generate_divelog_pdf)
 
 db_bp = Blueprint('db_bp', __name__, url_prefix='/db')
 
@@ -96,6 +98,33 @@ def update_sightings_route():
     data = request.json
     response, status = update_sightings_for_dive(data)
     return jsonify(response), status
+
+@db_bp.route('/generate_divelog_pdf', methods=['POST'])
+def generate_divelog_pdf_route():
+    data = request.json
+    try:
+        pdf_file_path, status_code = generate_divelog_pdf(data)
+
+        @after_this_request
+        def cleanup(response):
+            try:
+                os.remove(pdf_file_path)
+            except Exception as error:
+                # You might want to log this error
+                logging.exception(error)
+            return response
+        
+        # Set the attachment filename (you may want to generate a unique name based on input or timestamp)
+        attachment_filename = 'divelog.pdf'
+
+        return send_file(
+            pdf_file_path, 
+            as_attachment=True, 
+            attachment_filename=attachment_filename
+        ), status_code
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 def register_routes(app):

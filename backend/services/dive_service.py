@@ -371,7 +371,7 @@ def get_filtered_dives(data):
         return {'message': 'Failed to get dives', 'status': 500}, 500
 
 
-def update_sightings_for_dive(data):
+def update_sightings_for_dive(data):  # sourcery skip: extract-method
     try:
         if 'diveId' not in data:
             raise MissingDiveId()
