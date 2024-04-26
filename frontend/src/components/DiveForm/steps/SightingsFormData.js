@@ -133,6 +133,12 @@ const SightingsFormData = [
     validate: _validateCount
   },
   {
+    name: 'Flying Gurnard',
+    defaultValue: 0,
+    step: 6,
+    validate: _validateCount
+  },
+  {
     name: 'Lionfish Alive',
     defaultValue: 0,
     step: 6,

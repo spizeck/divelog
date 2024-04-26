@@ -106,15 +106,17 @@ const DiveFormData = {
       { key: '31', text: `Abraham's Hole`, value: `Abraham's Hole` },
       { key: '32', text: `David's Drop-off Deep`, value: `David's Drop-off Deep`},
       { key: '33', text: 'Core Gut', value: 'Core Gut' },
-      { key: '34', text: 'Cove Bay', value: 'Cove Bay' },
-      { key: '35', text: 'End of the Runway', value: 'End of the Runway' },
-      { key: '36', text: 'Airport Drift', value: 'Airport Drift' },
-      { key: '37', text: 'Airport North', value: 'Airport North' },
-      { key: '38', text: 'Green Island', value: 'Green Island' },
-      { key: '39', text: 'Great Point Drift', value: 'Great Point Drift' },
-      { key: '40', text: 'Ghost Wreck', value: 'Ghost Wreck' },
-      { key: '41', text: 'Saba Bank', value: 'Saba Bank' },
-      { key: '42', text: 'Blackwater', value: 'Blackwater' }
+      { key: '34', text: 'Old Booby Hill', value: `Old Booby Hill` },
+      { key: '35', text: 'Cove Bay', value: 'Cove Bay' },
+      { key: '36', text: 'End of the Runway', value: 'End of the Runway' },
+      { key: '37', text: 'Airport Drift', value: 'Airport Drift' },
+      { key: '38', text: 'Spanish Town', value: 'Spanish Town' },
+      { key: '39', text: 'Great Backyard', value: 'Great Backyard' },
+      { key: '40', text: 'Green Island', value: 'Green Island' },
+      { key: '41', text: 'Great Point Drift', value: 'Great Point Drift' },
+      { key: '42', text: 'Ghost Wreck', value: 'Ghost Wreck' },
+      { key: '43', text: 'Saba Bank', value: 'Saba Bank' },
+      { key: '44', text: 'Blackwater', value: 'Blackwater' }
     ],
     validate: value => {
       if (value.length === 0) {
